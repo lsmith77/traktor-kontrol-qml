@@ -175,64 +175,64 @@ Learn from others' mistakes and save yourself troubleshooting time:
 
 ### 1. **Modifying files while Traktor is running**
 
-❌ **Wrong:** Edit files with Traktor open
-✅ **Right:** Close Traktor completely (not just minimize), edit files, then restart
+- ❌ **Wrong:** Edit files with Traktor open
+- ✅ **Right:** Close Traktor completely (not just minimize), edit files, then restart
 
 **Why:** Traktor loads QML files on startup. Changes made while running won't take effect and may cause conflicts.
 
 ### 2. **Editing multiple files before testing**
 
-❌ **Wrong:** Make 10 changes across 5 files, then test
-✅ **Right:** Make ONE change, test immediately, then proceed
+- ❌ **Wrong:** Make 10 changes across 5 files, then test
+- ✅ **Right:** Make ONE change, test immediately, then proceed
 
 **Why:** When something breaks, you won't know which change caused it. Debug time increases exponentially.
 
 ### 3. **Skipping backups**
 
-❌ **Wrong:** "It's just a small change, I don't need a backup"
-✅ **Right:** **ALWAYS** backup before any modification
+- ❌ **Wrong:** "It's just a small change, I don't need a backup"
+- ✅ **Right:** **ALWAYS** backup before any modification
 
 **Why:** Even "small" changes can cascade into bigger issues. Backups take 30 seconds; rebuilding from scratch takes hours.
 
 ### 4. **Using the wrong text editor**
 
-❌ **Wrong:** Windows Notepad (default encoding issues), TextEdit on Mac (formatting problems)
-✅ **Right:** VS Code, Sublime Text, Notepad++, Atom, or any proper code editor with UTF-8
+- ❌ **Wrong:** Windows Notepad (default encoding issues), TextEdit on Mac (formatting problems)
+- ✅ **Right:** VS Code, Sublime Text, Notepad++, Atom, or any proper code editor with UTF-8
 
 **Why:** Basic text editors can add invisible characters or wrong encoding that breaks QML syntax.
 
 ### 5. **Copying code without understanding it**
 
-❌ **Wrong:** Copy entire sections blindly from examples
-✅ **Right:** Copy small pieces, understand what each part does, adapt to your needs
+- ❌ **Wrong:** Copy entire sections blindly from examples
+- ✅ **Right:** Copy small pieces, understand what each part does, adapt to your needs
 
 **Why:** Different controllers have different file structures. Code from S8 examples may not work on S4 MK3 without adjustments.
 
 ### 6. **Ignoring error messages**
 
-❌ **Wrong:** "Traktor won't start, I'll just try more random fixes"
-✅ **Right:** Read error messages, check syntax, restore backup, try again methodically
+- ❌ **Wrong:** "Traktor won't start, I'll just try more random fixes"
+- ✅ **Right:** Read error messages, check syntax, restore backup, try again methodically
 
 **Why:** QML syntax errors are usually explicit about line numbers and problems. Read the errors!
 
 ### 7. **Forgetting about Traktor updates**
 
-❌ **Wrong:** Update Traktor, launch it, wonder where your customizations went
-✅ **Right:** Backup custom qml folder BEFORE updating, re-apply after update
+- ❌ **Wrong:** Update Traktor, launch it, wonder where your customizations went
+- ✅ **Right:** Backup custom qml folder BEFORE updating, re-apply after update
 
 **Why:** Updates overwrite the entire qml folder. See [FAQ: Update Warning](#-critical-update-warning).
 
 ### 8. **Testing in a live performance**
 
-❌ **Wrong:** "I'll try this new mod at tonight's gig!"
-✅ **Right:** Test thoroughly at home, run through your full workflow, THEN use live
+- ❌ **Wrong:** "I'll try this new mod at tonight's gig!"
+- ✅ **Right:** Test thoroughly at home, run through your full workflow, THEN use live
 
 **Why:** Murphy's Law. New code always breaks at the worst possible time. Test offline first.
 
 ### 9. **Not documenting changes**
 
-❌ **Wrong:** Make changes, forget what you modified 3 months later
-✅ **Right:** Add comments in code, keep a changes log, use Git with descriptive commits
+- ❌ **Wrong:** Make changes, forget what you modified 3 months later
+- ✅ **Right:** Add comments in code, keep a changes log, use Git with descriptive commits
 
 **Why:** Future you (or someone helping you) will need to know what was changed and why.
 

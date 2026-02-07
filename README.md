@@ -682,7 +682,7 @@ This documentation was inspired by community customizations from:
 - **[artemvmin's Traktor S4 MK3 Mod](https://github.com/artemvmin/traktor_s4mk3_mod)**
 - **[djmirror v1.2.0](https://github.com/djmirror/traktor-kontrol-screens/tree/v1.2.0)** - Fader start and LED blinkers
 - **[Supreme Edition 3.0 BETA 36.3](https://community.native-instruments.com/discussion/4473/)** - Modular settings and vinyl break
-- **[SupremeModEdit V2](https://community.native-instruments.com/discussion/4473/supremeeditionmod-edit)** by @Aleix Jiménez - Dynamic waveforms and advanced UI
+- **[SupremeModEdit V2](https://community.native-instruments.com/discussion/4473/supremeeditionmod-edit)** by Sûlherokhh - Dynamic waveforms and advanced UI
 - Various contributions from the Native Instruments community forums
 
 ---

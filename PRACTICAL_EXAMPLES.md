@@ -3321,11 +3321,11 @@ Wire { from: "loop_gesture.double_click"; to: /* halve loop size */ }
 
 ---
 
-## 🚀 Example 27: Advanced UI Innovations (SupremeModEdit V2)
+## 🚀 Example 27: Advanced UI Innovations
 
 **Difficulty**: 🔴 Expert | **Layer**: All Layers | **Time**: Full day | **Controllers**: Screen controllers
 
-SupremeModEdit V2 introduces several advanced UI and interaction features that enhance the Traktor experience on controllers with screens (D2/S5/S8).
+Introduces several advanced UI and interaction features that enhance the Traktor experience on controllers with screens (D2/S5/S8).
 
 ### Feature 1: Dynamic Waveforms with Filter/Volume Response
 
@@ -4396,7 +4396,5 @@ Wire {
 | 17  | Encoder Conflict Fix  | All         | Prevents stem/loop encoder conflicts                   |
 | 18  | Screen Button 7 Alt   | D2          | Alternative toggle (performance control)               |
 | 19  | Remix Save Fix        | All         | Proper TriggerPropertyAdapter usage                    |
-
-**Credits**: SupremeModEdit V2 by @Aleix Jiménez, building on Supreme Edition Mod innovations.
 
 ---

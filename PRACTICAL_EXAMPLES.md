@@ -1546,6 +1546,99 @@ Rectangle {
 }
 ```
 
+### Special Visualization Modes
+
+Beyond standard color themes, the SupremeModEdit community developed specialized visualization modes that transform waveform rendering. These can be added as additional entries in the `waveformColorsMap` array:
+
+```qml
+// X-Ray: Inverted monochrome, emphasizes transients
+{
+  low1:  rgba(200, 200, 200, 60),  low2:  rgba(180, 180, 180, 80),
+  mid1:  rgba(140, 140, 140, 100), mid2:  rgba(120, 120, 120, 120),
+  high1: rgba(40,  40,  40,  180), high2: rgba(20,  20,  20,  200)
+},
+
+// Infrared: Warm reds/oranges, low-light friendly
+{
+  low1:  rgba(80,  0,   0,   150), low2:  rgba(120, 10,  0,   170),
+  mid1:  rgba(200, 60,  0,   120), mid2:  rgba(220, 80,  0,   140),
+  high1: rgba(255, 180, 50,  140), high2: rgba(255, 200, 80,  170)
+},
+
+// Ultraviolet: Cool purples/blues
+{
+  low1:  rgba(40,  0,   80,  150), low2:  rgba(60,  0,   120, 170),
+  mid1:  rgba(120, 40,  200, 120), mid2:  rgba(140, 60,  220, 140),
+  high1: rgba(200, 150, 255, 140), high2: rgba(220, 180, 255, 170)
+}
+```
+
+Combo modes (XR/UV, XR/UV/IR) blend bands from different visualizations — for example, lows from Infrared with highs from Ultraviolet — creating multi-tonal waveforms that separate frequency ranges visually.
+
+### RGBA Waveform Color Adjustment via Controller Knobs
+
+For real-time color tuning directly from hardware, map encoder knobs to individual RGBA channels (0-255) with on-screen feedback:
+
+```qml
+// Mutable color properties (user-adjustable at runtime)
+property int customR: 100
+property int customG: 180
+property int customB: 220
+property int customA: 150
+
+// Map four performance knobs to RGBA channels
+Wire {
+  from: "%surface%.knobs.1"
+  to: EncoderScriptAdapter {
+    onIncrement: { customR = Math.min(255, customR + 5) }
+    onDecrement: { customR = Math.max(0,   customR - 5) }
+  }
+}
+Wire {
+  from: "%surface%.knobs.2"
+  to: EncoderScriptAdapter {
+    onIncrement: { customG = Math.min(255, customG + 5) }
+    onDecrement: { customG = Math.max(0,   customG - 5) }
+  }
+}
+Wire {
+  from: "%surface%.knobs.3"
+  to: EncoderScriptAdapter {
+    onIncrement: { customB = Math.min(255, customB + 5) }
+    onDecrement: { customB = Math.max(0,   customB - 5) }
+  }
+}
+Wire {
+  from: "%surface%.knobs.4"
+  to: EncoderScriptAdapter {
+    onIncrement: { customA = Math.min(255, customA + 5) }
+    onDecrement: { customA = Math.max(0,   customA - 5) }
+  }
+}
+
+// Pop-up display showing current RGBA values
+Text {
+  id: rgbaPopup
+  text: "R:" + customR + " G:" + customG + " B:" + customB + " A:" + customA
+  color: Qt.rgba(customR/255, customG/255, customB/255, 1.0)
+  font.pixelSize: 14
+  visible: rgbaPopupTimer.running
+}
+
+Timer {
+  id: rgbaPopupTimer
+  interval: 2000
+}
+```
+
+To use the custom color in your waveform, reference the properties in the Canvas paint handler:
+
+```qml
+ctx.fillStyle = Qt.rgba(customR/255, customG/255, customB/255, customA/255)
+```
+
+This approach lets you dial in exact waveform colors by ear/eye during a session, then note the final RGBA values for a permanent theme entry.
+
 ## 📊 Example 13: Phase Meter with Configurable Height
 
 **Difficulty**: 🟡 Intermediate | **Layer**: 🖼️ Screens | **Time**: 45 min | **Controllers**: S4 MK3
@@ -2185,6 +2278,12 @@ Item {
   AppProperty { id: propKey;      path: pathPrefix + "content.musical_key" }
   AppProperty { id: propBpm;      path: pathPrefix + "tempo.base_bpm" }
   AppProperty { id: propFilePath; path: pathPrefix + "track.content.file_path" }
+
+  // Additional track metadata (available but not always populated)
+  AppProperty { id: propComment;   path: pathPrefix + "content.comment" }
+  AppProperty { id: propLabel;     path: pathPrefix + "content.label" }
+  AppProperty { id: propCatalog;   path: pathPrefix + "content.catalog_number" }
+  AppProperty { id: propBitrate;   path: pathPrefix + "content.bitrate" }
 
   // Playback state properties
   AppProperty { id: propElapsedTime; path: pathPrefix + "track.player.elapsed_time" }
@@ -3385,9 +3484,11 @@ Rectangle {
 }
 ```
 
-### Feature 2: Expanded Zoom Steps (20 Levels)
+### Feature 2: Expanded Zoom Steps (20-80 Levels)
 
-Nearly stepless waveform zoom with 20 incremental levels:
+Nearly stepless waveform zoom. The basic version uses 20 levels; for truly smooth zooming, expand to 80 steps combined with Traktor's native zoom and button-hold progressive zoom.
+
+**20-level version** (good for most uses):
 
 ```qml
 // Define 20 zoom levels
@@ -3426,6 +3527,64 @@ Wire {
   enabled: !browserMode && deckType == DeckType.Track
 }
 ```
+
+**80-level version** (essentially stepless):
+
+For truly smooth zooming, generate 80 evenly distributed steps across the zoom range. This works best when combined with button-hold progressive zoom — holding a zoom button triggers a timer that continuously steps through levels:
+
+```qml
+// Generate 80 zoom levels programmatically
+readonly property real zoomMin: 0.25
+readonly property real zoomMax: 25.0
+readonly property int  zoomSteps: 80
+
+property int currentZoomIndex: 20  // Start around 1.0x
+
+function zoomLevelAt(index) {
+  // Logarithmic distribution gives finer control at low zoom, coarser at high zoom
+  var t = index / (zoomSteps - 1)
+  return zoomMin * Math.pow(zoomMax / zoomMin, t)
+}
+
+function zoomIn()  {
+  if (currentZoomIndex < zoomSteps - 1) {
+    currentZoomIndex++
+    waveformZoom.value = zoomLevelAt(currentZoomIndex)
+  }
+}
+
+function zoomOut() {
+  if (currentZoomIndex > 0) {
+    currentZoomIndex--
+    waveformZoom.value = zoomLevelAt(currentZoomIndex)
+  }
+}
+
+// Button-hold progressive zoom: hold to keep zooming
+Timer {
+  id: zoomHoldTimer
+  interval: 80   // Step every 80ms while held
+  repeat: true
+  property bool zoomingIn: true
+  onTriggered: { zoomingIn ? zoomIn() : zoomOut() }
+}
+
+// Zoom in button: tap for single step, hold for continuous
+ButtonScriptAdapter {
+  name: "ZoomIn"
+  onPress:   { zoomIn(); zoomHoldTimer.zoomingIn = true; zoomHoldTimer.restart() }
+  onRelease: { zoomHoldTimer.stop() }
+}
+
+// Zoom out button: tap for single step, hold for continuous
+ButtonScriptAdapter {
+  name: "ZoomOut"
+  onPress:   { zoomOut(); zoomHoldTimer.zoomingIn = false; zoomHoldTimer.restart() }
+  onRelease: { zoomHoldTimer.stop() }
+}
+```
+
+The logarithmic distribution in the 80-step version gives finer control at low zoom levels (where precision matters for beatgrid alignment) and coarser steps at high zoom (where you're viewing the full track overview).
 
 ### Feature 3: Browse-On-Touch Mode with Smart Back Button
 
@@ -4308,6 +4467,16 @@ WiresGroup {
 
 **Note**: This fix resolves encoder conflicts in legacy-remix-pad-mode and stems-pad-mode where volume/filter controls are visible on screen.
 
+**Debugging encoder conflicts**: When isolating which condition is blocking your encoder, these related properties help narrow the problem:
+
+| Property | Type | Description |
+| -------- | ---- | ----------- |
+| `slotState.value` | bool | True when any stem/sample slot button is toggled or held |
+| `deck.focusedSlotstate` | bool | True when a specific slot has focus (more granular than `slotState`) |
+| `deck.footerControlled` | bool | True when the footer panel (stem/remix controls) is actively being controlled |
+
+Test each independently in your `WiresGroup enabled:` condition to find the right granularity. For example, `enabled: active && !deck.focusedSlotstate` is more specific than `!slotState.value` — it only disables stock controls when a particular slot is focused, rather than whenever any slot is selected.
+
 ### Feature 18: Screen Button 7 Alternative Toggle
 
 Alternative configuration for D2 screen button 7:
@@ -4372,12 +4541,24 @@ Wire {
 - Prevents crashes when trying to save on non-remix decks
 - Button 2 now safely saves remix sets when shifted
 
+**Property Adapter Quick Reference**: Choosing the wrong adapter type is a common source of bugs. Here's when to use each:
+
+| Adapter | Behavior | Use When |
+| ------- | -------- | -------- |
+| `TogglePropertyAdapter` | Flips a boolean on press, flips back on next press | On/off states (FX enable, sync toggle, loop active) |
+| `TriggerPropertyAdapter` | Fires a one-shot action on press | Single events (load track, save remix set, seek to cue) |
+| `HoldPropertyAdapter` | Sets value on press, resets on release | Hold-to-activate (preview play, momentary FX, slip mode) |
+| `ButtonScriptAdapter` | Custom onPress/onRelease script logic | Complex behavior (multi-tap, conditional actions, timers) |
+| `EncoderScriptAdapter` | Custom onIncrement/onDecrement script logic | Encoder rotation (zoom, browse, value adjustment) |
+
+A common mistake is using `HoldPropertyAdapter` for actions that should fire once (like saving a remix set). The hold adapter sets the value to true while pressed and false on release — if the action triggers on the true-to-false transition, it may not fire at all or may cause unexpected behavior.
+
 ### Complete Features Summary
 
 | #   | Feature               | Controllers | Benefit                                                |
 | --- | --------------------- | ----------- | ------------------------------------------------------ |
 | 1   | Dynamic Waveforms     | D2, S5, S8  | Visual feedback for filter/volume changes              |
-| 2   | 20 Zoom Levels        | All         | Nearly stepless zoom precision                         |
+| 2   | 20-80 Zoom Levels     | All         | Nearly stepless zoom precision (progressive hold zoom) |
 | 3   | Smart Back Button     | All         | Browser toggle when browse-on-touch off                |
 | 4   | PadFX First Tap       | All         | Immediate response (no hold required)                  |
 | 5   | Double-Tap Functions  | All         | One-handed operation (no shift needed)                 |

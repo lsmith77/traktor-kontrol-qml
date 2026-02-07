@@ -41,7 +41,7 @@ This documentation suite teaches you how to customize **Native Instruments Trakt
 [File Locations](#where-traktors-qml-files-live) • [Architecture](#understanding-traktors-architecture) • [What You Can Customize](#what-can-you-customize) • [Decision Tree](#decision-tree-finding-the-right-file)
 
 **📚 Documentation Overview:**
-[PRACTICAL_EXAMPLES.md](#practical_examplesmd---start-here-) • [QUICK_REFERENCE.md](#quick_referencemd---keep-open-while-coding)
+[PRACTICAL_EXAMPLES.md](#practical_examplesmd---start-here-) • [QUICK_REFERENCE.md](#quick_referencemd---keep-open-while-coding) • [COMPATIBILITY_FIXES.md](#compatibility_fixesmd---version-specific-fixes)
 
 **🔧 Reference & Help:**
 [Planning Framework](#planning-approach-4-questions) • [Best Practices](#best-practices) • [Backup/Restore Commands](#quick-command-reference) • [FAQ](#frequently-asked-questions)
@@ -166,6 +166,24 @@ One-page lookups, templates, debugging guides, and safety checks.
 - **Rollback instructions**: How to undo if something breaks
 
 **Use this when:** You need quick syntax, want to verify a property path, need a template, or are troubleshooting an issue
+
+---
+
+### **COMPATIBILITY_FIXES.md** - Version-Specific Fixes
+
+**Fixes for bugs and breaking changes between Traktor versions**
+
+Not all QML code works across every Traktor version. This file documents specific patches you may need depending on your version.
+
+**What's inside:**
+
+- **Version compatibility matrix**: Which Traktor versions break what (3.5, 3.8+, 4.x boundaries)
+- **Flux marker fix**: Broken `followFluxPosition` property repair for Traktor 3.5+ (all screen controllers)
+- **Mod base version requirements**: How to correctly install overlay-based community mods
+- **Migration tips**: What to check and test after a Traktor update
+- **Version-specific property changes**: New/changed AppProperty paths by version
+
+**Use this when:** You've updated Traktor and something stopped working, or you're installing a community mod built for a different version
 
 ---
 
@@ -683,6 +701,7 @@ This documentation was inspired by community customizations from:
 - **[djmirror v1.2.0](https://github.com/djmirror/traktor-kontrol-screens/tree/v1.2.0)** - Fader start and LED blinkers
 - **[Supreme Edition 3.0 BETA 36.3](https://community.native-instruments.com/discussion/4473/)** - Modular settings and vinyl break
 - **[SupremeModEdit V2](https://community.native-instruments.com/discussion/4473/supremeeditionmod-edit)** by Sûlherokhh - Dynamic waveforms and advanced UI
+- **[Flux Marker Fix](https://community.native-instruments.com/discussion/1202/dysfunctional-flux-marker-repaired)** - Community fix for broken flux marker on hardware screens (Traktor 3.5+)
 - Various contributions from the Native Instruments community forums
 
 ---

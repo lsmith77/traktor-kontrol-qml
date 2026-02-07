@@ -34,6 +34,7 @@
 - [Getting Help](#getting-help) - Troubleshooting & error messages
 - See also: [README.md](README.md) for architecture overview
 - See also: [QUICK_REFERENCE.md](QUICK_REFERENCE.md) for syntax lookup
+- See also: [COMPATIBILITY_FIXES.md](COMPATIBILITY_FIXES.md) for version-specific bug fixes
 
 ---
 

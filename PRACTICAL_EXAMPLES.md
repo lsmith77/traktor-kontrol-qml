@@ -4199,6 +4199,159 @@ onRightScreenViewValueChanged: {
 }
 ```
 
+### Feature 14: Multiple D2s with Independent Deck Assignment
+
+When using two D2 controllers to control different deck pairs (one for A/B, one for C/D), the deck assignment logic in D2.qml needs configuration to ensure each device focuses on its intended decks.
+
+#### Understanding Deck Assignment
+
+The D2.qml file contains the `decksAssignment` property and deck focus switching logic:
+
+```qml
+// File: CSI/D2/D2.qml (around line 105)
+
+property bool isInDecksAssignmentMode: false
+property bool triggerDeckFocusSwitch: true
+
+MappingPropertyDescriptor {
+  id: decksAssignment
+  path: "mapping.settings.decks_assignment"
+  type: MappingPropertyDescriptor.Integer
+  value: DecksAssignment.AC  // Default: shows Decks A & C
+}
+
+// Deck button behavior: press to toggle between A/B and C/D views
+ButtonScriptAdapter {
+  name: "deck_button_adapter"
+  onPress: {
+    isInDecksAssignmentMode = true
+    triggerDeckFocusSwitch = true
+  }
+  onRelease: {
+    if (triggerDeckFocusSwitch) deck.deckFocus = !deck.deckFocus
+    isInDecksAssignmentMode = false
+  }
+}
+```
+
+#### Setup for Two D2 Controllers
+
+**Device 1 (Left D2):** A/B Decks
+
+```qml
+// Modify decksAssignment.value default:
+value: DecksAssignment.AC  // Shows A/C on screen, but only A/B are mapped to buttons
+```
+
+Then customize the button mapping to exclude decks C/D:
+
+```qml
+WiresGroup {
+  enabled: !isInDecksAssignmentMode
+
+  // Map only to channels 1 & 2 (Decks A & B)
+  Wire {
+    from: "surface.deck.play"
+    to: TogglePropertyAdapter {
+      path: "app.traktor.decks.1.play"  // Deck A only
+    }
+  }
+
+  Wire {
+    from: "surface.deck.cue"
+    to: TogglePropertyAdapter {
+      path: "app.traktor.decks.1.cue"  // Deck A only
+    }
+  }
+
+  // Shift+Deck button to switch between decks A & B (same device)
+  Wire {
+    from: "surface.deck"
+    to: ButtonScriptAdapter {
+      onPress: {
+        if (shift) {
+          // Switch to deck B
+          focusedDeck.value = 2
+        }
+      }
+    }
+  }
+}
+```
+
+**Device 2 (Right D2):** C/D Decks
+
+```qml
+// Modify decksAssignment.value default:
+value: DecksAssignment.BD  // Shows B/D on screen, but only C/D are mapped to buttons
+```
+
+Then customize button mapping:
+
+```qml
+WiresGroup {
+  enabled: !isInDecksAssignmentMode
+
+  // Map only to channels 3 & 4 (Decks C & D)
+  Wire {
+    from: "surface.deck.play"
+    to: TogglePropertyAdapter {
+      path: "app.traktor.decks.3.play"  // Deck C only
+    }
+  }
+
+  Wire {
+    from: "surface.deck.cue"
+    to: TogglePropertyAdapter {
+      path: "app.traktor.decks.3.cue"  // Deck C only
+    }
+  }
+
+  // Shift+Deck button to switch between decks C & D (same device)
+  Wire {
+    from: "surface.deck"
+    to: ButtonScriptAdapter {
+      onPress: {
+        if (shift) {
+          // Switch to deck D
+          focusedDeck.value = 4
+        }
+      }
+    }
+  }
+}
+```
+
+#### Alternative: Using Controller Manager (No QML Modification)
+
+If you prefer not to modify QML files, configure deck assignment in Traktor's Controller Manager:
+
+1. Open **Traktor Preferences → Controller Manager**
+2. Select your first D2 device
+3. In the mapping for **Deck button**, assign:
+   - **Press**: "Deck Focus A" (not toggle)
+   - **Shift+Press**: "Deck Focus B"
+4. Select your second D2 device
+5. In the mapping for **Deck button**, assign:
+   - **Press**: "Deck Focus C" (not toggle)
+   - **Shift+Press**: "Deck Focus D"
+
+This locks each D2 to its intended deck pair without restarting Traktor.
+
+#### Troubleshooting Multiple D2 Setup
+
+**Problem:** Both D2s show the same decks (both show A/B)
+
+**Solution:** Check Controller Manager → ensure each device has a unique device name/assignment
+
+**Problem:** Deck buttons don't switch between intended decks
+
+**Solution:** Verify `focusedDeck.value` mappings reference correct deck numbers (1-4 for A-D)
+
+**Problem:** FX Assignment buttons affect wrong channels
+
+**Solution:** FX mappings in lines 170-220 of D2.qml use `focusedDeck` variable. Ensure it updates correctly when switching decks.
+
 **Benefits:**
 
 - **Fullscreen mode**: Browser uses full screen width when active on either display
@@ -4469,10 +4622,10 @@ WiresGroup {
 
 **Debugging encoder conflicts**: When isolating which condition is blocking your encoder, these related properties help narrow the problem:
 
-| Property | Type | Description |
-| -------- | ---- | ----------- |
-| `slotState.value` | bool | True when any stem/sample slot button is toggled or held |
-| `deck.focusedSlotstate` | bool | True when a specific slot has focus (more granular than `slotState`) |
+| Property                | Type | Description                                                                   |
+| ----------------------- | ---- | ----------------------------------------------------------------------------- |
+| `slotState.value`       | bool | True when any stem/sample slot button is toggled or held                      |
+| `deck.focusedSlotstate` | bool | True when a specific slot has focus (more granular than `slotState`)          |
 | `deck.footerControlled` | bool | True when the footer panel (stem/remix controls) is actively being controlled |
 
 Test each independently in your `WiresGroup enabled:` condition to find the right granularity. For example, `enabled: active && !deck.focusedSlotstate` is more specific than `!slotState.value` — it only disables stock controls when a particular slot is focused, rather than whenever any slot is selected.
@@ -4543,13 +4696,13 @@ Wire {
 
 **Property Adapter Quick Reference**: Choosing the wrong adapter type is a common source of bugs. Here's when to use each:
 
-| Adapter | Behavior | Use When |
-| ------- | -------- | -------- |
-| `TogglePropertyAdapter` | Flips a boolean on press, flips back on next press | On/off states (FX enable, sync toggle, loop active) |
-| `TriggerPropertyAdapter` | Fires a one-shot action on press | Single events (load track, save remix set, seek to cue) |
-| `HoldPropertyAdapter` | Sets value on press, resets on release | Hold-to-activate (preview play, momentary FX, slip mode) |
-| `ButtonScriptAdapter` | Custom onPress/onRelease script logic | Complex behavior (multi-tap, conditional actions, timers) |
-| `EncoderScriptAdapter` | Custom onIncrement/onDecrement script logic | Encoder rotation (zoom, browse, value adjustment) |
+| Adapter                  | Behavior                                           | Use When                                                  |
+| ------------------------ | -------------------------------------------------- | --------------------------------------------------------- |
+| `TogglePropertyAdapter`  | Flips a boolean on press, flips back on next press | On/off states (FX enable, sync toggle, loop active)       |
+| `TriggerPropertyAdapter` | Fires a one-shot action on press                   | Single events (load track, save remix set, seek to cue)   |
+| `HoldPropertyAdapter`    | Sets value on press, resets on release             | Hold-to-activate (preview play, momentary FX, slip mode)  |
+| `ButtonScriptAdapter`    | Custom onPress/onRelease script logic              | Complex behavior (multi-tap, conditional actions, timers) |
+| `EncoderScriptAdapter`   | Custom onIncrement/onDecrement script logic        | Encoder rotation (zoom, browse, value adjustment)         |
 
 A common mistake is using `HoldPropertyAdapter` for actions that should fire once (like saving a remix set). The hold adapter sets the value to true while pressed and false on release — if the action triggers on the true-to-false transition, it may not fire at all or may cause unexpected behavior.
 

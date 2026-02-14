@@ -13,12 +13,12 @@ This documentation suite teaches you how to customize **Native Instruments Trakt
 - How to customize visual displays and screens
 - How to create multi-function buttons with gestures
 - How to build warning systems, theme managers, and advanced features
-- Real-world examples from 27 community customizations
+- Real-world examples from dozens of community customizations
 
 **What you need:**
 
 - Native Instruments Traktor Pro (version 3.x or 4.x)
-- A compatible hardware controller (S4 MK3, S5, S8, D2, X1 MK3, etc.)
+- A compatible hardware controller (S4 MK3, S3, S5, S8, D2, X1 MK3, etc.)
 - Text editor (VS Code, Sublime Text, or any code editor)
 - Basic understanding of code (helpful but not required for simple mods)
 
@@ -121,7 +121,7 @@ To check your version: Open Traktor → Help → About Traktor
 
 ### **PRACTICAL_EXAMPLES.md** - Start Here ⭐
 
-**3,900+ lines | 27 Complete Examples**
+**6,000+ lines | 39 Complete Examples**
 
 The primary reference document containing real-world customizations with complete working code.
 
@@ -133,8 +133,9 @@ The primary reference document containing real-world customizations with complet
 - **Examples 17-20**: Gestures & automation - 30 min-2 hours each
 - **Example 21**: HTTP API integration - 4+ hours
 - **Examples 22-25**: Expert systems (modular settings, LED control, effects) - 2-4 hours each
-- **Example 26**: Native TP4 ButtonGestures - 15 minutes
-- **Example 27**: Comprehensive UI innovations (19 features) - Full day
+- **Examples 26-27**: Native TP4 ButtonGestures & comprehensive UI - 15 min to full day
+- **Examples 28-32**: Community mod patterns (beat counters, colors, keys, setup pages, waveforms)
+- **Examples 33-39**: S3 PerformanceMod patterns (soft takeover, sync LED, FX sequencer, stem controls, loop tuning, deck cycling, FX memory banks)
 
 **Quick Index inside:**
 
@@ -665,7 +666,7 @@ These real customizations from the community demonstrate the scope of what can b
 - New load modes (stems, secondary decks)
 - Enhanced property paths
 
-**All detailed in:** PRACTICAL_EXAMPLES.md (27 complete examples with code)
+**All detailed in:** PRACTICAL_EXAMPLES.md (examples with code)
 
 ---
 

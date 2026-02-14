@@ -257,6 +257,7 @@ import CSI 1.0
 | traktor-kontrol-screens (tipesoft) | TP 3.10-3.11 | `import QtQuick` (versionless) | Yes |
 | S4 MK3 Mod (Joe Easton) | TP 3.x (2019) | `import QtQuick 2.5` | Check compatibility |
 | X1 MK3 Performance Mod V12 | TP 4.4.1 | `import QtQuick 2.0` | No (already compatible) |
+| S3 PerformanceMod 4.0.2 (pixel) | TP 4.4.1 | `import QtQuick 2.0` / `2.5` / `2.12` (mixed) | No (already compatible) |
 | Supreme Edition / SupremeModEdit | TP 3.5-3.7 | `import QtQuick 2.0` | Check compatibility |
 
 ---
@@ -279,6 +280,10 @@ These mods replace shared modules with self-contained versions:
 | `CSI/Common/ExtendedBrowserModule.qml` | `CSI/S4MK3/S4MK3Browse.qml` | S4 MK3 Mod (Joe Easton) |
 | `CSI/Common/DeckHelpers.js` | `CSI/S4MK3/S4MK3Functions.js` | S4 MK3 Mod (Joe Easton) |
 | `CSI/Common/ChannelFX/FourChannelFXSelector.qml` | `CSI/S4MK3/S4MK3ChannelFXSelector.qml` | S4 MK3 Mod (Joe Easton) |
+| `CSI/Common/ChannelFX/FourChannelFXSelector.qml` | `CSI/Common/ChannelFX/FourChannelFXSelectorS3.qml` | S3 PerformanceMod (pixel) |
+| `CSI/Common/ChannelFX/` (multiple) | `CSI/Common/ChannelFX/ChannelFXS3.qml`, `FXChannelsSequencerS3.qml`, `FXControlsS3.qml`, `FXToggleMixerS3.qml`, `FXUnitsSelectorS3.qml` | S3 PerformanceMod (pixel) |
+| `CSI/Common/ExtendedBrowserModule.qml` | `CSI/Common/ExtendedBrowserModuleS3.qml` | S3 PerformanceMod (pixel) |
+| `CSI/Common/HotcuesModule.qml` | `CSI/Common/HotcuesModuleS3.qml` | S3 PerformanceMod (pixel) |
 | `CSI/Common/ChannelFX/TwoChannelFXSelector.qml` | (removed) | traktor-kontrol-screens (tipesoft) |
 
 ### The Fix

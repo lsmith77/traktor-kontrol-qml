@@ -28,6 +28,7 @@
 - [Examples 22-25](#example-22-modular-settings-framework) - 🔴 Expert (Modular systems, LED control, effects)
 - [Examples 26-27](#example-26-native-tp4-buttongestures-module) - 🟢🔴 Easy-Expert (TP4 features & comprehensive UI)
 - [Examples 28-32](#example-28-beat-counter-phrasebarbeat-display) - 🟢🟠 Beginner-Advanced (Community mod patterns)
+- [Examples 33-39](#example-33-soft-takeover-with-visual-direction-feedback) - 🟡🔴 Intermediate-Expert (S3 PerformanceMod patterns)
 
 **💡 Getting Help:**
 
@@ -62,6 +63,7 @@
 - **Examples 22-25**: Modular systems, LED control, simulation effects
 - **Examples 26-27**: Native TP4 features and comprehensive UI innovations
 - **Examples 28-32**: Community mod patterns (beat counters, color systems, key conversion, setup pages, waveform themes)
+- **Examples 33-39**: S3 PerformanceMod patterns (soft takeover, sync feedback, FX sequencer, stem controls, loop tuning, deck cycling, FX memory banks)
 
 ### Reading Each Example
 
@@ -93,11 +95,11 @@ All file paths in examples are relative to your Traktor installation:
 
 | Category                | Examples               | Focus                                 |
 | ----------------------- | ---------------------- | ------------------------------------- |
-| **Controller Behavior** | 1, 17-18, 31            | Button/encoder mappings, Wire logic   |
-| **Timing & Gestures**   | 2, 17, 19-20, 26        | Timers, double-tap, long-hold         |
+| **Controller Behavior** | 1, 17-18, 31, 33, 37-38 | Button/encoder mappings, Wire logic   |
+| **Timing & Gestures**   | 2, 17, 19-20, 26, 34    | Timers, double-tap, long-hold         |
 | **Visual Display**      | 5-10, 12-13, 15-16, 27-28, 30, 32 | Screen layouts, colors, indicators |
-| **Settings Systems**    | 4, 11, 22, 29, 32       | Preferences, configuration            |
-| **Advanced Features**   | 21, 23-25, 31            | API integration, LED control, effects |
+| **Settings Systems**    | 4, 11, 22, 29, 32, 39   | Preferences, configuration            |
+| **Advanced Features**   | 21, 23-25, 31, 35-36, 39 | API integration, LED control, effects, FX sequencer |
 
 ### How to Apply an Example
 
@@ -157,6 +159,8 @@ Most examples can be adapted:
 - Example 28: Beat Counter (Phrase.Bar.Beat)
 - Example 29: Per-Deck Color Customization
 - Example 30: Camelot Key Conversion
+- Example 34: Multi-State Sync LED Feedback
+- Example 38: Deck Type Cycling
 
 **Advanced**:
 
@@ -166,6 +170,10 @@ Most examples can be adapted:
 - Example 27: Comprehensive UI Innovations (19 features)
 - Example 31: On-Device Multi-Page Setup System
 - Example 32: Spectrum Waveform Color Themes
+- Example 33: Soft Takeover with Visual Feedback
+- Example 36: Stem Deck Pad Controls with SuperKnobs
+- Example 37: Loop Boundary Fine-Tuning
+- Examples 35, 39: FX Sequencer & Memory Banks (Expert)
 
 ### By Category
 
@@ -180,6 +188,11 @@ Most examples can be adapted:
 - Example 24: Vinyl break
 - Example 25: Fader start
 - Example 26: ButtonGestures module
+- Example 33: Soft takeover
+- Example 34: Sync LED feedback
+- Example 36: Stem pad controls
+- Example 37: Loop fine-tuning
+- Example 38: Deck type cycling
 
 **Visual Display** (Screens Layer):
 
@@ -213,12 +226,14 @@ Most examples can be adapted:
 - Example 23: LED blinkers
 - Example 27: 19 advanced UI features
 - Example 31: On-device setup system
+- Example 35: FX channel sequencer
+- Example 39: FX memory bank snapshots
 
 ### By Controller Focus
 
 **All Controllers**:
 
-- Examples 1-5, 11-14, 17-26
+- Examples 1-5, 11-14, 17-26, 33-39
 
 **Screen Controllers** (D2/S5/S8/S4MK3):
 
@@ -264,6 +279,13 @@ Most examples can be adapted:
 | 30  | Camelot Keys     | Easy       | Screens         | 20 min   |
 | 31  | Device Setup     | Advanced   | CSI/Screens     | 2 hrs    |
 | 32  | Waveform Themes  | Easy       | Defines/Screens | 15 min   |
+| 33  | Soft Takeover    | Advanced   | CSI             | 1 hr     |
+| 34  | Sync LED Color   | Medium     | CSI             | 30 min   |
+| 35  | FX Sequencer     | Expert     | CSI             | 3 hrs    |
+| 36  | Stem Pad Ctrl    | Advanced   | CSI             | 2 hrs    |
+| 37  | Loop Fine-Tune   | Advanced   | CSI             | 1 hr     |
+| 38  | Deck Type Cycle  | Medium     | CSI             | 30 min   |
+| 39  | FX Memory Banks  | Expert     | CSI             | 4 hrs    |
 
 ---
 
@@ -5314,3 +5336,1039 @@ This is a simple lookup pattern: the preferences file stores an integer theme in
 This pattern extends naturally to other visual elements — deck header colors, phase meter colors, or even font choices can use the same index-based approach from a single preferences file.
 
 **See also**: [Example 10 (Color Scheme)](#-example-10-deck-color-scheme-customization) for basic color changes, [Example 29 (Per-Deck Colors)](#-example-29-per-deck-color-customization-via-settings-file) for a more comprehensive color system.
+
+---
+
+## 🎛️ Example 33: Soft Takeover with Visual Direction Feedback
+
+**Difficulty**: 🟠 Advanced | **Layer**: 🔌 CSI | **Time**: 1 hr | **Controllers**: All with knobs/faders
+
+**Source**: S3 PerformanceMod 4.0.2 (pixel)
+
+### Default Behavior (Native Instruments)
+
+When switching between decks or FX units, hardware knob positions don't match software values. Moving a knob causes an abrupt jump from the software value to the hardware position.
+
+### Customized Behavior
+
+Soft takeover prevents value jumps: the knob must first "catch up" to the software value before it takes effect. LED buttons flash to show which direction (up/down) the knob needs to move to catch up.
+
+**Step 1: Wire knobs through SoftTakeover components**
+
+```qml
+// CSI/[Controller]/[Controller]Channel.qml
+Module {
+  id: module
+  property int index: 1
+  property bool knobActive: false
+
+  readonly property string surface_prefix: "s3.mixer.channels." + module.index + "."
+  readonly property string app_prefix: "app.traktor.mixer.channels." + module.index + "."
+
+  // Create one SoftTakeover instance per knob
+  SoftTakeover { name: "softtakeover1" }  // gain
+  SoftTakeover { name: "softtakeover2" }  // eq.high
+  SoftTakeover { name: "softtakeover3" }  // eq.mid
+  SoftTakeover { name: "softtakeover4" }  // eq.low
+  SoftTakeover { name: "softtakeover5" }  // volume
+  SoftTakeover { name: "softtakeover6" }  // channel_fx.amount
+
+  // Track which direction each knob needs to move (-1=down, 0=matched, 1=up)
+  MappingPropertyDescriptor {
+    id: softTakeoverDirectionProp1
+    path: module.propertiesPath + ".softtakeover.1.direction"
+    type: MappingPropertyDescriptor.Integer; value: 0
+  }
+  // ... repeat for each knob
+
+  // Track which knob was last touched (for LED feedback)
+  MappingPropertyDescriptor {
+    id: lastActiveKnobProp
+    path: module.propertiesPath + ".last_active_knob"
+    type: MappingPropertyDescriptor.Integer; value: 0
+  }
+
+  // Wire hardware knob → SoftTakeover input
+  Wire { from: surface_prefix + "gain"; to: "softtakeover1.input" }
+  Wire { from: surface_prefix + "eq.high"; to: "softtakeover2.input" }
+  // ... repeat for each knob
+
+  // Wire SoftTakeover output → software parameter
+  Wire {
+    from: "softtakeover1.output"
+    to: ValuePropertyAdapter {
+      path: app_prefix + "gain"
+      ignoreEvents: PinEvent.WireEnabled | PinEvent.WireDisabled
+    }
+  }
+  // ... repeat for each knob
+
+  // Wire direction monitor → direction property (for LED feedback)
+  Wire {
+    from: "softtakeover1.direction_monitor"
+    to: DirectPropertyAdapter {
+      path: module.propertiesPath + ".softtakeover.1.direction"
+    }
+  }
+  // ... repeat for each knob
+}
+```
+
+**Step 2: Track knob activity and broadcast direction**
+
+```qml
+// Detect which knob is active and propagate direction to global state
+Wire {
+  from: surface_prefix + "gain"
+  to: KnobScriptAdapter {
+    onTurn: {
+      // Broadcast soft takeover state to global properties for LED feedback
+      softTakeoverChannel.value = true
+      softTakeoverDirectionChannel.value = softTakeoverDirectionProp1.value
+      lastActiveKnobProp.value = 1
+      knobActive = true
+      knobActiveTimer.restart()
+    }
+  }
+}
+
+// Auto-clear after 500ms of inactivity
+Timer {
+  id: knobActiveTimer
+  interval: 500
+  repeat: true
+  running: knobActive
+  onTriggered: {
+    knobActive = false
+    lastActiveKnobProp.value = 0
+    softTakeoverChannel.value = false
+  }
+}
+```
+
+**Step 3: Blink ON/CUE buttons to show direction**
+
+```qml
+Timer {
+  id: blinkTimer
+  property bool blink: false
+  interval: 125
+  repeat: true
+  running: knobActive
+  onTriggered: blink = !blink
+  onRunningChanged: blink = running
+}
+
+// ON button flashes when knob needs to turn UP to catch up
+Wire {
+  from: "s3.mixer.channels." + module.index + ".channel_fx.on"
+  to: ButtonScriptAdapter {
+    brightness:
+      (lastActiveKnobProp.value == 1 && softTakeoverDirectionProp1.value === 1) ||
+      (lastActiveKnobProp.value == 2 && softTakeoverDirectionProp2.value === 1)
+        ? blinkTimer.blink
+        : fx_on.value ? 1.0 : 0.0
+  }
+}
+
+// CUE button flashes when knob needs to turn DOWN
+Wire {
+  from: "s3.mixer.channels." + module.index + ".cue"
+  to: ButtonScriptAdapter {
+    brightness:
+      (lastActiveKnobProp.value == 1 && softTakeoverDirectionProp1.value === -1) ||
+      (lastActiveKnobProp.value == 2 && softTakeoverDirectionProp2.value === -1)
+        ? blinkTimer.blink
+        : cue.value ? 1.0 : 0.0
+  }
+}
+```
+
+### Explanation
+
+The `SoftTakeover` component is a built-in CSI element that acts as a gate between hardware input and software output. It holds back the hardware value until the physical knob position crosses (catches up to) the current software value. The key innovation here is the `direction_monitor` output, which reports whether the knob needs to move up (+1), down (-1), or is matched (0). By wiring this to LED button brightness with a blink timer, the DJ gets immediate visual feedback about which way to turn each knob.
+
+| Component | Role |
+| --------- | ---- |
+| `SoftTakeover` | Built-in CSI gate — blocks value until knob catches up |
+| `.input` | Hardware knob position (raw) |
+| `.output` | Filtered value (only passes through after catch-up) |
+| `.direction_monitor` | Reports needed direction: -1 (down), 0 (matched), +1 (up) |
+| `KnobScriptAdapter` | Detects knob activity for LED routing |
+
+**Adaptation**: This pattern works on any controller with knobs. Replace `surface_prefix` and `app_prefix` with your controller's paths. The `SoftTakeover` component is part of CSI 1.0 and available on all controllers.
+
+---
+
+## 🚦 Example 34: Multi-State Sync LED Color Feedback
+
+**Difficulty**: 🟡 Intermediate | **Layer**: 🔌 CSI | **Time**: 30 min | **Controllers**: All with Sync button LED
+
+**Source**: S3 PerformanceMod 4.0.2 (pixel)
+
+### Default Behavior (Native Instruments)
+
+The Sync button LED is binary: on when sync is enabled, off when disabled. No visual indication of whether the deck is actually in sync with the master.
+
+### Customized Behavior
+
+The Sync LED shows three colors based on actual sync state:
+- **GREEN**: Tempo AND phase are in sync (safe to mix)
+- **LIME**: Tempo matches but phase is drifting (beat offset)
+- **RED**: Neither tempo nor phase are matched (not in sync)
+
+Additionally, Sync tap performs TempoSync (matches BPM without enabling Sync lock), and Sync hold toggles Sync on/off with auto tempo reset.
+
+**Step 1: Compute sync state from tempo and phase properties**
+
+```qml
+// CSI/[Controller]/[Controller]Transport.qml
+Module {
+  id: module
+  property int deckIdx: 0
+
+  AppProperty { id: tempoAbsoluteProp; path: "app.traktor.decks." + deckIdx + ".tempo.absolute" }
+  AppProperty { id: isSyncTriggeredProp; path: "app.traktor.decks." + deckIdx + ".sync.tempo" }
+  AppProperty { id: tempoPhaseProp; path: "app.traktor.decks." + deckIdx + ".tempo.phase" }
+  AppProperty { id: clockBPMProp; path: "app.traktor.masterclock.tempo" }
+  AppProperty { id: deckBPMProp; path: "app.traktor.decks." + deckIdx + ".tempo.true_bpm" }
+  AppProperty { id: masterIdProp; path: "app.traktor.masterclock.source_id" }
+  AppProperty { id: isSyncEnabled; path: "app.traktor.decks." + deckIdx + ".sync.enabled" }
+
+  readonly property int masterIdx: masterIdProp.value + 1
+  readonly property bool isMaster: (masterIdx == deckIdx)
+
+  // Tempo match: relative BPM difference within 0.01%
+  readonly property bool syncInTempo:
+    Math.abs((clockBPMProp.value - deckBPMProp.value) / deckBPMProp.value).toFixed(5) <= 0.0001
+
+  // Phase match: phase offset within ±2.5% of a beat
+  readonly property double phase: (tempoPhaseProp.value * 2).toFixed(4)
+  readonly property bool syncInPhase: phase >= -0.025 && phase <= 0.025
+}
+```
+
+**Step 2: Wire sync button with computed color**
+
+```qml
+ButtonScriptAdapter {
+  name: "SyncButton"
+  // Tri-state color based on actual sync state
+  color: !syncInTempo ? Color.Red
+       : (syncInTempo && syncInPhase) ? Color.Green
+       : Color.Lime
+  brightness: isSyncEnabled.value
+  // ... press/release handlers below
+}
+
+Wire {
+  from: "%surface%.sync"
+  to: "SyncButton"
+  enabled: !module.shift
+}
+```
+
+**Step 3: Tap for TempoSync, Hold for Sync Toggle**
+
+```qml
+ButtonScriptAdapter {
+  name: "SyncButton"
+  color: !syncInTempo ? Color.Red
+       : (syncInTempo && syncInPhase) ? Color.Green
+       : Color.Lime
+  brightness: isSyncEnabled.value
+
+  onPress: {
+    if (holdSync_countdown.running) {
+      holdSync_countdown.stop()
+      doubleTapSync = true  // Double-tap detected
+    }
+    else holdSync_countdown.restart()
+  }
+  onRelease: {
+    if (holdSync_countdown.running) {
+      tapSync_countdown.restart()  // Short tap: TempoSync
+    }
+    else if (!doubleTapSync) {
+      // Hold release: if sync was off, reset tempo to original
+      if (!isSyncEnabled.value) tempoAbsoluteProp.value = 1
+      tapSync_countdown.stop()
+    }
+    else {
+      doubleTapSync = false
+      tapSync_countdown.stop()
+    }
+  }
+}
+
+Timer {
+  id: holdSync_countdown; interval: 200
+  onTriggered: {
+    if (tapSync_countdown.running) {
+      // Tap after hold: toggle sync off + trigger tempo sync
+      isSyncEnabled.value = false
+      isSyncTriggeredProp.value = !isSyncTriggeredProp.value
+    }
+    else {
+      // Simple hold: toggle sync lock
+      isSyncEnabled.value = !isSyncEnabled.value
+    }
+  }
+}
+Timer { id: tapSync_countdown; interval: 200 }
+```
+
+### Explanation
+
+The tri-state color comes from two computed booleans:
+
+| State | `syncInTempo` | `syncInPhase` | Color | Meaning |
+| ----- | ------------- | ------------- | ----- | ------- |
+| In sync | true | true | GREEN | Safe to mix — tempo and beats aligned |
+| Tempo only | true | false | LIME | BPM matches but beats are offset |
+| Out of sync | false | (any) | RED | BPM doesn't match master |
+
+The tolerances (0.01% for tempo, 2.5% for phase) provide small error margins that accommodate beat juggling. The phase calculation `(tempoPhaseProp.value * 2).toFixed(4)` normalizes the raw phase value to a -1.0 to +1.0 range.
+
+**SHIFT+Sync** uses a similar pattern for Master control: tap toggles deck as TempoMaster, hold toggles Master Clock AUTO mode, with GREEN (is master), LIME (not master, AUTO off), RED (not master, AUTO on).
+
+**See also**: [Example 18 (Auto-Sync)](#example-18-auto-sync-with-master-tempo) for basic sync wiring, [Example 23 (LED Blinkers)](#-example-23-led-blinker-system-for-buttons) for blink timer patterns.
+
+---
+
+## 🎹 Example 35: FX Channel Sequencer (Record & Playback Knob Movements)
+
+**Difficulty**: 🔴 Expert | **Layer**: 🔌 CSI | **Time**: 3 hrs | **Controllers**: All with FX amount knobs
+
+**Source**: S3 PerformanceMod 4.0.2 (pixel)
+
+### Default Behavior (Native Instruments)
+
+Channel FX amount knobs are manually controlled. There is no way to automate or loop a knob movement pattern.
+
+### Customized Behavior
+
+Record knob movements in real-time, then play them back as infinite loops synced to your performance. Hold ON + turn knob to record, double-tap ON to start/stop playback. ON buttons flash when a sequence is active.
+
+**Step 1: Set up recording state and string-encoded sequence storage**
+
+```qml
+// CSI/Common/ChannelFX/FXChannelsSequencerS3.qml
+Module {
+  id: module
+
+  // Sequence data: string-encoded as "%/value/timestamp" entries
+  property string seq_1: ""
+  property string seq_2: ""
+  property string seq_3: ""
+  property string seq_4: ""
+
+  // Recording state per channel
+  property bool recSeq_1: false
+  property bool recSeq_2: false
+  property bool recSeq_3: false
+  property bool recSeq_4: false
+
+  // Split sequences for entry count validation
+  property variant entryCheck_1: seq_1.split('%')
+  property variant entryCheck_2: seq_2.split('%')
+  property variant entryCheck_3: seq_3.split('%')
+  property variant entryCheck_4: seq_4.split('%')
+}
+```
+
+**Step 2: Record knob movements as timestamped entries**
+
+```qml
+// Monitor the FX adjust property — when recording, append value+timestamp
+AppProperty {
+  id: fxAdjust_1
+  path: "app.traktor.mixer.channels.1.fx.adjust"
+  onValueChanged: {
+    if (recSeq_1)
+      seq_1 += "%/" + value + "/" + new Date().getTime()
+  }
+}
+// ... repeat for channels 2-4
+
+// Start/stop recording with bookend entries
+function seqStartEnd(channel, value, action) {
+  var time = new Date().getTime()
+  var seqEnd = "%/" + value + "/" + time + "%/000/" + time
+
+  if (channel == 1) {
+    if (action == "endSeq") {
+      recSeq_1 = false
+      if (entryCheck_1.length > 3) fxChannelPlay_1 = true  // Auto-play if enough data
+      seq_1 += seqEnd  // Append final entry
+    }
+    else if (action == "startSeq") {
+      fxChannelPlay_1 = false  // Stop any existing playback
+      seq_1 = ""               // Clear previous sequence
+      recSeq_1 = true          // Start recording
+    }
+  }
+  // ... repeat for channels 2-4
+}
+```
+
+**Step 3: Play back the sequence with dynamic timing**
+
+```qml
+Timer {
+  property int i: -1
+  property int dist: 1
+  property string str: seq_1
+  property variant entry: str.split('%')
+
+  id: playSeq_1
+  interval: dist
+  repeat: fxChannelPlay_1
+  running: fxChannelPlay_1 && fxChannelsSequencer.value
+
+  onTriggered: {
+    var entryNext = entry[++i + 2].split('/')
+    var entryCurrent = entry[i + 1].split('/')
+
+    if (i != entry.length - 3) {
+      // Calculate time until next entry
+      if (entryCurrent[2] != entryNext[2])
+        dist = entryNext[2] - entryCurrent[2]
+      // Apply the recorded value
+      fxAdjust_1.value = entryCurrent[1]
+    } else {
+      // Loop: restart from beginning
+      playSeq_1.stop()
+      i = -1
+      playSeq_1.start()
+    }
+  }
+  onRunningChanged: i = -1, dist = 1
+}
+// ... repeat for channels 2-4
+```
+
+**Step 4: Wire buttons to control recording/playback**
+
+```qml
+// ON button (Hold) + Amount knob turn = start recording
+// ON button (Double-Tap) = stop/start playback
+Wire {
+  from: "%surface%.channel_fx.on.1"
+  to: ButtonScriptAdapter {
+    onPress: {
+      holdChannelButton_1 = true
+      if (!recSeq_1 && !fxChannelPlay_1) {
+        seqStartEnd(1, fxAdjust_1.value, "startSeq")
+      }
+    }
+    onRelease: {
+      holdChannelButton_1 = false
+      if (recSeq_1) {
+        seqStartEnd(1, fxAdjust_1.value, "endSeq")
+      }
+    }
+    // Flash when sequence is active
+    brightness: fxChannelPlay_1 ? blinkTimer.blink : recSeq_1 ? 1.0 : 0.0
+  }
+}
+```
+
+### Explanation
+
+The sequencer uses a string-based approach to store timestamped value snapshots:
+
+**Recording format**: `%/0.45/1706123456789%/0.52/1706123456801%/0.58/1706123456815`
+
+| Part | Example | Purpose |
+| ---- | ------- | ------- |
+| `%` | Delimiter | Splits entries |
+| `/value/` | `0.45` | FX amount at this point (0.0-1.0) |
+| `/timestamp` | `1706123456789` | `Date.getTime()` in milliseconds |
+
+**Playback**: The timer parses entries, calculates the interval between consecutive timestamps (`dist = nextTimestamp - currentTimestamp`), and applies each value at the correct moment. When it reaches the end, it loops back to the start.
+
+**Why string encoding?** QML's `MappingPropertyDescriptor` doesn't support arrays or complex objects. Encoding data as delimited strings is a common workaround — split on `%` to get entries, split on `/` to get fields. This is the same technique used for persistent state across sessions.
+
+**Adaptation**: This pattern works for automating any continuous parameter. Replace `fx.adjust` with any `AppProperty` path (volume, filter, EQ, etc.).
+
+---
+
+## 🎚️ Example 36: Stem Deck Pad Controls with SuperKnobs and Auto-Reset
+
+**Difficulty**: 🟠 Advanced | **Layer**: 🔌 CSI | **Time**: 2 hrs | **Controllers**: All with pad buttons + encoders
+
+**Source**: S3 PerformanceMod 4.0.2 (pixel)
+
+### Default Behavior (Native Instruments)
+
+Stem deck controls are limited to basic mute/unmute via pads. There's no way to adjust individual stem volume, filter, or FX send from hardware pads, and no automatic reset when loading a new track.
+
+### Customized Behavior
+
+Pads become multi-function stem controls: tap to mute/unmute, hold + turn encoder to adjust volume/filter/FX send per stem. A "SuperKnobs" mode lets encoders control all stems at once. Loading a new track automatically resets all stem parameters to defaults.
+
+**Step 1: Define stem properties and color scheme**
+
+```qml
+// CSI/[Controller]/[Controller]Stems.qml
+Module {
+  id: module
+  property int deckIdx: 0
+  property bool holdButton: false
+
+  // Hold state for each stem × parameter
+  property bool volumeHold1: false
+  property bool volumeHold2: false
+  property bool volumeHold3: false
+  property bool volumeHold4: false
+  property bool filterHold1: false
+  // ... repeat for filter and fxsend
+
+  // Color scheme: each parameter type has a distinct color
+  readonly property variant colorStem: [
+    Color.White,       // volume (pads 1-4)
+    Color.Blue,        // filter (pads 5-8)
+    Color.DarkOrange,  // fxSend (SHIFT + pads 1-4)
+    Color.White,       // holdButton active indicator
+    Color.Red          // reset (SHIFT + pads 5-8)
+  ]
+
+  // Stem properties (volume, mute, filter, FX send)
+  AppProperty { id: stemMuted_1;  path: "app.traktor.decks." + deckIdx + ".stems.1.muted" }
+  AppProperty { id: stemVolume_1; path: "app.traktor.decks." + deckIdx + ".stems.1.volume" }
+  AppProperty { id: stemFilter_1; path: "app.traktor.decks." + deckIdx + ".stems.1.filter_value" }
+  AppProperty { id: stemFilterOn_1; path: "app.traktor.decks." + deckIdx + ".stems.1.filter_on" }
+  AppProperty { id: stemFxSend_1; path: "app.traktor.decks." + deckIdx + ".stems.1.fx_send" }
+  AppProperty { id: stemFxSendOn_1; path: "app.traktor.decks." + deckIdx + ".stems.1.fx_send_on" }
+  AppProperty { id: stemColorId_1; path: "app.traktor.decks." + deckIdx + ".stems.1.color_id" }
+  // ... repeat for stems 2-4
+}
+```
+
+**Step 2: Implement tap-to-mute / hold-to-adjust with timers**
+
+```qml
+// Tap/hold detection timer (250ms threshold)
+Timer {
+  id: holdButton_volume1; interval: 250
+  onTriggered: {
+    if (tapButton_volume1.running) {
+      // Double-tap: toggle mute
+      if (!stemMuted_1.value) stemMuted_1.value = true
+      else stemMuted_1.value = false
+    } else {
+      // Hold: enter adjustment mode
+      volumeHold1 = true
+    }
+  }
+}
+Timer { id: tapButton_volume1; interval: 250 }
+
+// Pad 1: Volume control for Stem 1
+Wire {
+  from: "%surface%.pads.1"
+  to: ButtonScriptAdapter {
+    // Color changes: white=volume, green=adjusting, dim=muted
+    brightness: volumeHold1 ? 1.0 : stemMuted_1.value ? 0.0 : 1.0
+    color: volumeHold1 ? colorStem[3] : stemColorId_1.value
+
+    onPress: {
+      if (stemsKnobs.value) {
+        // SuperKnobs mode: tap directly toggles mute
+        stemMuted_1.value = !stemMuted_1.value
+      } else {
+        volume1.value = true
+        if (holdButton_volume1.running) {
+          holdButton_volume1.stop()
+          holdButton = true
+        } else holdButton_volume1.restart()
+      }
+    }
+    onRelease: {
+      volume1.value = false
+      volumeHold1 = false
+      if (holdButton_volume1.running) tapButton_volume1.restart()
+      else if (!holdButton) tapButton_volume1.stop()
+      else { holdButton = false; tapButton_volume1.stop() }
+    }
+  }
+}
+
+// When holding pad, encoder adjusts stem volume
+Wire {
+  enabled: volumeHold1
+  from: "%surface%.loop_size.turn"
+  to: RelativePropertyAdapter {
+    path: "app.traktor.decks." + deckIdx + ".stems.1.volume"
+    step: 0.05
+    mode: RelativeMode.Stepped
+  }
+}
+```
+
+**Step 3: Auto-reset all stem parameters on track load**
+
+```qml
+AppProperty {
+  id: deckLoadedSignal
+  path: "app.traktor.decks." + deckIdx + ".is_loaded_signal"
+  onValueChanged: {
+    // Check per-deck reset setting
+    var stemsReset = false
+    if (deckIdx == 1 && stemsReset1.value) stemsReset = true
+    if (deckIdx == 2 && stemsReset2.value) stemsReset = true
+    // ... decks 3-4
+
+    if (value && stemsReset) {
+      keyAdjust.value = 0  // Reset key adjust too
+
+      // Reset all 4 stems to defaults
+      stemMuted_1.value = false
+      stemVolume_1.value = 1.0
+      stemFilterOn_1.value = false
+      stemFilter_1.value = 0.5          // Center position
+      stemFxSendOn_1.value = true
+      stemFxSend_1.value = 1.0
+      // ... repeat for stems 2-4
+    }
+  }
+}
+```
+
+### Explanation
+
+This pattern layers three concepts:
+
+1. **Tap/hold gesture detection** via dual timers (250ms threshold) — same pattern as [Example 19](#example-19-long-hold-pattern-shift-layer-expansion) but applied to stem control
+2. **Conditional encoder routing** using `enabled: volumeHold1` — the encoder only controls stem volume while the pad is held
+3. **Auto-reset on signal** via `is_loaded_signal` — fires once when a new track is loaded into the deck
+
+**Key stem AppProperty paths**:
+
+| Path | Type | Description |
+| ---- | ---- | ----------- |
+| `app.traktor.decks.X.stems.Y.muted` | bool | Stem mute state |
+| `app.traktor.decks.X.stems.Y.volume` | float | Stem volume (0.0-1.0) |
+| `app.traktor.decks.X.stems.Y.filter_value` | float | Filter position (0.0-1.0, 0.5=center) |
+| `app.traktor.decks.X.stems.Y.filter_on` | bool | Filter enabled |
+| `app.traktor.decks.X.stems.Y.fx_send` | float | FX send level (0.0-1.0) |
+| `app.traktor.decks.X.stems.Y.fx_send_on` | bool | FX send enabled |
+| `app.traktor.decks.X.stems.Y.color_id` | int | Stem color (from track metadata) |
+| `app.traktor.decks.X.is_loaded_signal` | signal | Fires once when track loads |
+
+---
+
+## 🔁 Example 37: Loop Boundary Fine-Tuning via Jogwheel
+
+**Difficulty**: 🟠 Advanced | **Layer**: 🔌 CSI | **Time**: 1 hr | **Controllers**: All with jogwheel + shift
+
+**Source**: S3 PerformanceMod 4.0.2 (pixel)
+
+### Default Behavior (Native Instruments)
+
+Loop boundaries can only be set at quantized positions. There is no way to fine-tune where a loop starts or ends after it's been created.
+
+### Customized Behavior
+
+While a loop is active, hold SHIFT+GRID to adjust Loop-In or SHIFT+JOG to adjust Loop-Out using the jogwheel (continuous) or move encoder (beat-quantized). Hold both to move the entire loop. The jogwheel LEDs turn green during adjustment.
+
+**Step 1: Define loop adjustment properties**
+
+```qml
+// CSI/[Controller]/[Controller]Deck.qml
+AppProperty { id: inActiveLoopProp; path: "app.traktor.decks." + deckIdx + ".loop.is_in_active_loop" }
+AppProperty { id: moveModeProp; path: "app.traktor.decks." + deckIdx + ".move.mode" }
+AppProperty { id: moveSizeProp; path: "app.traktor.decks." + deckIdx + ".move.size" }
+
+MappingPropertyDescriptor {
+  id: loopInAdjustEnableProp
+  path: deckPropertiesPath + ".loop_in_adjust"
+  type: MappingPropertyDescriptor.Boolean; value: false
+}
+MappingPropertyDescriptor {
+  id: loopOutAdjustEnableProp
+  path: deckPropertiesPath + ".loop_out_adjust"
+  type: MappingPropertyDescriptor.Boolean; value: false
+}
+```
+
+**Step 2: Wire SHIFT+GRID and SHIFT+JOG to enable adjustment modes**
+
+```qml
+WiresGroup {
+  enabled: module.active && inActiveLoopProp.value &&
+           (deckType == DeckType.Track || deckType == DeckType.Stem) && module.shift
+
+  // SHIFT+GRID = adjust Loop-In point
+  Wire {
+    from: "%surface%.grid_adjust"
+    to: HoldPropertyAdapter {
+      path: deckPropertiesPath + ".loop_in_adjust"; value: true
+    }
+  }
+  Wire {
+    from: "%surface%.grid_adjust"
+    to: ButtonScriptAdapter {
+      onPress: {
+        // If both loop-in and loop-out are held, move the whole loop
+        if (loopOutAdjustEnableProp.value) moveModeProp.value = 1  // Move Loop
+        else moveModeProp.value = 2  // Move Loop-In only
+      }
+      onRelease: {
+        if (loopOutAdjustEnableProp.value) moveModeProp.value = 3  // Move Loop-Out
+        else moveModeProp.value = 0  // Reset to Beatjump
+      }
+    }
+  }
+
+  // SHIFT+JOG = adjust Loop-Out point
+  Wire {
+    from: "%surface%.jog_mode"
+    to: HoldPropertyAdapter {
+      path: deckPropertiesPath + ".loop_out_adjust"; value: true
+    }
+  }
+}
+```
+
+**Step 3: Route jogwheel to loop position adjustment**
+
+```qml
+// Jogwheel rotation adjusts loop boundary with fine precision
+Wire {
+  enabled: loopInAdjustEnableProp.value || loopOutAdjustEnableProp.value
+  from: "%surface%.jogwheel.rotation"
+  to: EncoderScriptAdapter {
+    onTick: {
+      const minimalTickValue = 0.0005
+      const rotationScaleFactor = 1000
+      if (value < -minimalTickValue || value > minimalTickValue) {
+        activeCuePosition = activeCuePosition + (value * rotationScaleFactor)
+      }
+      activeCuePositionProp.value = activeCuePosition
+    }
+  }
+}
+
+// Move encoder adjusts loop boundary by exactly 1 beat
+Wire {
+  enabled: loopInAdjustEnableProp.value || loopOutAdjustEnableProp.value
+  from: "%surface%.loop_move"
+  to: RelativePropertyAdapter {
+    path: "app.traktor.decks." + deckIdx + ".move_internal"
+    step: 1; mode: RelativeMode.Stepped
+  }
+}
+```
+
+### Explanation
+
+Traktor exposes loop boundary control through the `move.mode` property:
+
+| `move.mode` value | Effect |
+| ------------------ | ------ |
+| 0 | Beatjump (default) |
+| 1 | Move entire Loop |
+| 2 | Move Loop-In point |
+| 3 | Move Loop-Out point |
+
+The pattern combines `HoldPropertyAdapter` (tracks button hold state) with `ButtonScriptAdapter` (switches move mode based on which buttons are held). The jogwheel provides continuous sub-beat precision via `rotationScaleFactor`, while the encoder provides quantized beat-level adjustments.
+
+The jogwheel LED color change (`Color.Green` during loop adjustment) is handled by the `jogColorProp` binding in the deck module, which checks `inActiveLoopProp.value`.
+
+---
+
+## 🔄 Example 38: Deck Type Cycling (Track / Remix / Stem / Live)
+
+**Difficulty**: 🟡 Intermediate | **Layer**: 🔌 CSI | **Time**: 30 min | **Controllers**: All with EXT/mode button
+
+**Source**: S3 PerformanceMod 4.0.2 (pixel)
+
+### Default Behavior (Native Instruments)
+
+Deck types must be changed through the Traktor software UI. There is no hardware control to cycle through deck types on the fly.
+
+### Customized Behavior
+
+SHIFT+EXT cycles through deck types (Track → Remix → Stem → Track) while the deck is stopped. Deck D additionally supports Live Input mode. The EXT button also serves as a tap/hold multi-function button: tap toggles the mic/line D input, double-tap reloads FX snapshots, and hold enters an extended modifier mode.
+
+**Step 1: Track deck state and define the cycling function**
+
+```qml
+// CSI/[Controller]/[Controller]Mixer.qml
+Module {
+  id: module
+  property bool shift: false
+  property int deckid: 0
+
+  AppProperty { id: deckType; path: "app.traktor.decks." + deckid + ".type" }
+  AppProperty { id: deckDType; path: "app.traktor.decks.4.type" }
+  AppProperty { id: isPlaying; path: "app.traktor.decks." + deckid + ".play" }
+  AppProperty { id: isDPlaying; path: "app.traktor.decks.4.play" }
+
+  // Determine which deck is focused based on side + deck selector
+  MappingPropertyDescriptor { id: deckLeftSelect; path: "mapping.state.left.top_deck_focus" }
+  MappingPropertyDescriptor { id: deckRightSelect; path: "mapping.state.right.top_deck_focus" }
+
+  function deckshift(select) {
+    if (select == left && shift) {
+      deckid = deckLeftSelect.value ? 1 : 3
+    }
+    if (select == right && shift) {
+      deckid = deckRightSelect.value ? 2 : 4
+    }
+  }
+}
+```
+
+**Step 2: Wire SHIFT+EXT to cycle deck types**
+
+```qml
+WiresGroup {
+  enabled: module.shift
+
+  Wire {
+    from: "s3.mixer.ext"
+    to: ButtonScriptAdapter {
+      onPress: {
+        // Decks A, B, C: cycle Track → Remix → Stem
+        if (!isPlaying.value && deckid != 4) {
+          if (deckType.value == DeckType.Track) deckType.value = DeckType.Remix
+          else if (deckType.value == DeckType.Remix) deckType.value = DeckType.Stem
+          else deckType.value = DeckType.Track
+        }
+        // Deck D: cycle through all types including Live
+        if (!isDPlaying.value && deckid == 4) {
+          if (deckDType.value == DeckType.Track) deckDType.value = DeckType.Remix
+          else if (deckDType.value == DeckType.Remix) deckDType.value = DeckType.Stem
+          else if (deckDType.value == DeckType.Stem) deckDType.value = DeckType.Live
+          else deckDType.value = DeckType.Track
+        }
+      }
+    }
+  }
+}
+```
+
+**Step 3: EXT button multi-function (no-shift): hold for modifier, tap for mic, double-tap for FX reload**
+
+```qml
+Timer {
+  id: holdButton_ext; interval: 500
+  onTriggered: {
+    if (tapButton_ext.running) {
+      // Double-tap: toggle Deck D mic/line input + switch to Live
+      deckDInputModeProp.value = !deckDInputModeProp.value
+      if (!isDPlaying.value) deckDType.value = DeckType.Live
+    } else {
+      // Hold: enter extended modifier mode
+      extHoldButton = true
+      extHold.value = true
+    }
+  }
+}
+Timer { id: tapButton_ext; interval: 500 }
+
+WiresGroup {
+  enabled: !module.shift
+
+  Wire {
+    from: "s3.mixer.ext"
+    to: ButtonScriptAdapter {
+      onPress: {
+        if (holdButton_ext.running) {
+          holdButton_ext.stop()
+          // Quick re-press: reload all FX snapshots
+          fxResetDisabled.value = true
+          fx_load_1.value = true
+          fx_load_2.value = true
+          fx_load_3.value = true
+          fx_load_4.value = true
+          holdButton = true
+        }
+        else holdButton_ext.restart()
+        brightness = 1.0
+      }
+      onRelease: {
+        extHoldButton = false
+        extHold.value = false
+        if (holdButton_ext.running) tapButton_ext.restart()
+        else if (!holdButton) tapButton_ext.stop()
+        else { holdButton = false; tapButton_ext.stop() }
+        brightness = 0.0
+      }
+    }
+  }
+}
+```
+
+### Explanation
+
+The `DeckType` enum values are built into CSI:
+
+| DeckType | Value | Description |
+| -------- | ----- | ----------- |
+| `DeckType.Track` | 0 | Standard track playback |
+| `DeckType.Remix` | 1 | Remix deck with sample slots |
+| `DeckType.Stem` | 2 | Stem deck with 4 stem channels |
+| `DeckType.Live` | 3 | Live audio input |
+
+Setting `deckType.value` directly changes the deck type in Traktor. The safety check `!isPlaying.value` prevents type changes during playback, which would interrupt audio.
+
+The EXT button demonstrates a triple-function pattern: **tap** (mic toggle), **double-tap** (FX reload), **hold** (modifier layer). This uses the same dual-timer architecture as [Example 19](#example-19-long-hold-pattern-shift-layer-expansion) but with three distinct actions.
+
+---
+
+## 💾 Example 39: FX Memory Bank Snapshots (16 Banks with Save/Load/Delete)
+
+**Difficulty**: 🔴 Expert | **Layer**: 🔌 CSI | **Time**: 4 hrs | **Controllers**: All with pad buttons
+
+**Source**: S3 PerformanceMod 4.0.2 (pixel)
+
+### Default Behavior (Native Instruments)
+
+FX unit settings (effect type, dry/wet, parameters, button states) are lost when you change effects. There's no way to save and recall FX configurations from hardware.
+
+### Customized Behavior
+
+16 memory bank slots on the pad buttons. Hold SHIFT + hold a pad to save the current FX state. SHIFT + tap a green pad to load a snapshot. SHIFT + double-tap a green pad to delete it. Snapshots persist across sessions via `MappingPropertyDescriptor` with `mapping.settings.*` paths.
+
+**Step 1: Define snapshot storage (30 parameters per FX unit × 4 units × 16 banks)**
+
+```qml
+// CSI/[Controller]/[Controller].qml (top-level Mapping)
+// Each bank stores: FX type, dry/wet, knob1-3, buttons, enable states
+// Bank 1, FX Unit 1: 30 parameters
+MappingPropertyDescriptor {
+  id: fxMemoryBank_1_1_1
+  path: "mapping.settings.FX_Memory_Bank_1_1_1"
+  type: MappingPropertyDescriptor.Integer; value: -1  // -1 = empty
+}
+MappingPropertyDescriptor {
+  id: fxMemoryBank_1_1_2
+  path: "mapping.settings.FX_Memory_Bank_1_1_2"
+  type: MappingPropertyDescriptor.Integer; value: 0  // dry_wet
+}
+// ... up to fxMemoryBank_1_1_30
+
+// Naming convention: FX_Memory_Bank_{bank}_{unit}_{param}
+// bank: 1-16, unit: 1-4, param: 1-30
+// Param mapping:
+//   1 = FX type (-1 = empty/unused)
+//   2-5 = Integer params (dry_wet, knob1, knob2, knob3)
+//   6-9 = Boolean params (button states)
+//   10-13 = Integer params (select fields)
+//   14-30 = Boolean params (enable states, pattern player steps)
+```
+
+**Step 2: Save/Load/Delete via pad gestures**
+
+```qml
+// CSI/[Controller]/[Controller]FXUnitsMemoryBank.qml
+Module {
+  // Current active bank (-1 = none)
+  // fxMemoryBankPadAktiv tracks which pad is loaded
+
+  // Save: read current FX state into bank properties
+  function saveFxSnapshot(bank) {
+    // Store FX Unit 1 state
+    fxMemoryBank[bank + "_1_1"].value = fx_unit_1_type_Prop.value
+    fxMemoryBank[bank + "_1_2"].value = fx_unit_1_dry_wet_Prop.value
+    fxMemoryBank[bank + "_1_3"].value = fx_unit_1_knob1_Prop.value
+    fxMemoryBank[bank + "_1_4"].value = fx_unit_1_knob2_Prop.value
+    fxMemoryBank[bank + "_1_5"].value = fx_unit_1_knob3_Prop.value
+    fxMemoryBank[bank + "_1_6"].value = fx_unit_1_buttons1_Prop.value
+    // ... repeat for all params and all 4 FX units
+  }
+
+  // Load: apply stored values with staggered delays to prevent race conditions
+  function switchFxUnits(bank) {
+    // First disable everything to avoid conflicts
+    fx_unit_1_enabled_Prop.value = false
+    fx_unit_1_buttons1_Prop.value = false
+    // ... disable all units
+
+    // Load FX types immediately
+    fx_unit_1_type_Prop.value = fxMemoryBank[bank + "_1_1"].value
+    fx_unit_2_type_Prop.value = fxMemoryBank[bank + "_2_1"].value
+    fx_unit_3_type_Prop.value = fxMemoryBank[bank + "_3_1"].value
+    fx_unit_4_type_Prop.value = fxMemoryBank[bank + "_4_1"].value
+  }
+
+  // Staggered loading prevents FX engine race conditions
+  property int delayLoadUnits: 50          // Load FX types
+  property int delayLoadPatternPlayer: 75  // Load pattern steps
+  property int delayLoadCurrentSound: 80   // Load knob values
+  property int delayLoadButtons: 100       // Load button states
+
+  Timer {
+    id: delayLoadTimer
+    interval: parent.delayLoadButtons
+    onTriggered: {
+      // Apply knob values and button states after FX type has loaded
+      fx_unit_1_dry_wet_Prop.value = fxMemoryBank[currentBank + "_1_2"].value
+      fx_unit_1_knob1_Prop.value = fxMemoryBank[currentBank + "_1_3"].value
+      // ... all remaining params
+    }
+  }
+}
+```
+
+**Step 3: Wire pads with save/load/delete gestures**
+
+```qml
+// Pad behavior depends on SHIFT hold and pad state:
+//   SHIFT + Hold pad = SAVE (pad turns green)
+//   SHIFT + Tap green pad = LOAD
+//   SHIFT + Double-tap green pad = DELETE (pad turns red, then off)
+
+Wire {
+  from: "%surface%.pads.1"
+  to: ButtonScriptAdapter {
+    color: fxSaveMemoryBank_1.value ? Color.Green  // Saved
+         : fxMemoryBankPadAktiv.value == 0 ? Color.Mint  // Currently loaded
+         : Color.Black  // Empty
+    brightness: fxSaveMemoryBank_1.value || fxMemoryBankPadAktiv.value == 0
+      ? (fxMemoryBankPadAktiv.value == 0 ? blinkTimer.blink : 1.0)
+      : 0.0
+
+    onPress: {
+      if (module.shift) {
+        if (!fxSaveMemoryBank_1.value) {
+          // Empty slot: save current state
+          saveFxSnapshot("Bank_1")
+          fxSaveMemoryBank_1.value = true
+        } else {
+          // Occupied slot: load snapshot
+          if (holdPadTimer_1.running) {
+            // Double-tap: delete
+            holdPadTimer_1.stop()
+            fxSaveMemoryBank_1.value = false
+          } else {
+            holdPadTimer_1.restart()
+            switchFxUnits("Bank_1")
+            fxMemoryBankPadAktiv.value = 0
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### Explanation
+
+The memory bank system works by mirroring the entire FX unit state (4 units × ~30 parameters each) into `MappingPropertyDescriptor` properties under the `mapping.settings.*` namespace. Since `mapping.settings` persists while Traktor is running, snapshots survive across track changes and FX switches.
+
+**Staggered loading** is critical: when restoring a snapshot, the FX type must load first (50ms delay), then the pattern player configuration (75ms), then knob values (80ms), and finally button states (100ms). Without these delays, Traktor's FX engine may discard parameter values that arrive before the effect type is fully loaded.
+
+| Gesture | Action | Visual Feedback |
+| ------- | ------ | --------------- |
+| SHIFT + Hold pad | Save snapshot | Pad turns GREEN |
+| SHIFT + Tap green pad | Load snapshot | Pad blinks (loaded) |
+| SHIFT + Double-tap green pad | Delete snapshot | Pad turns RED briefly, then OFF |
+
+**Scale**: The full implementation uses ~1920 `MappingPropertyDescriptor` instances (16 banks × 4 units × 30 params). This is a large footprint but necessary because QML has no built-in serialization.
+
+**See also**: [Example 31 (On-Device Setup)](#-example-31-on-device-multi-page-setup-system) for another `MappingPropertyDescriptor`-heavy pattern, [Example 22 (Modular Settings)](#-example-22-modular-settings-framework) for settings architecture.

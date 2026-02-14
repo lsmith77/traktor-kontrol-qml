@@ -324,4 +324,44 @@ This ensures new controller support files remain intact.
 
 ---
 
+## Fix 6: D2/S8/S5 Deck Focus Not Persisting Across Restarts
+
+**Affected versions**: All
+**Affected controllers**: D2, S8, S5 (controllers using `Deck_S8Style.qml`)
+**Source**: [NI Community Forum - D2 Deck Focus](https://community.native-instruments.com/discussion/50006/d2-deck-focus)
+
+### The Problem
+
+When you select a deck focus on the D2 (e.g., switching from Deck A to Deck C), the selection resets to the default when Traktor restarts or the controller reconnects.
+
+### The Fix
+
+Change the deck focus property path from `propertiesPath` (transient `mapping.state`) to `settingsPath` (persistent `mapping.settings`).
+
+**File 1**: `CSI/D2/Deck_S8Style.qml` (around line 100)
+
+```qml
+// Change this:
+path: propertiesPath + ".deck_focus"
+// To this:
+path: settingsPath + ".deck_focus"
+```
+
+**File 2**: `Screens/D2/Views/Deck/DeckView.qml` (around line 54)
+
+```qml
+// Change this:
+MappingProperty { id: deckFocusProp; path: screen.propertiesPath + ".deck_focus" }
+// To this:
+MappingProperty { id: deckFocusProp; path: "mapping.settings.deck_focus" }
+```
+
+### How It Works
+
+Properties under `mapping.state.*` are transient — they reset when the controller disconnects. Properties under `mapping.settings.*` are saved in Traktor's mapping file and persist across restarts. Both files (CSI and Screen) must use the same path for the screen to display the correct state.
+
+**See also**: [PRACTICAL_EXAMPLES.md - Example 41](PRACTICAL_EXAMPLES.md#-example-41-persistent-deck-focus-d2-settingspath-fix) for the full explanation of `mapping.state` vs `mapping.settings`.
+
+---
+
 **Have a fix for a version-specific issue?** Add it to this file following the format above: Problem, Affected versions, Fix, and Explanation.

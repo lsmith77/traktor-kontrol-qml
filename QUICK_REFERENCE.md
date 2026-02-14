@@ -29,7 +29,8 @@
 
 **📚 Cross-References:**
 - See [README.md](README.md) for architecture overview & getting started
-- See [PRACTICAL_EXAMPLES.md](PRACTICAL_EXAMPLES.md) for 27 complete examples
+- See [PRACTICAL_EXAMPLES.md](PRACTICAL_EXAMPLES.md) for 41 complete examples
+- See [Commands.txt](Commands.txt) for the complete AppProperty path reference
 - Jump to specific example: [PRACTICAL_EXAMPLES.md → Table of Contents](PRACTICAL_EXAMPLES.md#-table-of-contents)
 
 ---
@@ -275,6 +276,10 @@ Rectangle {
 ---
 
 ## Common Property Paths
+
+> **Complete reference**: See [Commands.txt](Commands.txt) for the full list of all known `AppProperty` paths organized by category (global, browser, deck, track, stem, remix, mixer, effects, settings). The table below covers the most common ones with usage examples.
+>
+> **Source**: [NI Community Forum - S4MK3/S3 Performance Mod QML Coding](https://community.native-instruments.com/discussion/26956/s4mk3-s3-performance-mod-qml-coding)
 
 ### Find Property by Use Case
 

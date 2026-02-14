@@ -1,0 +1,509 @@
+//--------------------------------------------------------------------------------------------------------------------
+//GLOBAL PROPERTIES
+//--------------------------------------------------------------------------------------------------------------------
+
+"app.traktor.snap"
+"app.traktor.quant"
+"app.traktor.measurement.enable"
+
+"app.traktor.midi.buttons."
+"app.traktor.midi.faders."
+"app.traktor.midi.knobs."
+
+"app.traktor.informer.%sdeckheader_message.%d.visible"
+"app.traktor.informer.%sdeck_loading_warnings.%d."
+
+"settings.pro.plus.pattern_player.ready"  //Traktor Pro 4
+
+//MasterClock
+"app.traktor.masterclock.tempo"
+"app.traktor.masterclock.active_tempo"
+"app.traktor.masterclock.mode"
+"app.traktor.masterclock.source_id"
+
+//--------------------------------------------------------------------------------------------------------------------
+//BROWSER PROPERTIES
+//--------------------------------------------------------------------------------------------------------------------
+
+"app.traktor.browser.full_screen"
+"app.traktor.browser.favorites.select"
+"app.traktor.browser.flip_sort_up_down"
+"app.traktor.browser.sort_id"
+"app.traktor.browser.tree.expand"
+"app.traktor.browser.tree.collapse"
+"app.traktor.browser.tree.expand_collapse"
+"app.traktor.browser.tree.select_up_down"
+"app.traktor.browser.list.select_up_down"
+
+//Preparation list
+"app.traktor.browser.preparation.append"
+"app.traktor.browser.preparation.toggle"
+"app.traktor.browser.preparation.add_next"
+"app.traktor.browser.preparation.jump_to_list"
+
+//Preview Player
+"app.traktor.browser.preview_player.load"
+"app.traktor.browser.preview_player.load_or_play"
+"app.traktor.browser.preview_player.unload"
+"app.traktor.browser.preview_player.play"
+"app.traktor.browser.preview_player.seek"
+"app.traktor.browser.preview_player.is_loaded"
+"app.traktor.browser.preview_content.track_length"
+"app.traktor.browser.preview_player.elapsed_time"
+
+//--------------------------------------------------------------------------------------------------------------------
+// Loaded Deck Metadata
+//--------------------------------------------------------------------------------------------------------------------
+
+"app.traktor.decks.X.content.title"
+"app.traktor.decks.X.content.album"
+"app.traktor.decks.X.content.artist"
+"app.traktor.decks.X.content.genre"
+"app.traktor.decks.X.content.comment"
+"app.traktor.decks.X.content.comment2"
+"app.traktor.decks.X.content.remixer"
+"app.traktor.decks.X.content.label"
+"app.traktor.decks.X.content.mix"
+"app.traktor.decks.X.content.catalog_number"
+"app.traktor.decks.X.content.number"
+"app.traktor.decks.X.content.number_of"
+"app.traktor.decks.X.content.cover_md5"
+"app.traktor.decks.X.content.bpm"
+"app.traktor.decks.X.content.display_bpm"
+"app.traktor.decks.X.content.musical_key"
+"app.traktor.decks.X.content.legacy_key" //keyText
+"app.traktor.decks.X.content.key_index"
+"app.traktor.decks.X.content.bitrate"
+"app.traktor.decks.X.content.grid_offset"
+"app.traktor.decks.X.content.total_gain"
+
+"app.traktor.decks.X.track.content.track_length"
+"app.traktor.decks.X.track.content.sample_count"
+"app.traktor.decks.X.track.content.sample_rate"
+"app.traktor.decks.X.track.content.file_path"
+"app.traktor.decks.X.track.content.entry_key"  //this refers to the "number of the track in the collection"
+
+//--------------------------------------------------------------------------------------------------------------------
+//DECK PROPERTIES
+//--------------------------------------------------------------------------------------------------------------------
+
+//Traktor Pro Deck State
+"app.traktor.decks.size"
+"app.traktor.decks.X.view.select"
+"app.traktor.decks.X.view.show_advanced_panel"
+"app.traktor.decks.X.view.select_advanced_panel"
+
+//State
+"app.traktor.decks.X.direct_thru"
+"app.traktor.decks.X.playback_mode" //TimeCode
+"app.traktor.decks.X.is_loaded"
+"app.traktor.decks.X.is_loaded_signal"
+
+//Load
+"app.traktor.decks.X.load.next"
+"app.traktor.decks.X.load.previous"
+"app.traktor.decks.X.load.selected"
+"app.traktor.decks.X.load_secondary.selected"  //Traktor Pro 4
+"app.traktor.decks.X.load_track.selected"  //Traktor Pro 4
+"app.traktor.decks.X.load_stems.selected"  //Traktor Pro 4
+"app.traktor.decks.X.load.from_preview_player"
+"app.traktor.decks.X.unload"
+
+//Play State
+"app.traktor.decks.X.play"
+"app.traktor.decks.X.reverse"
+"app.traktor.decks.X.running"
+"app.traktor.decks.X.cue"
+"app.traktor.decks.X.cup"
+
+//Flux
+"app.traktor.decks.X.flux.enabled"
+"app.traktor.decks.X.flux.state"
+"app.traktor.decks.X.flux.reverse"
+
+//Jogwheels
+"app.traktor.decks.X.seek"
+"app.traktor.decks.X.platter.touch"
+"app.traktor.decks.X.platter.move"
+
+//Sync & Master
+"app.traktor.decks.X.set_as_master"
+"app.traktor.decks.X.sync.enabled"
+"app.traktor.decks.X.sync.phase"
+"app.traktor.decks.X.sync.tempo"
+
+//Tempo
+"app.traktor.decks.X.tempo.absolute"
+"app.traktor.decks.X.tempo.adjust"
+"app.traktor.decks.X.tempo.adjust_bpm"
+"app.traktor.decks.X.tempo.range_select"
+"app.traktor.decks.X.tempo.range_value"
+"app.traktor.decks.X.tempo.base_bpm"
+"app.traktor.decks.X.tempo.true_bpm"
+"app.traktor.decks.X.tempo.true_tempo"
+"app.traktor.decks.X.tempo.tempo_for_display"
+"app.traktor.decks.X.tempo.phase"
+"app.traktor.decks.X.tempo.beatphase"
+"app.traktor.decks.X.tempo.fader_enabled"
+"app.traktor.decks.X.tempobend.discrete"
+"app.traktor.decks.X.tempobend.stepless"
+
+//Loop
+"app.traktor.decks.X.loop.set.in"
+"app.traktor.decks.X.loop.set.out"
+"app.traktor.decks.X.loop.set.auto"
+"app.traktor.decks.X.loop.set.auto_with_size"
+"app.traktor.decks.X.loop.set.auto_with_size_backward"
+"app.traktor.decks.X.loop.size"
+"app.traktor.decks.X.loop.active"
+"app.traktor.decks.X.loop.is_in_active_loop"
+
+//Move
+"app.traktor.decks.X.move.size"
+"app.traktor.decks.X.move.mode" //0: BeatJump, 1: Loop, 2: LoopIn, 3: Loop Out
+"app.traktor.decks.X.move" //-1: Backwards, 1: Forwards
+"app.traktor.decks.X.move_internal"
+"app.traktor.decks.X.beatjump"
+
+//TimeCode
+"app.traktor.decks.X.timecode.deck_mode"
+"app.traktor.decks.X.timecode.show_scopeview"
+"app.traktor.decks.X.timecode.calibrate"
+"app.traktor.decks.X.timecode.reset_tempo_offset"
+"app.traktor.decks.X.scratch"
+
+//Haptic
+"app.traktor.decks.X.haptic.playing"
+"app.traktor.decks.X.haptic.pitch.stable"
+"app.traktor.decks.X.haptic.pitch.instant"
+"app.traktor.decks.X.haptic.reset_tempo_offset"
+
+//--------------------------------------------------------------------------------------------------------------------
+//TRACK DECK PROPERTIES
+//--------------------------------------------------------------------------------------------------------------------
+
+//Player
+"app.traktor.decks.X.track.stable_bpm"
+"app.traktor.decks.X.track.track_end_warning"
+"app.traktor.decks.X.track.waveform_zoom"
+"app.traktor.decks.X.track.waveform_daw_view"
+
+"app.traktor.decks.X.track.player.elapsed_time"
+"app.traktor.decks.X.track.player.playhead_position"
+"app.traktor.decks.X.track.player.flux_position"
+"app.traktor.decks.X.track.player.effective_tempo"
+"app.traktor.decks.X.track.player.sync_factor"
+"app.traktor.decks.X.track.player.next_cue_point"
+"app.traktor.decks.X.track.player.waveform_data"
+"app.traktor.decks.X.track.player.cues_data"
+
+//Key
+"app.traktor.decks.X.track.key.lock_enabled"
+"app.traktor.decks.X.track.key.adjust"
+"app.traktor.decks.X.track.key.transpose"
+"app.traktor.decks.X.track.key.lock_enabled_preserve_pitch"
+"app.traktor.decks.X.track.key.resulting.quantized"
+"app.traktor.decks.X.track.key.resulting.precise"
+"app.traktor.decks.X.track.key.final_id"
+
+//Cue
+"app.traktor.decks.X.track.cue.set_and_store"
+"app.traktor.decks.X.track.cue.store"
+"app.traktor.decks.X.track.cue.delete"
+"app.traktor.decks.X.track.cue.jump_to_next_prev"
+"app.traktor.decks.X.track.cue.map_hotcue"
+"app.traktor.decks.X.track.cue.select_or_set_hotcue"
+"app.traktor.decks.X.track.cue.delete_hotcue"
+"app.traktor.decks.X.track.cue.type"
+
+"app.traktor.decks.X.track.cue.hotcues.Y.exists"
+"app.traktor.decks.X.track.cue.hotcues.Y.start_pos"
+"app.traktor.decks.X.track.cue.hotcues.Y.length"
+"app.traktor.decks.X.track.cue.hotcues.Y.repeats"
+"app.traktor.decks.X.track.cue.hotcues.Y.delete"
+
+"app.traktor.decks.X.track.cue.active.type"
+"app.traktor.decks.X.track.cue.active.name"
+"app.traktor.decks.X.track.cue.active.start_pos"
+"app.traktor.decks.X.track.cue.active.length"
+"app.traktor.decks.X.track.cue.active.repeats"
+
+//Grid
+"app.traktor.decks.X.analyze"
+"app.traktor.decks.X.track.beat_pos_relative_to_grid"
+"app.traktor.decks.X.track.grid.set_autogrid"
+"app.traktor.decks.X.track.grid.copy_phase_from_master"
+"app.traktor.decks.X.track.grid.reset_bpm"
+"app.traktor.decks.X.track.grid.adjust_bpm"
+"app.traktor.decks.X.track.grid.nudge_bpm"  //Traktor Pro 4
+"app.traktor.decks.X.track.grid.lock_bpm"
+"app.traktor.decks.X.track.grid.double_bpm"
+"app.traktor.decks.X.track.grid.half_bpm"
+"app.traktor.decks.X.track.grid.tap"
+"app.traktor.decks.X.track.grid.enable_tick"
+"app.traktor.decks.X.track.grid.is_unlocked"  //Traktor Pro 4
+"app.traktor.decks.X.track.grid.has_grid_markers"  //Traktor Pro 4
+"app.traktor.decks.X.track.grid.is_flexigrid"  //Traktor Pro 4
+"app.traktor.decks.X.track.grid.can_edit"  //Traktor Pro 4
+"app.traktor.decks.X.track.grid.can_add_grid_marker"  //Traktor Pro 4
+"app.traktor.decks.X.track.grid.can_edit_grid_marker"  //Traktor Pro 4
+"app.traktor.decks.X.track.grid.can_tap"  //Traktor Pro 4
+"app.traktor.decks.X.track.gridmarker.set"
+"app.traktor.decks.X.track.gridmarker.delete"
+"app.traktor.decks.X.track.gridmarker.move"
+
+//Duplicate Deck
+"app.traktor.decks.X.track.duplicate_deck.1"
+"app.traktor.decks.X.track.duplicate_deck.2"
+"app.traktor.decks.X.track.duplicate_deck.3"
+"app.traktor.decks.X.track.duplicate_deck.4"
+
+//Freeze Mode
+"app.traktor.decks.X.freeze.enabled"
+"app.traktor.decks.X.freeze.slice_count"
+"app.traktor.decks.X.freeze.current_slice"
+"app.traktor.decks.X.freeze.slice_size_index"
+"app.traktor.decks.X.freeze.first_slice_in_range"
+"app.traktor.decks.X.freeze.last_slice_in_range"
+"app.traktor.decks.X.freeze.last_activated_slice"
+"app.traktor.decks.X.freeze.is_slicer_mode"
+"app.traktor.decks.X.freeze.slice_start_in_sec"
+"app.traktor.decks.X.freeze.slice_width_in_sec"
+"app.traktor.decks.X.freeze.slice_size_in_measures"
+"app.traktor.decks.X.freeze.jump_to_slice.%d"
+
+//--------------------------------------------------------------------------------------------------------------------
+//STEM DECK PROPERTIES
+//--------------------------------------------------------------------------------------------------------------------
+
+"app.traktor.decks.X.stems.Y.stem_info_exists"
+"app.traktor.decks.X.stems.Y.color_id"
+"app.traktor.decks.X.stems.Y.volume"
+"app.traktor.decks.X.stems.Y.muted"
+"app.traktor.decks.X.stems.Y.filter_value"
+"app.traktor.decks.X.stems.Y.filter_on"
+"app.traktor.decks.X.stems.Y.fx_send_on"
+"app.traktor.decks.X.stems.Y.fx_send"
+"app.traktor.decks.X.stems.Y.level"
+
+//--------------------------------------------------------------------------------------------------------------------
+//REMIX DECK PROPERTIES
+//--------------------------------------------------------------------------------------------------------------------
+
+"app.traktor.decks.X.capture_source"
+
+"app.traktor.decks.X.remix.page"
+"app.traktor.decks.X.remix.save_set"
+"app.traktor.decks.X.remix.current_beat_pos"
+"app.traktor.decks.X.remix.quant_index"
+
+//Sequencer
+"app.traktor.decks.X.remix.sequencer.on"
+"app.traktor.decks.X.remix.sequencer.swing"
+"app.traktor.decks.X.remix.sequencer.rec.on"
+"app.traktor.decks.X.remix.sequencer.triggers.1"
+"app.traktor.decks.X.remix.sequencer.triggers.2"
+"app.traktor.decks.X.remix.sequencer.triggers.3"
+"app.traktor.decks.X.remix.sequencer.triggers.4"
+
+//Remix Players
+"app.traktor.decks.X.remix.players.Y.name" ???
+"app.traktor.decks.X.remix.players.Y.volume"
+"app.traktor.decks.X.remix.players.Y.muted"
+"app.traktor.decks.X.remix.players.Y.filter_value"
+"app.traktor.decks.X.remix.players.Y.filter_on"
+"app.traktor.decks.X.remix.players.Y.fx_send_on"
+"app.traktor.decks.X.remix.players.Y.fx_send"
+"app.traktor.decks.X.remix.players.Y.level"
+
+"app.traktor.decks.X.remix.players.Y.key_lock"
+"app.traktor.decks.X.remix.players.Y.active_cell_row"
+"app.traktor.decks.X.remix.players.Y.play_position"
+"app.traktor.decks.X.remix.players.Y.content.is_memory_only"
+"app.traktor.decks.X.remix.players.Y.content.memory_audio_time_stamp"
+
+"app.traktor.decks.X.remix.players.Y.play_primary"  //Traktor Pro 4
+"app.traktor.decks.X.remix.players.Y.play_secondary"  //Traktor Pro 4
+
+//Sequencer Player
+"app.traktor.decks.X.remix.players.Y.sequencer.selected_cell"
+"app.traktor.decks.X.remix.players.Y.sequencer.current_step"
+"app.traktor.decks.X.remix.players.Y.sequencer.pattern_mode"
+"app.traktor.decks.X.remix.players.Y.sequencer.pattern_speed"
+"app.traktor.decks.X.remix.players.Y.sequencer.pattern_length"
+"app.traktor.decks.X.remix.players.Y.sequencer.steps.1"
+"app.traktor.decks.X.remix.players.Y.sequencer.steps.2"
+"app.traktor.decks.X.remix.players.Y.sequencer.steps.3"
+"app.traktor.decks.X.remix.players.Y.sequencer.steps.4"
+"app.traktor.decks.X.remix.players.Y.sequencer.steps.5"
+"app.traktor.decks.X.remix.players.Y.sequencer.steps.6"
+"app.traktor.decks.X.remix.players.Y.sequencer.steps.7"
+"app.traktor.decks.X.remix.players.Y.sequencer.steps.8"
+"app.traktor.decks.X.remix.players.Y.sequencer.steps.9"
+"app.traktor.decks.X.remix.players.Y.sequencer.steps.10"
+"app.traktor.decks.X.remix.players.Y.sequencer.steps.11"
+"app.traktor.decks.X.remix.players.Y.sequencer.steps.12"
+"app.traktor.decks.X.remix.players.Y.sequencer.steps.13"
+"app.traktor.decks.X.remix.players.Y.sequencer.steps.14"
+"app.traktor.decks.X.remix.players.Y.sequencer.steps.15"
+"app.traktor.decks.X.remix.players.Y.sequencer.steps.16"
+"app.traktor.decks.X.remix.players.Y.sequencer.delete_pattern"
+
+//Remix Cells
+"app.traktor.decks.X.remix.cell.columns.Y.rows.Z.color_id"
+"app.traktor.decks.X.remix.cell.columns.Y.rows.Z.name"
+"app.traktor.decks.X.remix.cell.columns.Y.rows.Z.trigger"
+"app.traktor.decks.X.remix.cell.columns.Y.rows.Z.stop"
+"app.traktor.decks.X.remix.cell.columns.Y.rows.Z.capture"
+"app.traktor.decks.X.remix.cell.columns.Y.rows.Z.load"
+"app.traktor.decks.X.remix.cell.columns.Y.rows.Z.state" //0: Empty, 1: Loaded, 2: Playing, 3: Waiting
+"app.traktor.decks.X.remix.cell.columns.Y.rows.Z.play_mode" //"Looped" or "OneShot"
+"app.traktor.decks.X.remix.cell.columns.Y.rows.Z.pitch"
+"app.traktor.decks.X.remix.cell.columns.Y.rows.Z.gain"
+
+//Remix Cells Animation
+"app.traktor.decks.X.remix.cell.columns.Y.rows.Z.animation.color_id.1"
+"app.traktor.decks.X.remix.cell.columns.Y.rows.Z.animation.color_id.2"
+"app.traktor.decks.X.remix.cell.columns.Y.rows.Z.animation.brightness.1"
+"app.traktor.decks.X.remix.cell.columns.Y.rows.Z.animation.brightness.2"
+"app.traktor.decks.X.remix.cell.columns.Y.rows.Z.animation.color_ratio"  //(1 --> white (already played), 0.001-0.999 --> playing sample (1 shot), 0 --> playing sample (loop))
+"app.traktor.decks.X.remix.cell.columns.Y.rows.Z.animation.display_state"
+
+//--------------------------------------------------------------------------------------------------------------------
+//MIXER PROPERTIES
+//--------------------------------------------------------------------------------------------------------------------
+
+//X-Fader Curve
+"app.traktor.mixer.xfader.adjust"
+"app.traktor.mixer.xfader.curve"
+
+//Master Volume Levels
+"app.traktor.mixer.master_volume"
+"app.traktor.mixer.cue.volume"
+"app.traktor.mixer.cue.mix"
+"app.traktor.mixer.mic_volume"
+
+"app.traktor.mixer.master.level.sum"
+"app.traktor.mixer.master.level.left"
+"app.traktor.mixer.master.level.right"
+"app.traktor.mixer.master.level.clip.sum"
+"app.traktor.mixer.master.level.clip.left"
+"app.traktor.mixer.master.level.clip.right"
+
+//Channel
+"app.traktor.mixer.channels.X.volume"
+"app.traktor.mixer.channels.X.gain"
+
+"app.traktor.mixer.channels.X.autogain"
+"app.traktor.mixer.channels.X.eq.midlow"
+
+
+"app.traktor.mixer.channels.X.eq.high"
+"app.traktor.mixer.channels.X.eq.mid"
+"app.traktor.mixer.channels.X.eq.mid_low"  //Traktor Pro 4
+"app.traktor.mixer.channels.X.eq.low"
+"app.traktor.mixer.channels.X.eq.kill_high"  //Traktor Pro 4
+"app.traktor.mixer.channels.X.eq.kill_mid"  //Traktor Pro 4
+"app.traktor.mixer.channels.X.eq.kill_mid_low"  //Traktor Pro 4
+"app.traktor.mixer.channels.X.eq.kill_low"  //Traktor Pro 4
+"app.traktor.mixer.channels.X.fx.adjust"
+"app.traktor.mixer.channels.X.fx.on"
+"app.traktor.mixer.channels.X.fx.select"
+"app.traktor.mixer.channels.X.xfader_assign.left"
+"app.traktor.mixer.channels.X.xfader_assign.right"
+"app.traktor.mixer.channels.X.fx.assign.1"
+"app.traktor.mixer.channels.X.fx.assign.2"
+"app.traktor.mixer.channels.X.fx.assign.3"
+"app.traktor.mixer.channels.X.fx.assign.4"
+"app.traktor.mixer.channels.X.level.prefader.linear.meter"
+"app.traktor.mixer.channels.X.level.prefader.linear.left"
+"app.traktor.mixer.channels.X.level.prefader.linear.right"
+"app.traktor.mixer.channels.X.level.prefader.linear.sum"
+
+//--------------------------------------------------------------------------------------------------------------------
+//EFFECT PROPERTIES
+//--------------------------------------------------------------------------------------------------------------------
+
+"app.traktor.fx.4fx_units"
+"app.traktor.fx.X.dry_wet"
+"app.traktor.fx.X.knobs.1"
+"app.traktor.fx.X.knobs.2"
+"app.traktor.fx.X.knobs.3"
+"app.traktor.fx.X.enabled"
+"app.traktor.fx.X.buttons.1"
+"app.traktor.fx.X.buttons.2"
+"app.traktor.fx.X.buttons.3"
+"app.traktor.fx.X.parameters.1"
+"app.traktor.fx.X.parameters.2"
+"app.traktor.fx.X.parameters.3"
+"app.traktor.fx.X.knobs.1.name"
+"app.traktor.fx.X.knobs.2.name"
+"app.traktor.fx.X.knobs.3.name"
+"app.traktor.fx.X.buttons.1.name"
+"app.traktor.fx.X.buttons.2.name"
+"app.traktor.fx.X.buttons.3.name"
+"app.traktor.fx.X.enabled.available"  //Traktor Pro 4
+"app.traktor.fx.X.buttons.1.available"  //Traktor Pro 4
+"app.traktor.fx.X.buttons.2.available"  //Traktor Pro 4
+"app.traktor.fx.X.buttons.3.available"  //Traktor Pro 4
+"app.traktor.fx.X.select.1"
+"app.traktor.fx.X.select.2"
+"app.traktor.fx.X.select.3"
+"app.traktor.fx.X.store"
+"app.traktor.fx.X.lfo_reset"
+
+//Pattern Player
+"app.traktor.fx.X.kitSelect"
+"app.traktor.fx.X.pattern_player.kit_shortname"
+"app.traktor.fx.X.pattern_player.current_sound"
+"app.traktor.fx.X.pattern_player.current_step"
+"app.traktor.fx.X.pattern_player.is_customized"
+"app.traktor.fx.X.pattern_player.reset_pattern"
+"app.traktor.fx.X.pattern_player.steps.1.state"
+"app.traktor.fx.X.pattern_player.steps.2.state"
+"app.traktor.fx.X.pattern_player.steps.3.state"
+"app.traktor.fx.X.pattern_player.steps.4.state"
+"app.traktor.fx.X.pattern_player.steps.5.state"
+"app.traktor.fx.X.pattern_player.steps.6.state"
+"app.traktor.fx.X.pattern_player.steps.7.state"
+"app.traktor.fx.X.pattern_player.steps.8.state"
+"app.traktor.fx.X.pattern_player.steps.9.state"
+"app.traktor.fx.X.pattern_player.steps.10.state"
+"app.traktor.fx.X.pattern_player.steps.11.state"
+"app.traktor.fx.X.pattern_player.steps.12.state"
+"app.traktor.fx.X.pattern_player.steps.13.state"
+"app.traktor.fx.X.pattern_player.steps.14.state"
+"app.traktor.fx.X.pattern_player.steps.15.state"
+"app.traktor.fx.X.pattern_player.steps.16.state"
+
+//--------------------------------------------------------------------------------------------------------------------
+//SETTING PROPERTIES
+//--------------------------------------------------------------------------------------------------------------------
+
+"app.traktor.settings.paths.root"
+"app.traktor.settings.waveform.color"
+
+"app.traktor.MetadataSync.Enabled"
+"app.traktor.settings.metadatasync.enabled"
+
+//Deck Header Info
+"app.traktor.Fileinfo.Top.Left"
+"app.traktor.settings.deckheader.top.left"
+"app.traktor.Fileinfo.Top.Mid"
+"app.traktor.settings.deckheader.top.mid"
+"app.traktor.Fileinfo.Top.Right"
+"app.traktor.settings.deckheader.top.right"
+
+"app.traktor.Fileinfo.Mid.Left"
+"app.traktor.settings.deckheader.mid.left"
+"app.traktor.Fileinfo.Mid.Mid"
+"app.traktor.settings.deckheader.mid.mid"
+"app.traktor.Fileinfo.Mid.Right"
+"app.traktor.settings.deckheader.mid.right"
+
+"app.traktor.Fileinfo.Bottom.Left"
+"app.traktor.settings.deckheader.bottom.left"
+"app.traktor.Fileinfo.Bottom.Mid"
+"app.traktor.settings.deckheader.bottom.mid"
+"app.traktor.Fileinfo.Bottom.Right"
+"app.traktor.settings.deckheader.bottom.right"

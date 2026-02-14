@@ -29,6 +29,7 @@
 - [Examples 26-27](#example-26-native-tp4-buttongestures-module) - 🟢🔴 Easy-Expert (TP4 features & comprehensive UI)
 - [Examples 28-32](#example-28-beat-counter-phrasebarbeat-display) - 🟢🟠 Beginner-Advanced (Community mod patterns)
 - [Examples 33-39](#example-33-soft-takeover-with-visual-direction-feedback) - 🟡🔴 Intermediate-Expert (S3 PerformanceMod patterns)
+- [Examples 40-41](#example-40-multi-deck-assignment-cycling-z1-mk2-channel-select) - 🟢🟡 Beginner-Intermediate (Deck assignment & persistence)
 
 **💡 Getting Help:**
 
@@ -64,6 +65,7 @@
 - **Examples 26-27**: Native TP4 features and comprehensive UI innovations
 - **Examples 28-32**: Community mod patterns (beat counters, color systems, key conversion, setup pages, waveform themes)
 - **Examples 33-39**: S3 PerformanceMod patterns (soft takeover, sync feedback, FX sequencer, stem controls, loop tuning, deck cycling, FX memory banks)
+- **Examples 40-41**: Deck assignment cycling (Z1 MK2) and persistent deck focus (D2)
 
 ### Reading Each Example
 
@@ -95,7 +97,7 @@ All file paths in examples are relative to your Traktor installation:
 
 | Category                | Examples               | Focus                                 |
 | ----------------------- | ---------------------- | ------------------------------------- |
-| **Controller Behavior** | 1, 17-18, 31, 33, 37-38 | Button/encoder mappings, Wire logic   |
+| **Controller Behavior** | 1, 17-18, 31, 33, 37-38, 40-41 | Button/encoder mappings, Wire logic   |
 | **Timing & Gestures**   | 2, 17, 19-20, 26, 34    | Timers, double-tap, long-hold         |
 | **Visual Display**      | 5-10, 12-13, 15-16, 27-28, 30, 32 | Screen layouts, colors, indicators |
 | **Settings Systems**    | 4, 11, 22, 29, 32, 39   | Preferences, configuration            |
@@ -161,6 +163,7 @@ Most examples can be adapted:
 - Example 30: Camelot Key Conversion
 - Example 34: Multi-State Sync LED Feedback
 - Example 38: Deck Type Cycling
+- Example 40: Z1 MK2 Deck Assignment Cycling
 
 **Advanced**:
 
@@ -171,6 +174,7 @@ Most examples can be adapted:
 - Example 31: On-Device Multi-Page Setup System
 - Example 32: Spectrum Waveform Color Themes
 - Example 33: Soft Takeover with Visual Feedback
+- Example 41: Persistent Deck Focus (D2)
 - Example 36: Stem Deck Pad Controls with SuperKnobs
 - Example 37: Loop Boundary Fine-Tuning
 - Examples 35, 39: FX Sequencer & Memory Banks (Expert)
@@ -237,7 +241,15 @@ Most examples can be adapted:
 
 **Screen Controllers** (D2/S5/S8/S4MK3):
 
-- Examples 6-10, 15-16, 22, 27-32
+- Examples 6-10, 15-16, 22, 27-32, 41
+
+**Z1 MK2 Specific**:
+
+- Example 40: Deck assignment cycling
+
+**D2 Specific**:
+
+- Example 41: Persistent deck focus
 
 **S4 MK3 Specific**:
 
@@ -286,6 +298,8 @@ Most examples can be adapted:
 | 37  | Loop Fine-Tune   | Advanced   | CSI             | 1 hr     |
 | 38  | Deck Type Cycle  | Medium     | CSI             | 30 min   |
 | 39  | FX Memory Banks  | Expert     | CSI             | 4 hrs    |
+| 40  | Deck Assignment  | Medium     | CSI             | 45 min   |
+| 41  | Deck Focus Fix   | Easy       | CSI             | 15 min   |
 
 ---
 
@@ -6372,3 +6386,241 @@ The memory bank system works by mirroring the entire FX unit state (4 units × ~
 **Scale**: The full implementation uses ~1920 `MappingPropertyDescriptor` instances (16 banks × 4 units × 30 params). This is a large footprint but necessary because QML has no built-in serialization.
 
 **See also**: [Example 31 (On-Device Setup)](#-example-31-on-device-multi-page-setup-system) for another `MappingPropertyDescriptor`-heavy pattern, [Example 22 (Modular Settings)](#-example-22-modular-settings-framework) for settings architecture.
+
+---
+
+## 🔀 Example 40: Multi-Deck Assignment Cycling (Z1 MK2 Channel Select)
+
+**Difficulty**: 🟡 Intermediate | **Layer**: 🔌 CSI | **Time**: 45 min | **Controllers**: Z1 MK2 (adaptable to others)
+
+**Source**: [Z1 MK2 Channel Select QML](Z1%20MK2%20Channel%20Select%20QML/) (AlfredSoul) — see also [Instructions.txt](Z1%20MK2%20Channel%20Select%20QML/Instructions.txt) for installation
+
+### Default Behavior (Native Instruments)
+
+The Z1 MK2 is hardcoded to control decks A and B. There is no way to switch which decks the hardware controls, unlike the X1 MK2 which has a built-in mode button for deck assignment.
+
+### Customized Behavior
+
+The MODE button cycles through 6 deck pair combinations (A-B, C-D, A-C, D-B, C-A, B-D), enabling one or two Z1 MK2 controllers to control any combination of Traktor's 4 decks.
+
+**Step 1: Define a DeviceAssignment singleton with deck pair mappings**
+
+```qml
+// Defines/DeviceAssignment.qml
+pragma Singleton
+import QtQuick 2.0
+
+QtObject {
+  // Constants for each deck pair assignment
+  readonly property int decks_a_b: 0
+  readonly property int decks_c_d: 1
+  readonly property int decks_a_c: 2
+  readonly property int decks_d_b: 3
+  readonly property int decks_c_a: 4
+  readonly property int decks_b_d: 5
+
+  // Map assignment → left deck index (1=A, 2=B, 3=C, 4=D)
+  function leftDeckIdx(assignment) {
+    switch (assignment) {
+      case decks_a_b: return 1  // A
+      case decks_c_d: return 3  // C
+      case decks_a_c: return 1  // A
+      case decks_d_b: return 4  // D
+      case decks_c_a: return 3  // C
+      case decks_b_d: return 2  // B
+    }
+  }
+
+  // Map assignment → right deck index
+  function rightDeckIdx(assignment) {
+    switch (assignment) {
+      case decks_a_b: return 2  // B
+      case decks_c_d: return 4  // D
+      case decks_a_c: return 3  // C
+      case decks_d_b: return 2  // B
+      case decks_c_a: return 1  // A
+      case decks_b_d: return 4  // D
+    }
+  }
+}
+```
+
+**Step 2: Wire MODE button to cycle through assignments**
+
+```qml
+// CSI/Z1MK2/Z1MK2.qml
+import CSI 1.0
+import "Defines"
+
+Mapping {
+  id: mapping
+  readonly property string propertiesPath: "mapping.state"
+
+  // Persistent deck assignment — wraps around through all 6 options
+  MappingPropertyDescriptor {
+    id: deckAssignmentProp
+    type: MappingPropertyDescriptor.Integer
+    path: mapping.propertiesPath + ".deck_assignment"
+    value: DeviceAssignment.decks_a_b  // Default: A-B
+    min: DeviceAssignment.decks_a_b     // 0
+    max: DeviceAssignment.decks_b_d     // 5
+  }
+
+  // Computed deck indices — update automatically when assignment changes
+  readonly property int leftDeckIdx: DeviceAssignment.leftDeckIdx(deckAssignmentProp.value)
+  readonly property int rightDeckIdx: DeviceAssignment.rightDeckIdx(deckAssignmentProp.value)
+
+  // Expose indices as mapping properties (for screen side to read)
+  MappingPropertyDescriptor {
+    path: mapping.propertiesPath + ".left_deck_index"
+    type: MappingPropertyDescriptor.Integer
+    value: mapping.leftDeckIdx
+  }
+  MappingPropertyDescriptor {
+    path: mapping.propertiesPath + ".right_deck_index"
+    type: MappingPropertyDescriptor.Integer
+    value: mapping.rightDeckIdx
+  }
+
+  Z1MK2 { name: "surface" }
+
+  // MODE button: increment deck assignment with wraparound
+  Wire {
+    from: "surface.mode"
+    to: RelativePropertyAdapter {
+      path: mapping.propertiesPath + ".deck_assignment"
+      mode: RelativeMode.Increment
+      wrap: true  // Wraps from max (5) back to min (0)
+    }
+  }
+
+  // Left and right sides use computed deck indices
+  Z1MK2Side {
+    name: "left"
+    deckIdx: mapping.leftDeckIdx
+    surface: "surface.left"
+    propertiesPath: mapping.propertiesPath + ".left"
+    // ... button action settings
+  }
+
+  Z1MK2Side {
+    name: "right"
+    deckIdx: mapping.rightDeckIdx
+    surface: "surface.right"
+    propertiesPath: mapping.propertiesPath + ".right"
+    // ... button action settings
+  }
+}
+```
+
+### Explanation
+
+The key technique is **indirection through a singleton lookup table**:
+
+1. `DeviceAssignment.qml` defines all valid deck pair combinations as constants and provides functions to resolve them to deck indices
+2. A single `MappingPropertyDescriptor` with `min`/`max` bounds stores the current assignment
+3. `RelativePropertyAdapter` with `wrap: true` creates the cycling behavior — each button press increments by 1, wrapping from 5 back to 0
+4. `readonly property int leftDeckIdx` recomputes automatically when the assignment changes, and all child modules that reference it update instantly
+
+**Comparison with stock Z1 MK2**: The stock QML uses `SetPropertyAdapter` with only 2 assignments (A-B / C-D toggle). This mod replaces that with `RelativePropertyAdapter` + 6 assignments for much more flexibility.
+
+| Component | Purpose |
+| --------- | ------- |
+| `DeviceAssignment` (singleton) | Maps assignment number → deck indices |
+| `RelativePropertyAdapter` | Increment with wrap for cycling |
+| `MappingPropertyDescriptor` with `min`/`max` | Bounds the cycling range |
+| `readonly property` | Auto-recomputing deck index binding |
+
+**Adaptation**: This pattern works for any controller that needs dynamic deck assignment. Replace the `leftDeckIdx`/`rightDeckIdx` functions with your desired deck combinations. For a simpler 2-way toggle, use `SetPropertyAdapter` instead of `RelativePropertyAdapter`.
+
+**See also**: [Example 38 (Deck Type Cycling)](#-example-38-deck-type-cycling-track--remix--stem--live) for cycling through deck *types* instead of deck *assignments*.
+
+---
+
+## 🎯 Example 41: Persistent Deck Focus (D2 settingsPath Fix)
+
+**Difficulty**: 🟢 Beginner | **Layer**: 🔌 CSI | **Time**: 15 min | **Controllers**: D2 (applies to S8, S5 with similar structure)
+
+**Source**: [NI Community Forum - D2 Deck Focus](https://community.native-instruments.com/discussion/50006/d2-deck-focus)
+
+### Default Behavior (Native Instruments)
+
+When you select a deck focus on the D2 (e.g., switching from Deck A to Deck C), the selection resets to the default when Traktor restarts or the controller reconnects. You must re-select your preferred deck every session.
+
+### Customized Behavior
+
+Deck focus persists across Traktor restarts by storing the setting in `mapping.settings` (persistent) instead of `mapping.state` (transient).
+
+**The Fix: Change `propertiesPath` to `settingsPath` for deck focus**
+
+```qml
+// CSI/D2/Deck_S8Style.qml (around line 100)
+
+// BEFORE: deck focus resets on restart
+MappingPropertyDescriptor {
+  id: deckFocusProp
+  path: propertiesPath + ".deck_focus"     // mapping.state.deck_focus — TRANSIENT
+  type: MappingPropertyDescriptor.Integer
+  value: 0
+  onValueChanged: {
+    updateFocusDependentDeckTypes()
+    updateFooter()
+    updatePads()
+    updateEncoder()
+  }
+}
+
+// AFTER: deck focus persists across sessions
+MappingPropertyDescriptor {
+  id: deckFocusProp
+  path: settingsPath + ".deck_focus"       // mapping.settings.deck_focus — PERSISTENT
+  type: MappingPropertyDescriptor.Integer
+  value: 0
+  onValueChanged: {
+    updateFocusDependentDeckTypes()
+    updateFooter()
+    updatePads()
+    updateEncoder()
+  }
+}
+```
+
+**Also update the screen side to match:**
+
+```qml
+// Screens/D2/Views/Deck/DeckView.qml (around line 54)
+
+// BEFORE:
+MappingProperty { id: deckFocusProp; path: screen.propertiesPath + ".deck_focus" }
+
+// AFTER:
+MappingProperty { id: deckFocusProp; path: "mapping.settings.deck_focus" }
+```
+
+### Explanation
+
+This fix exploits the difference between two `MappingPropertyDescriptor` path namespaces:
+
+| Namespace | Persistence | Use Case |
+| --------- | ----------- | -------- |
+| `mapping.state.*` | Transient — resets on reconnect/restart | UI state (current page, temporary modes) |
+| `mapping.settings.*` | Persistent — saved in Traktor's mapping file | User preferences (deck assignment, colors) |
+
+By moving `deck_focus` from `propertiesPath` (which points to `mapping.state`) to `settingsPath` (which points to `mapping.settings`), the value is written to Traktor's internal mapping storage and reloaded automatically.
+
+**This pattern applies to any property you want to persist.** The D2.qml file already defines both paths:
+
+```qml
+// CSI/D2/D2.qml
+Deck_S8Style {
+  id: deck
+  name: "deck"
+  surface: "surface"
+  settingsPath: "mapping.settings"     // ← persistent
+  propertiesPath: "mapping.state"      // ← transient
+}
+```
+
+**Files to modify**: `Deck_S8Style.qml` (CSI side) and `DeckView.qml` (Screen side) — both must use the same path or the screen won't reflect the saved state.
+
+**See also**: [Example 31 (On-Device Setup)](#-example-31-on-device-multi-page-setup-system) for the `mapping.state` vs `mapping.settings` distinction in detail.

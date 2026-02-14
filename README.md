@@ -121,7 +121,7 @@ To check your version: Open Traktor → Help → About Traktor
 
 ### **PRACTICAL_EXAMPLES.md** - Start Here ⭐
 
-**6,000+ lines | 39 Complete Examples**
+**6,500+ lines | 41 Complete Examples**
 
 The primary reference document containing real-world customizations with complete working code.
 
@@ -136,6 +136,7 @@ The primary reference document containing real-world customizations with complet
 - **Examples 26-27**: Native TP4 ButtonGestures & comprehensive UI - 15 min to full day
 - **Examples 28-32**: Community mod patterns (beat counters, colors, keys, setup pages, waveforms)
 - **Examples 33-39**: S3 PerformanceMod patterns (soft takeover, sync LED, FX sequencer, stem controls, loop tuning, deck cycling, FX memory banks)
+- **Examples 40-41**: Deck assignment cycling (Z1 MK2) and persistent deck focus (D2)
 
 **Quick Index inside:**
 
@@ -158,7 +159,7 @@ One-page lookups, templates, debugging guides, and safety checks.
 
 - **File location map**: Which file to edit for what you want to change
 - **Common tasks**: Swap shift, change timers, add buttons, modify displays
-- **Property paths**: Complete reference of Traktor properties
+- **Property paths**: Common reference with usage examples (see also [Commands.txt](Commands.txt) for the complete list)
 - **Design patterns**: 7 reusable patterns (multi-function buttons, warnings, encoders, etc.)
 - **Modification recipes**: Copy-paste solutions for common needs
 - **Troubleshooting**: 6 common problems + debugging techniques
@@ -185,6 +186,31 @@ Not all QML code works across every Traktor version. This file documents specifi
 - **Version-specific property changes**: New/changed AppProperty paths by version
 
 **Use this when:** You've updated Traktor and something stopped working, or you're installing a community mod built for a different version
+
+---
+
+### **Commands.txt** - Complete AppProperty Path Reference
+
+**500+ lines | Every known Traktor AppProperty path**
+
+A comprehensive listing of all known `AppProperty` paths that QML files can read and write. Organized by category with inline comments noting which paths are Traktor Pro 4-only.
+
+**Source**: [NI Community Forum - S4MK3/S3 Performance Mod QML Coding](https://community.native-instruments.com/discussion/26956/s4mk3-s3-performance-mod-qml-coding)
+
+**What's inside:**
+
+- **Global properties**: Snap, quant, MIDI buttons/faders/knobs, master clock
+- **Browser properties**: Navigation, preview player, preparation list
+- **Deck properties**: Play state, load, flux, jogwheel, sync, tempo, loop, move, timecode, haptic
+- **Track properties**: Player state, key, cue/hotcue, beatgrid, freeze mode, duplicate deck
+- **Metadata**: Title, artist, album, BPM, key, bitrate, file path, cover art
+- **Stem properties**: Volume, mute, filter, FX send per stem channel
+- **Remix properties**: Sequencer, players, cells, cell animation
+- **Mixer properties**: Volume, EQ (including TP4 kill switches), channel FX, crossfader, levels
+- **Effect properties**: Dry/wet, knobs, buttons, select, pattern player (TP4)
+- **Settings properties**: Waveform color, deck header info fields, file paths
+
+**Use this when:** You need to find the exact `AppProperty` path for a Traktor feature, or want to discover what properties are available for a new mod idea
 
 ---
 

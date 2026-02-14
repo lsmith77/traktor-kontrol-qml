@@ -27,6 +27,7 @@
 - [Example 21](#example-21-external-http-api-integration) - 🔴 Expert (API integration - 4+ hours)
 - [Examples 22-25](#example-22-modular-settings-framework) - 🔴 Expert (Modular systems, LED control, effects)
 - [Examples 26-27](#example-26-native-tp4-buttongestures-module) - 🟢🔴 Easy-Expert (TP4 features & comprehensive UI)
+- [Examples 28-32](#example-28-beat-counter-phrasebarbeat-display) - 🟢🟠 Beginner-Advanced (Community mod patterns)
 
 **💡 Getting Help:**
 
@@ -60,6 +61,7 @@
 - **Examples 21**: External API integration
 - **Examples 22-25**: Modular systems, LED control, simulation effects
 - **Examples 26-27**: Native TP4 features and comprehensive UI innovations
+- **Examples 28-32**: Community mod patterns (beat counters, color systems, key conversion, setup pages, waveform themes)
 
 ### Reading Each Example
 
@@ -91,11 +93,11 @@ All file paths in examples are relative to your Traktor installation:
 
 | Category                | Examples               | Focus                                 |
 | ----------------------- | ---------------------- | ------------------------------------- |
-| **Controller Behavior** | 1, 17-18               | Button/encoder mappings, Wire logic   |
-| **Timing & Gestures**   | 2, 17, 19-20, 26       | Timers, double-tap, long-hold         |
-| **Visual Display**      | 5-10, 12-13, 15-16, 27 | Screen layouts, colors, indicators    |
-| **Settings Systems**    | 4, 11, 22              | Preferences, configuration            |
-| **Advanced Features**   | 21, 23-25              | API integration, LED control, effects |
+| **Controller Behavior** | 1, 17-18, 31            | Button/encoder mappings, Wire logic   |
+| **Timing & Gestures**   | 2, 17, 19-20, 26        | Timers, double-tap, long-hold         |
+| **Visual Display**      | 5-10, 12-13, 15-16, 27-28, 30, 32 | Screen layouts, colors, indicators |
+| **Settings Systems**    | 4, 11, 22, 29, 32       | Preferences, configuration            |
+| **Advanced Features**   | 21, 23-25, 31            | API integration, LED control, effects |
 
 ### How to Apply an Example
 
@@ -152,6 +154,9 @@ Most examples can be adapted:
 - Examples 11-13: Settings & Theme Systems
 - Examples 14-16: Warning & Indicator Systems
 - Example 26: Native ButtonGestures
+- Example 28: Beat Counter (Phrase.Bar.Beat)
+- Example 29: Per-Deck Color Customization
+- Example 30: Camelot Key Conversion
 
 **Advanced**:
 
@@ -159,6 +164,8 @@ Most examples can be adapted:
 - Example 21: HTTP API Integration
 - Examples 22-25: Modular Systems & Effects
 - Example 27: Comprehensive UI Innovations (19 features)
+- Example 31: On-Device Multi-Page Setup System
+- Example 32: Spectrum Waveform Color Themes
 
 ### By Category
 
@@ -187,12 +194,17 @@ Most examples can be adapted:
 - Example 15: Touch menu
 - Example 16: Time warnings
 - Example 27: Dynamic waveforms & UI
+- Example 28: Beat counter
+- Example 30: Camelot key conversion
+- Example 32: Spectrum waveform themes
 
 **Settings & Configuration** (Defines Layer):
 
 - Example 4: Preferences system
 - Example 11: JSON settings
 - Example 22: Modular settings
+- Example 29: Per-deck color settings
+- Example 32: Waveform color themes
 
 **Advanced Features**:
 
@@ -200,6 +212,7 @@ Most examples can be adapted:
 - Example 21: External HTTP API
 - Example 23: LED blinkers
 - Example 27: 19 advanced UI features
+- Example 31: On-device setup system
 
 ### By Controller Focus
 
@@ -207,13 +220,13 @@ Most examples can be adapted:
 
 - Examples 1-5, 11-14, 17-26
 
-**Screen Controllers** (D2/S5/S8):
+**Screen Controllers** (D2/S5/S8/S4MK3):
 
-- Examples 6-10, 15-16, 22, 27
+- Examples 6-10, 15-16, 22, 27-32
 
 **S4 MK3 Specific**:
 
-- Examples 13, 15, 17-18
+- Examples 13, 15, 17-18, 28-29
 
 ### Quick Reference Table
 
@@ -246,6 +259,11 @@ Most examples can be adapted:
 | 25  | Fader Start      | Advanced   | CSI             | 2 hrs    |
 | 26  | ButtonGestures   | Easy       | CSI             | 15 min   |
 | 27  | UI Innovations   | Expert     | All Layers      | Full day |
+| 28  | Beat Counter     | Medium     | Screens         | 30 min   |
+| 29  | Per-Deck Colors  | Medium     | Defines/Screens | 45 min   |
+| 30  | Camelot Keys     | Easy       | Screens         | 20 min   |
+| 31  | Device Setup     | Advanced   | CSI/Screens     | 2 hrs    |
+| 32  | Waveform Themes  | Easy       | Defines/Screens | 15 min   |
 
 ---
 
@@ -4733,3 +4751,566 @@ A common mistake is using `HoldPropertyAdapter` for actions that should fire onc
 | 19  | Remix Save Fix        | All         | Proper TriggerPropertyAdapter usage                    |
 
 ---
+
+## 🎹 Example 28: Beat Counter (Phrase.Bar.Beat Display)
+
+**Difficulty**: 🟡 Intermediate | **Layer**: 🖥️ Screens | **Time**: 30 min | **Controllers**: All screen controllers
+
+**Source**: S4 MK3 Mod (Joe Easton), X1 MK3 Performance Mod (Sulherokhh)
+
+### Default Behavior (Native Instruments)
+
+Traktor's hardware screens show elapsed and remaining time, but don't display a musical position counter showing the current phrase, bar, and beat. DJs mixing by phrase structure have to count mentally.
+
+### Customized Behavior
+
+A beat counter displays the current position as `Phrase.Bar.Beat` (e.g., `3.2.1` = phrase 3, bar 2, beat 1). This helps DJs align mixes on phrase boundaries. Two implementations exist:
+
+**Version A: Fixed Phrase Length (S4 MK3 Mod)**
+
+```qml
+// In ViewModels/DeckInfo.qml or equivalent
+AppProperty { id: propElapsedTime; path: "app.traktor.decks." + deckId + ".track.player.elapsed_time" }
+AppProperty { id: propGridOffset;  path: "app.traktor.decks." + deckId + ".track.grid.marker_position" }
+AppProperty { id: propMixerBpm;    path: "app.traktor.decks." + deckId + ".tempo.true_bpm" }
+
+function computeBeatCounterStringFromPosition(beat) {
+  var phraseLen = 4;  // 4 bars per phrase (standard)
+  var curBeat = parseInt(beat);
+
+  if (beat < 0.0)
+    curBeat = curBeat * -1;
+
+  var value1 = parseInt(((curBeat / 4) / phraseLen) + 1);  // Phrase number
+  var value2 = parseInt(((curBeat / 4) % phraseLen) + 1);  // Bar within phrase
+  var value3 = parseInt((curBeat % 4) + 1);                 // Beat within bar
+
+  if (beat < 0.0)
+    return "-" + value1 + "." + value2 + "." + value3;
+
+  return value1 + "." + value2 + "." + value3;
+}
+
+// Usage: convert elapsed time to beat position
+readonly property string beats:
+  computeBeatCounterStringFromPosition(
+    ((propElapsedTime.value * 1000 - propGridOffset.value) * propMixerBpm.value) / 60000.0
+  )
+```
+
+**Version B: Configurable Phrase Length (X1 MK3 Performance Mod)**
+
+```qml
+// Phrase length is configurable via MappingProperty (power of 2)
+MappingProperty {
+  id: customBeatCounterPhraseLengthProp
+  path: "mapping.settings.custom_phrase_length"
+}
+
+property int customBeatCounterPhraseLength: customBeatCounterPhraseLengthProp.value
+
+function computeBarsBeatsFromPosition(beat) {
+  var phraseLen   = Math.pow(2, customBeatCounterPhraseLength)  // 1, 2, 4, 8, 16...
+  var rawInt      = parseInt(beat + 0.0001)  // 0.0001 counters rounding error
+  var prefix      = (beat < 0) ? "-" : " "
+  var absBeats    = Math.abs(rawInt)
+  var phrases     = parseInt(absBeats / (phraseLen * 4)) + 1
+  var bars        = parseInt((absBeats / 4) % phraseLen) + 1
+  // When phrase length is 1, skip bar display (phrase == bar)
+  var phrasesBars = (customBeatCounterPhraseLength == 0) ? phrases + "." : phrases + "." + bars + "."
+  var beatInBar   = parseInt(absBeats % 4) + 1
+  return prefix + phrasesBars + beatInBar
+}
+```
+
+### Explanation
+
+The formula converts elapsed time to beat position:
+
+| Step | Formula | Purpose |
+| ---- | ------- | ------- |
+| 1 | `elapsed * 1000 - gridOffset` | Time in ms, aligned to beatgrid |
+| 2 | `* bpm / 60000` | Convert ms to beat number |
+| 3 | `beat / 4` | Convert beats to bars |
+| 4 | `bars / phraseLen` | Convert bars to phrases |
+| 5 | `bars % phraseLen` | Bar position within phrase |
+| 6 | `beat % 4` | Beat position within bar |
+
+**Beats-to-cue variant** (S4 MK3 Mod): Replace `propElapsedTime` with distance to next cue point for a countdown:
+
+```qml
+AppProperty { id: propNextCuePoint; path: "app.traktor.decks." + deckId + ".track.player.next_cue_point" }
+AppProperty { id: propTrackLength;  path: "app.traktor.decks." + deckId + ".track.content.track_length" }
+
+readonly property double cuePos:
+  (propNextCuePoint.value >= 0) ? propNextCuePoint.value : propTrackLength.value * 1000
+
+readonly property string beatsToCue:
+  computeBeatCounterStringFromPosition(
+    ((propElapsedTime.value * 1000 - cuePos) * propMixerBpm.value) / 60000.0
+  )
+```
+
+---
+
+## 🎨 Example 29: Per-Deck Color Customization via Settings File
+
+**Difficulty**: 🟡 Intermediate | **Layer**: 📐 Defines/Screens | **Time**: 45 min | **Controllers**: S4 MK3, screen controllers
+
+**Source**: S4 MK3 Mod (Joe Easton)
+
+### Default Behavior (Native Instruments)
+
+Traktor uses a fixed color scheme for decks, jog wheels, and FX indicators. Users cannot customize these colors without editing multiple QML files.
+
+### Customized Behavior
+
+A centralized `Settings.qml` file in `Screens/Defines/` allows per-deck color assignment for waveforms, jog wheels, phase meters, and FX indicators using a 16-color palette.
+
+**Step 1: Create the Settings file**
+
+```qml
+// Screens/Defines/Settings.qml
+import QtQuick 2.0
+
+QtObject {
+  // 16-color palette index:
+  // 0=Red, 1=DarkOrange, 2=LightOrange, 3=White/Default, 4=Yellow,
+  // 5=Lime, 6=Green, 7=Mint, 8=Cyan, 9=Turquoise, 10=Blue,
+  // 11=Plum, 12=Violet, 13=Purple, 14=Magenta, 15=Fuchsia
+
+  // Per-deck header/waveform color
+  readonly property int deckAColour: 10    // Blue
+  readonly property int deckBColour: 10    // Blue
+  readonly property int deckCColour: 2     // Light Orange
+  readonly property int deckDColour: 2     // Light Orange
+
+  // Per-deck jog wheel color (independent of deck color)
+  readonly property int jogAColour: 10
+  readonly property int jogBColour: 10
+  readonly property int jogCColour: 2
+  readonly property int jogDColour: 2
+
+  // Phase meter per-deck color
+  readonly property int phaseAColour: 3    // Default
+  readonly property int phaseBColour: 3
+  readonly property int phaseCColour: 3
+  readonly property int phaseDColour: 3
+
+  // FX indicator colors (per FX unit, not per deck)
+  readonly property int fx1Colour: 1       // Red
+  readonly property int fx2Colour: 8       // Cyan
+  readonly property int fx3Colour: 11      // Plum
+  readonly property int fx4Colour: 6       // Green
+  readonly property int filterColour: 3    // White
+
+  // Additional display preferences
+  readonly property bool camelotKey: false
+  readonly property bool enableBeatsBox: true
+  readonly property bool showBeatsToCue: false
+  readonly property bool elapsedTime: false         // false = remaining time
+  readonly property bool waveformEndFlashing: true
+  readonly property bool jogwheelEndFlashing: true
+}
+```
+
+**Step 2: Reference in screen components**
+
+```qml
+// In any Screens component (e.g., DeckHeader.qml)
+import "../Defines"
+
+Item {
+  // Import the settings singleton
+  Settings { id: settings }
+
+  // Color lookup function (maps index to actual color value)
+  function getColorFromIndex(colorIndex) {
+    var palette = [
+      "#FF0000", "#FF6600", "#FF9900", "#FFFFFF", "#FFCC00",
+      "#99FF00", "#00FF00", "#00FF99", "#00FFFF", "#00CCCC",
+      "#0066FF", "#9933FF", "#CC00FF", "#6600CC", "#FF00FF", "#FF0099"
+    ]
+    return palette[Math.min(colorIndex, palette.length - 1)]
+  }
+
+  // Use per-deck color
+  property color deckColor: {
+    switch (deckId) {
+      case 1: return getColorFromIndex(settings.deckAColour)
+      case 2: return getColorFromIndex(settings.deckBColour)
+      case 3: return getColorFromIndex(settings.deckCColour)
+      case 4: return getColorFromIndex(settings.deckDColour)
+    }
+  }
+
+  Rectangle {
+    color: deckColor
+    // ...
+  }
+}
+```
+
+### Explanation
+
+- **Centralized configuration**: All color settings live in one file, so users only edit `Settings.qml`
+- **Independent color axes**: Deck headers, jog wheels, phase meters, and FX units each have separate color assignments
+- **Palette-based**: Using index values (0-15) instead of hex colors makes the settings file human-readable
+- **Ship a default**: Include a `Settings-Default.qml` alongside `Settings.qml` so users can always restore defaults
+
+**Design pattern**: This is the same approach used by [Example 4 (Preferences)](#example-4-preferences-system-shared-configuration) but scaled up to cover every visual element. The key insight is separating the palette definition (in screen code) from the palette selection (in the settings file).
+
+---
+
+## 🔑 Example 30: Camelot Key Conversion for Browser and Deck Display
+
+**Difficulty**: 🟢 Beginner | **Layer**: 🖥️ Screens | **Time**: 20 min | **Controllers**: All screen controllers
+
+**Source**: traktor-kontrol-screens (tipesoft/kokernutz)
+
+### Default Behavior (Native Instruments)
+
+Traktor displays musical keys in Open Key notation (e.g., `1d`, `5m`). Many DJs prefer the Camelot wheel notation (e.g., `8B`, `12A`) used by Mixed In Key and Rekordbox.
+
+### Customized Behavior
+
+A utility function converts Open Key to Camelot notation, applied to deck headers and browser list items.
+
+**Step 1: Add conversion function**
+
+```qml
+// Screens/Defines/Utils.qml (or any shared utility file)
+import QtQuick 2.0
+
+QtObject {
+  function convertToCamelot(keyToConvert) {
+    if (keyToConvert == "") return "-"
+
+    switch (keyToConvert) {
+      // Major keys (d → B)
+      case "1d":  return "8B";   case "2d":  return "9B"
+      case "3d":  return "10B";  case "4d":  return "11B"
+      case "5d":  return "12B";  case "6d":  return "1B"
+      case "7d":  return "2B";   case "8d":  return "3B"
+      case "9d":  return "4B";   case "10d": return "5B"
+      case "11d": return "6B";   case "12d": return "7B"
+
+      // Minor keys (m → A)
+      case "1m":  return "8A";   case "2m":  return "9A"
+      case "3m":  return "10A";  case "4m":  return "11A"
+      case "5m":  return "12A";  case "6m":  return "1A"
+      case "7m":  return "2A";   case "8m":  return "3A"
+      case "9m":  return "4A";   case "10m": return "5A"
+      case "11m": return "6A";   case "12m": return "7A"
+    }
+    return "ERR"
+  }
+
+  // Optional: key compatibility offset for harmonic mixing
+  function getMasterKeyOffset(masterKey, trackKey) {
+    var masterMatch = masterKey.match(/(\d+)(d|m)/)
+    var trackMatch  = trackKey.match(/(\d+)(d|m)/)
+    if (!masterMatch || !trackMatch) return
+
+    // Same key number = perfect match
+    if (masterMatch[1] == trackMatch[1]) return 0
+
+    // Same mode (both major or both minor) — check adjacent keys
+    if (masterMatch[2] == trackMatch[2]) {
+      var getOffset = function(n) { return (((n - 1) + 12) % 12) + 1 }
+      if (getOffset(trackMatch[1] - 1) == masterMatch[1]) return  1   // +1 semitone
+      if (getOffset(trackMatch[1] - 2) == masterMatch[1]) return  2   // +2 semitones
+      if (getOffset(masterMatch[1] - 1) == trackMatch[1]) return -1   // -1 semitone
+      if (getOffset(masterMatch[1] - 2) == trackMatch[1]) return -2   // -2 semitones
+    }
+  }
+}
+```
+
+**Step 2: Use in deck header**
+
+```qml
+// In DeckHeaderText.qml or DeckInfo.qml
+import "../Defines"
+
+Item {
+  Utils { id: utils }
+
+  // Toggle via preferences
+  Prefs { id: prefs }
+
+  AppProperty { id: keyProp; path: "app.traktor.decks." + deckId + ".content.musical_key" }
+
+  Text {
+    text: prefs.camelotKey ? utils.convertToCamelot(keyProp.value) : keyProp.value
+    color: getKeyColor(keyProp.value)  // Optional: color-code by key
+  }
+}
+```
+
+**Step 3: Use in browser list**
+
+```qml
+// In Browser/ListDelegate.qml
+Text {
+  // The browser provides key as a column value
+  text: prefs.camelotKey ? utils.convertToCamelot(modelData.key) : modelData.key
+}
+```
+
+### Explanation
+
+The Camelot wheel maps the circle of fifths to numbers 1-12, with A (minor) and B (major) suffixes. The conversion table is static — Open Key `Xd` (major) maps to Camelot `YB`, and `Xm` (minor) maps to `YA`. The offset is consistent: Camelot number = `(OpenKey + 7) mod 12`.
+
+The `getMasterKeyOffset` function helps with harmonic mixing by showing how many semitones apart two tracks are. Keys within ±2 semitones of the same mode are generally compatible.
+
+**Toggle control**: Make the Camelot display optional via a `camelotKey` boolean in your preferences file (see [Example 4](#example-4-preferences-system-shared-configuration) or [Example 29](#-example-29-per-deck-color-customization-via-settings-file)).
+
+---
+
+## ⚙️ Example 31: On-Device Multi-Page Setup System
+
+**Difficulty**: 🟠 Advanced | **Layer**: 🔌 CSI + 🖥️ Screens | **Time**: 2 hrs | **Controllers**: Controllers with OLED/LCD screens
+
+**Source**: X1 MK3 Performance Mod (Sulherokhh)
+
+### Default Behavior (Native Instruments)
+
+Controller settings must be configured by editing QML files on the computer and restarting Traktor. There is no way to adjust preferences from the controller hardware itself.
+
+### Customized Behavior
+
+A multi-page on-device setup system uses `MappingPropertyDescriptor` for persistent state and the controller's screen + buttons to navigate setup pages and toggle options — no computer editing or restart required.
+
+**Step 1: Define persistent settings with MappingPropertyDescriptor**
+
+```qml
+// CSI/[Controller]/[Controller].qml
+Module {
+  id: module
+
+  // Persistent settings — these survive across screen changes
+  MappingPropertyDescriptor {
+    path: "mapping.settings.deck_assignment"
+    type: MappingPropertyDescriptor.Integer
+    value: 0  // 0 = A/B, 1 = C/D, etc.
+  }
+
+  MappingPropertyDescriptor {
+    path: "mapping.settings.custom_browser_mode"
+    type: MappingPropertyDescriptor.Boolean
+    value: false
+  }
+
+  MappingPropertyDescriptor {
+    path: "mapping.settings.custom_phrase_length"
+    type: MappingPropertyDescriptor.Integer
+    value: 2  // Power of 2: 0=1bar, 1=2bar, 2=4bar, 3=8bar
+  }
+
+  // Setup page state
+  MappingPropertyDescriptor {
+    id: deviceSetupStateProp
+    path: "mapping.state.device_setup_state"
+    type: MappingPropertyDescriptor.Integer
+    value: 0  // 0 = unassigned (setup mode), 1 = just_assigned, 2 = assigned (normal)
+  }
+
+  MappingPropertyDescriptor {
+    path: "mapping.state.device_setup_page"
+    type: MappingPropertyDescriptor.Integer
+    value: 1  // Current setup page number
+  }
+}
+```
+
+**Step 2: Read settings on the screen side**
+
+```qml
+// Screens/[Controller]/ModeScreen.qml or DeckScreen.qml
+Item {
+  // Read the persistent settings (read-only on screen side)
+  MappingProperty { id: deviceSetupStateProp; path: screen.propertiesPath + ".device_setup_state" }
+  MappingProperty { id: deviceSetupPageProp;  path: screen.propertiesPath + ".device_setup_page" }
+  MappingProperty { id: deckAssignmentProp;   path: "mapping.settings.deck_assignment" }
+
+  property int deviceSetupState: deviceSetupStateProp.value
+  property int deviceSetupPage:  deviceSetupPageProp.value
+
+  // Normal deck display — visible only when setup is complete
+  Item {
+    visible: deviceSetupState == 2  // assigned
+    // ... deck content ...
+  }
+
+  // Setup page display — visible during setup
+  Column {
+    visible: deviceSetupState == 0  // unassigned (setup mode)
+    spacing: 4
+
+    Text {
+      text: "SETUP PAGE " + deviceSetupPage
+      color: "white"
+      font.pixelSize: 14
+    }
+
+    // Page-specific options displayed here
+    Loader {
+      sourceComponent: {
+        switch (deviceSetupPage) {
+          case 1: return deckAssignmentPage
+          case 2: return displayOptionsPage
+          case 3: return beatCounterPage
+          default: return null
+        }
+      }
+    }
+  }
+}
+```
+
+**Step 3: Wire buttons to navigate setup**
+
+```qml
+// CSI/[Controller]/[Controller]DeviceSetup.qml
+Module {
+  id: module
+  property string surface: ""
+  property string propertiesPath: ""
+
+  function reset() {
+    deviceSetupStateProp.value = 0   // Enter setup mode
+    deviceSetupPageProp.value = 1    // Go to page 1
+  }
+
+  // Wire a button combo (e.g., SHIFT + specific button) to enter/exit setup
+  Wire {
+    from: "%surface%.buttons.setup"
+    to: ButtonScriptAdapter {
+      onPress: {
+        if (deviceSetupStateProp.value == 0) {
+          // In setup: advance to next page, or exit
+          if (deviceSetupPageProp.value < totalPages) {
+            deviceSetupPageProp.value++
+          } else {
+            deviceSetupStateProp.value = 2  // Exit setup → assigned
+          }
+        } else {
+          reset()  // Enter setup mode
+        }
+      }
+    }
+  }
+
+  // Wire encoders to change values on the current setup page
+  Wire {
+    from: "%surface%.encoder"
+    to: EncoderScriptAdapter {
+      onIncrement: adjustCurrentPageSetting(1)
+      onDecrement: adjustCurrentPageSetting(-1)
+    }
+    enabled: deviceSetupStateProp.value == 0
+  }
+
+  function adjustCurrentPageSetting(direction) {
+    switch (deviceSetupPageProp.value) {
+      case 1:
+        // Cycle deck assignment
+        deckAssignmentProp.value = (deckAssignmentProp.value + direction + 6) % 6
+        break
+      case 3:
+        // Adjust phrase length (0-4, representing 1/2/4/8/16 bars)
+        customPhraseLengthProp.value = Math.max(0, Math.min(4,
+          customPhraseLengthProp.value + direction))
+        break
+    }
+  }
+}
+```
+
+### Explanation
+
+This pattern uses two types of mapping properties:
+
+| Type | Path Prefix | Purpose | Lifetime |
+| ---- | ----------- | ------- | -------- |
+| `mapping.settings.*` | Settings | User preferences (deck assignment, phrase length) | Persist while Traktor runs |
+| `mapping.state.*` | State | UI state (setup page number, current mode) | Transient, reset on reconnect |
+
+The `MappingPropertyDescriptor` (CSI side) **declares and writes** the property, while `MappingProperty` (Screen side) **reads** it. This separation allows the controller logic to manage state while the screen simply displays it.
+
+**Key design choices from the X1 MK3 mod**:
+- Use `DeviceSetupState` enum (unassigned/just_assigned/assigned) to gate screen visibility
+- Each setup page maps to a specific `Loader` component so pages are independent
+- Encoder rotation adjusts the current page's setting without button combinations
+- Settings are immediately reflected on the screen (no restart needed)
+
+**See also**: [Example 22 (Modular Settings)](#-example-22-modular-settings-framework) for a Defines-layer approach to settings management.
+
+---
+
+## 🌈 Example 32: Spectrum Waveform Color Themes
+
+**Difficulty**: 🟢 Beginner | **Layer**: 📐 Defines/Screens | **Time**: 15 min | **Controllers**: Screen controllers (D2/S5/S8/S4MK3)
+
+**Source**: traktor-kontrol-screens (tipesoft/kokernutz)
+
+### Default Behavior (Native Instruments)
+
+Traktor displays spectrum waveforms with a fixed color scheme. The colors representing low, mid, and high frequencies cannot be customized.
+
+### Customized Behavior
+
+A theme selector in the preferences file lets users switch between 7 color schemes inspired by different DJ hardware manufacturers.
+
+**Step 1: Add theme setting to preferences**
+
+```qml
+// Screens/Defines/Prefs.qml
+QtObject {
+  property int spectrumWaveformColors: 1
+  // 1 - KOKERNUTZ   (custom blue-green theme)
+  // 2 - NEXUS        (warm orange-yellow)
+  // 3 - PRIME        (Denon Prime series style)
+  // 4 - SC5000/SC6000 (Denon SC style)
+  // 5 - CDJ 2000     (Pioneer blue-focused)
+  // 6 - CDJ 3000     (Pioneer modern)
+  // 7 - NUMARK       (Numark style)
+}
+```
+
+**Step 2: Apply theme in waveform rendering**
+
+```qml
+// In WaveformColor.qml or equivalent
+import "../Defines"
+
+Item {
+  Prefs { id: prefs }
+
+  // Color arrays: [low, mid, high] for each theme
+  readonly property variant waveformThemes: {
+    1: { low: "#0055FF", mid: "#00FF88", high: "#FFFFFF" },  // KOKERNUTZ
+    2: { low: "#FF6600", mid: "#FFCC00", high: "#FFFF99" },  // NEXUS
+    3: { low: "#FF0000", mid: "#00FF00", high: "#0066FF" },  // PRIME
+    4: { low: "#FF3300", mid: "#00CC00", high: "#0088FF" },  // SC5000/SC6000
+    5: { low: "#0044CC", mid: "#00AAFF", high: "#66DDFF" },  // CDJ 2000
+    6: { low: "#0066FF", mid: "#00CCFF", high: "#99EEFF" },  // CDJ 3000
+    7: { low: "#FF0066", mid: "#FF9900", high: "#00CCFF" }   // NUMARK
+  }
+
+  readonly property var currentTheme: waveformThemes[prefs.spectrumWaveformColors] || waveformThemes[1]
+
+  property color lowColor:  currentTheme.low
+  property color midColor:  currentTheme.mid
+  property color highColor: currentTheme.high
+}
+```
+
+### Explanation
+
+This is a simple lookup pattern: the preferences file stores an integer theme index, and the waveform component maps that index to a set of frequency band colors. To add a new theme, add a new entry to the `waveformThemes` object and document it in the preferences comments.
+
+This pattern extends naturally to other visual elements — deck header colors, phase meter colors, or even font choices can use the same index-based approach from a single preferences file.
+
+**See also**: [Example 10 (Color Scheme)](#-example-10-deck-color-scheme-customization) for basic color changes, [Example 29 (Per-Deck Colors)](#-example-29-per-deck-color-customization-via-settings-file) for a more comprehensive color system.

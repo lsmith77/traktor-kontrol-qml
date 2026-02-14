@@ -617,6 +617,48 @@ These real customizations from the community demonstrate the scope of what can b
 - Comprehensive D2/S5/S8 screen optimizations
 - Browse-on-touch smart controls
 
+**From Sulherokhh (X1 MK3 Community Performance Mod):**
+
+- 3-page on-device setup system using MappingProperty descriptors
+- Browser mode converting FX encoders into playlist/tree navigation
+- Mixer overlay with configurable EQ/filter/volume knob assignments per layer
+- Master level meter with clip and limiter indicators on the 128x64 OLED screen
+- CDJ-style LED feedback (Play=green, Sync=cyan, Cue=yellow with blink patterns)
+- Vinyl break effect with variable intensity based on hold duration
+- Fine tempo adjustment (0.01 BPM) and coarse adjustment (1.00 BPM) via encoder combos
+- Beatgrid manipulation (tap, set/delete grid markers) via button combos
+- Stem/Remix deck superknob (left=volume, right=high-pass filter)
+- Overmapping support via Sample Page Selector modifiers for external MIDI remapping
+- Custom Defines/enums architecture for state management
+
+**From Joe Easton (S4 MK3 Screen Mod, "Beta v0.9.1"):**
+
+- 16-color per-deck customization system (deck, jog wheel, waveform, phase meter, FX slots)
+- Central Settings.qml configuration file with 25+ user-configurable options
+- Beat counter display in phrase.bar.beat format (e.g., "3.2.4")
+- Beats-to-cue countdown computed from next cue point position
+- BPM offset display (difference between deck and master BPM)
+- Tempo-needed-to-match display (pitch % required to sync with master)
+- Colored deck headers with per-deck background colors and artist name display
+- Jog wheel track-end warning blink using Timer at 250ms intervals
+- Self-contained S4MK3 modules replacing shared Common modules (Browse, ChannelFX, Functions.js)
+- Bundled Qt runtime libraries for standalone distribution
+
+**From @tipesoft / kokernutz / community (Traktor Kontrol Screens):**
+
+- 7 spectrum waveform color themes (Kokernutz, Nexus, Prime, Denon SC5000/SC6000, Pioneer CDJ-2000/CDJ-3000, Numark)
+- Camelot key conversion with key offset calculations
+- Prefs.qml-based configuration system with toggleable features
+- Configurable deck data elements (all 9 display slots)
+- Hotcue bar with cue point names and color-coded markers
+- Phase meter widget for beat alignment visualization
+- Flux reverse via SHIFT+FLUX button combo
+- Fine/coarse tempo adjust direction toggle
+- Dynamic font sizing for long track titles
+- Mixer FX selector for S5/S8 with color-coded display
+- Deck letter indicator overlays on waveform stripe
+- Aggregated bug fixes (phase meter, BPM coloring, stem color bars, remix deck layout)
+
 **Native Traktor Pro 4:**
 
 - ButtonGestures module (built-in gesture detection)
@@ -701,6 +743,9 @@ This documentation was inspired by community customizations from:
 - **[djmirror v1.2.0](https://github.com/djmirror/traktor-kontrol-screens/tree/v1.2.0)** - Fader start and LED blinkers
 - **[Supreme Edition 3.0 BETA 36.3](https://community.native-instruments.com/discussion/4473/)** - Modular settings and vinyl break
 - **[SupremeModEdit V2](https://community.native-instruments.com/discussion/4473/supremeeditionmod-edit)** by Sûlherokhh - Dynamic waveforms and advanced UI
+- **[X1 MK3 Community Performance Mod V12](https://community.native-instruments.com/discussion/17167/x1mk3-qml-coding-projects-browsermode-anyone)** by Sûlherokhh - Browser mode, mixer overlay, 3-page setup system, vinyl break, CDJ-style LEDs, and fine tempo/beatgrid control for X1 MK3 (TP 4.4.1). With contributions from Stevan (SuperKnob concept), spinlud (beat counter/tempo), pixel, and Aleix Jiménez
+- **S4 MK3 Screen Mod ("Beta v0.9.1")** by Joe Easton - 16-color per-deck customization, beat counter, BPM offset display, colored deck headers, jog wheel track-end blink, and central Settings.qml configuration (TP 3.x, July 2019)
+- **[Traktor Kontrol Screens (tipesoft edition)](https://github.com/kokernutz/traktor-kontrol-screens)** by @tipesoft / @TraktorSimpleScreen - 7 spectrum waveform color themes, Camelot key display, hotcue bar, phase meter, flux reverse, Prefs.qml system, with contributions from kokernutz, jlertle, derzw3rg, and MrPatben8 (TP 3.10-3.11)
 - **[Flux Marker Fix](https://community.native-instruments.com/discussion/1202/dysfunctional-flux-marker-repaired)** - Community fix for broken flux marker on hardware screens (Traktor 3.5+)
 - Various contributions from the Native Instruments community forums
 

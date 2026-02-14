@@ -206,7 +206,116 @@ When updating Traktor and re-applying your QML mods:
 | ------- | ----- | --------------- |
 | TP4 (4.x) | `app.traktor.decks.X.load_secondary.selected`, `app.traktor.decks.X.load_track.selected`, `app.traktor.decks.X.load_stems.selected` | - |
 | TP4 (4.x) | `ButtonGestures` module (native gesture detection) | - |
+| TP4 (4.x) | `import QtQuick 2.0` (explicit version required) | `import QtQuick` (versionless) no longer used |
 | 3.5+ | - | `followFluxPosition` broken on WaveformTranslator ([Fix 1](#fix-1-flux-marker-not-appearing-on-hardware-screens)) |
+
+---
+
+## Fix 3: QtQuick Import Version Compatibility
+
+**Affected versions**: Mods built for TP 3.10-3.11 running on TP 4.x (or vice versa)
+**Affected controllers**: All
+
+### The Problem
+
+Community mods built for different Traktor versions may use different `QtQuick` import styles. The stock QML files have changed their import convention between major versions:
+
+- **Traktor Pro 3.10-3.11** (and some community mods): `import QtQuick` (versionless)
+- **Traktor Pro 4.x** (current stock): `import QtQuick 2.0` (explicit version)
+
+Mixing import styles can cause silent failures where components don't load properly.
+
+### The Fix
+
+When porting a mod between Traktor versions, ensure all QML files use the same import style as the target version's stock files:
+
+```qml
+// For Traktor Pro 4.x (current):
+import QtQuick 2.0
+import CSI 1.0
+
+// For older Traktor Pro 3.10-3.11 mods:
+import QtQuick
+import CSI 1.0
+```
+
+**Batch fix** (find and replace across all mod files):
+- Search: `import QtQuick\n` (without version number)
+- Replace: `import QtQuick 2.0\n`
+
+### Related Import Changes
+
+| Import | TP 3.x (older) | TP 4.x (current) |
+| ------ | --------------- | ----------------- |
+| QtQuick | `import QtQuick` | `import QtQuick 2.0` |
+| QtGraphicalEffects | `import QtGraphicalEffects 1.0` | `import Qt5Compat.GraphicalEffects` (some builds) |
+
+### Which Mods Are Affected
+
+| Mod | Built For | Import Style | Needs Fix for TP 4.x |
+| --- | --------- | ------------ | -------------------- |
+| traktor-kontrol-screens (tipesoft) | TP 3.10-3.11 | `import QtQuick` (versionless) | Yes |
+| S4 MK3 Mod (Joe Easton) | TP 3.x (2019) | `import QtQuick 2.5` | Check compatibility |
+| X1 MK3 Performance Mod V12 | TP 4.4.1 | `import QtQuick 2.0` | No (already compatible) |
+| Supreme Edition / SupremeModEdit | TP 3.5-3.7 | `import QtQuick 2.0` | Check compatibility |
+
+---
+
+## Fix 4: Controller-Specific Module Differences
+
+**Affected versions**: All
+**Affected controllers**: All (when porting mods between controllers)
+
+### The Problem
+
+Some community mods replace shared modules in `CSI/Common/` with controller-specific versions. This can cause conflicts when multiple mods are combined or when a mod is installed alongside stock files expecting the shared module.
+
+### Known Module Replacements
+
+These mods replace shared modules with self-contained versions:
+
+| Shared Module | Replaced By | Mod |
+| ------------- | ----------- | --- |
+| `CSI/Common/ExtendedBrowserModule.qml` | `CSI/S4MK3/S4MK3Browse.qml` | S4 MK3 Mod (Joe Easton) |
+| `CSI/Common/DeckHelpers.js` | `CSI/S4MK3/S4MK3Functions.js` | S4 MK3 Mod (Joe Easton) |
+| `CSI/Common/ChannelFX/FourChannelFXSelector.qml` | `CSI/S4MK3/S4MK3ChannelFXSelector.qml` | S4 MK3 Mod (Joe Easton) |
+| `CSI/Common/ChannelFX/TwoChannelFXSelector.qml` | (removed) | traktor-kontrol-screens (tipesoft) |
+
+### The Fix
+
+When installing these mods:
+
+1. **Check if the mod replaces shared modules** -- look for new files in the controller-specific directory that have similar names to files in `CSI/Common/`
+2. **Don't mix mods that replace the same shared module** in different ways
+3. **If combining mods**, ensure each mod's controller-specific replacements don't conflict with other controllers' imports of the shared module
+4. **Backup `CSI/Common/`** separately -- it's the most fragile area when combining mods
+
+---
+
+## Fix 5: New Hardware Support Files in TP 4.x
+
+**Affected versions**: Mods built for TP 3.x running on TP 4.x
+**Affected controllers**: Z1 MK2, MX2 (new in TP 4.x)
+
+### The Problem
+
+Traktor Pro 4.x added QML support for new controllers not present in TP 3.x:
+
+- `CSI/Z1MK2/` -- Z1 MK2 controller
+- `CSI/MX2/` -- MX2 controller
+- `Screens/Z1MK2/` -- Z1 MK2 screen definitions
+
+Community mods built for TP 3.x don't include these directories. If you replace the entire `qml/` folder with a mod's files, these controllers will stop working.
+
+### The Fix
+
+**Always use the overlay method** when installing mods:
+
+1. Start with the current stock TP 4.x `qml/` folder as your base
+2. Copy only the mod's changed files on top, overwriting when prompted
+3. **Never** replace the entire `qml/` folder with just the mod's files
+
+This ensures new controller support files remain intact.
 
 ---
 

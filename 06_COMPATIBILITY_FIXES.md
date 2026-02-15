@@ -1,28 +1,34 @@
-# Traktor QML Version Compatibility Fixes
+# Traktor QML: Compatibility Fixes
 
-**Purpose**: Fixes for bugs and breaking changes between Traktor versions. Apply these patches based on your specific Traktor version.
+**Purpose**: Version compatibility matrix and specific fixes for known issues across Traktor versions
+**Use when**: Something breaks after a Traktor update, or you're updating to a new Traktor version
 
-## Quick Navigation
+This file covers:
+
+- Compatibility notes and known fixes across Traktor versions
+- Specific solutions for reported bugs
+
+For debugging + testing, use: [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md)
+
+## 🧭 Quick Navigation
 
 - [Version Compatibility Matrix](#version-compatibility-matrix) - Which versions break what
 - [Fix 1: Flux Marker on Hardware Screens](#fix-1-flux-marker-not-appearing-on-hardware-screens) - Traktor 3.5+
 - [Fix 2: QML Mod Base Version Requirements](#fix-2-qml-mod-base-version-requirements) - Overlay installation method
 - [General Version Migration Tips](#general-version-migration-tips) - What to check after updates
 
----
-
 ## Version Compatibility Matrix
 
 QML mods can break between Traktor versions. This matrix documents known compatibility boundaries based on community experience.
 
-| Traktor Version | QML Status | Notes |
-| --------------- | ---------- | ----- |
-| 3.0 - 3.4 | Stable | Original QML structure, most mods originate here |
-| 3.5 | Breaking changes | `followFluxPosition` property broken ([Fix 1](#fix-1-flux-marker-not-appearing-on-hardware-screens)) |
-| 3.5 - 3.7 | Stable with fixes | Community mods (Supreme Edition, SupremeModEdit) confirmed working |
-| 3.8+ | Breaking changes | QML folder structure changes; many mods require rework |
-| 3.9 | Unconfirmed | Community mods not yet ported as of last report |
-| 4.x (TP4) | New features | Adds `ButtonGestures` module, new load modes, new property paths; older mods may need updates |
+| Traktor Version | QML Status        | Notes                                                                                                |
+| --------------- | ----------------- | ---------------------------------------------------------------------------------------------------- |
+| 3.0 - 3.4       | Stable            | Original QML structure, most mods originate here                                                     |
+| 3.5             | Breaking changes  | `followFluxPosition` property broken ([Fix 1](#fix-1-flux-marker-not-appearing-on-hardware-screens)) |
+| 3.5 - 3.7       | Stable with fixes | Community mods (Supreme Edition, SupremeModEdit) confirmed working                                   |
+| 3.8+            | Breaking changes  | QML folder structure changes; many mods require rework                                               |
+| 3.9             | Unconfirmed       | Community mods not yet ported as of last report                                                      |
+| 4.x (TP4)       | New features      | Adds `ButtonGestures` module, new load modes, new property paths; older mods may need updates        |
 
 **Key takeaway**: Always test mods after any Traktor update. Versions 3.5-3.7 are the most battle-tested for community mods. Moving to 3.8+ or 4.x may require significant rework.
 
@@ -43,7 +49,7 @@ After the Traktor 3.5 update, the Flux playmarker stopped appearing and moving o
 
 Replace the broken `followFluxPosition` binding with a manual position calculation in the WaveformContainer file.
 
-**File**: `Screens/S8/Views/Deck/WaveformContainer.qml` (path varies by controller — check your controller's `Screens/[Controller]/Views/Deck/` folder)
+**File**: `Screens/S8/Views/Deck/WaveformContainer.qml` (path varies by controller — check your controller's `Screens/[Controller]/Views/Deck` folder)
 
 #### Step 1: Add AppProperty Declarations
 
@@ -101,12 +107,12 @@ Traktor.WaveformTranslator {
 
 The formula calculates the pixel offset of the flux marker relative to the current playhead:
 
-| Component | Purpose |
-| --------- | ------- |
+| Component                                     | Purpose                                                 |
+| --------------------------------------------- | ------------------------------------------------------- |
 | `fluxPosition.value - playheadPosition.value` | Distance between flux return point and current playhead |
-| `/ wfPosition.sampleWidth` | Normalize to waveform's visible sample range |
-| `* 0x1f80000` | Scale to pixel coordinates in **normal playback mode** |
-| `* 0x13d8000` | Scale to pixel coordinates in **freeze/slicer mode** |
+| `/ wfPosition.sampleWidth`                    | Normalize to waveform's visible sample range            |
+| `* 0x1f80000`                                 | Scale to pixel coordinates in **normal playback mode**  |
+| `* 0x13d8000`                                 | Scale to pixel coordinates in **freeze/slicer mode**    |
 
 The two hex multipliers (`0x1f80000` = 33,095,680 and `0x13d8000` = 20,742,144) account for different waveform display scales between normal and freeze modes.
 
@@ -122,11 +128,11 @@ This is described by the original author as "an eyeball fix." If the marker posi
 
 This fix introduces three properties not commonly used elsewhere:
 
-| Property Path | Type | Description |
-| ------------- | ---- | ----------- |
-| `app.traktor.decks.X.track.player.playhead_position` | float | Current playhead position in the track |
-| `app.traktor.decks.X.track.player.flux_position` | float | Position where flux mode will return to |
-| `app.traktor.decks.X.freeze.enabled` | bool | Whether freeze/slicer mode is active |
+| Property Path                                        | Type  | Description                             |
+| ---------------------------------------------------- | ----- | --------------------------------------- |
+| `app.traktor.decks.X.track.player.playhead_position` | float | Current playhead position in the track  |
+| `app.traktor.decks.X.track.player.flux_position`     | float | Position where flux mode will return to |
+| `app.traktor.decks.X.freeze.enabled`                 | bool  | Whether freeze/slicer mode is active    |
 
 ---
 
@@ -146,6 +152,7 @@ When installing community QML mods:
 1. **Check which Traktor version the mod was built for**. For example, SupremeModEdit V2 requires the Traktor Beta 31 QML folder as its base.
 
 2. **Use the overlay method**, not full replacement:
+
    ```
    # Correct: overlay mod files on top of base
    1. Start with the correct base version's qml/ folder
@@ -159,7 +166,7 @@ When installing community QML mods:
 
 ### Why This Matters
 
-QML mods typically modify 10-30 files out of hundreds in the `qml/` folder. The unmodified files must come from the version the mod was designed for, because:
+QML mods typically modify 10-30 files out of hundreds in the `qml` folder. The unmodified files must come from the version the mod was designed for, because:
 
 - Internal `import` paths may change between versions
 - Component APIs (available properties, signals) can change
@@ -174,13 +181,14 @@ When updating Traktor and re-applying your QML mods:
 
 ### Before Updating
 
-1. **Backup your modded `qml/` folder** outside the Traktor directory
+1. **Backup your modded `qml` folder** outside the Traktor directory
 2. **Document your changes** — keep a list of which files you modified and why
-3. **Use Git** to track your modifications (see [README.md](README.md#use-git-for-version-control-recommended))
+3. **Use Git** to track your modifications (see the workflow notes in [01_BASICS.md](01_BASICS.md) and the structure in [00_HANDBOOK.md](00_HANDBOOK.md))
 
 ### After Updating
 
 1. **Diff the new stock files against your backup** to see what NI changed:
+
    ```bash
    diff -rq qml/ qml.modded/ | grep "differ"
    ```
@@ -202,12 +210,12 @@ When updating Traktor and re-applying your QML mods:
 
 ### Version-Specific Property Changes
 
-| Version | Added | Changed/Removed |
-| ------- | ----- | --------------- |
-| TP4 (4.x) | `app.traktor.decks.X.load_secondary.selected`, `app.traktor.decks.X.load_track.selected`, `app.traktor.decks.X.load_stems.selected` | - |
-| TP4 (4.x) | `ButtonGestures` module (native gesture detection) | - |
-| TP4 (4.x) | `import QtQuick 2.0` (explicit version required) | `import QtQuick` (versionless) no longer used |
-| 3.5+ | - | `followFluxPosition` broken on WaveformTranslator ([Fix 1](#fix-1-flux-marker-not-appearing-on-hardware-screens)) |
+| Version   | Added                                                                                                                               | Changed/Removed                                                                                                   |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| TP4 (4.x) | `app.traktor.decks.X.load_secondary.selected`, `app.traktor.decks.X.load_track.selected`, `app.traktor.decks.X.load_stems.selected` | -                                                                                                                 |
+| TP4 (4.x) | `ButtonGestures` module (native gesture detection)                                                                                  | -                                                                                                                 |
+| TP4 (4.x) | `import QtQuick 2.0` (explicit version required)                                                                                    | `import QtQuick` (versionless) no longer used                                                                     |
+| 3.5+      | -                                                                                                                                   | `followFluxPosition` broken on WaveformTranslator ([Fix 1](#fix-1-flux-marker-not-appearing-on-hardware-screens)) |
 
 ---
 
@@ -240,25 +248,26 @@ import CSI 1.0
 ```
 
 **Batch fix** (find and replace across all mod files):
+
 - Search: `import QtQuick\n` (without version number)
 - Replace: `import QtQuick 2.0\n`
 
 ### Related Import Changes
 
-| Import | TP 3.x (older) | TP 4.x (current) |
-| ------ | --------------- | ----------------- |
-| QtQuick | `import QtQuick` | `import QtQuick 2.0` |
+| Import             | TP 3.x (older)                  | TP 4.x (current)                                  |
+| ------------------ | ------------------------------- | ------------------------------------------------- |
+| QtQuick            | `import QtQuick`                | `import QtQuick 2.0`                              |
 | QtGraphicalEffects | `import QtGraphicalEffects 1.0` | `import Qt5Compat.GraphicalEffects` (some builds) |
 
 ### Which Mods Are Affected
 
-| Mod | Built For | Import Style | Needs Fix for TP 4.x |
-| --- | --------- | ------------ | -------------------- |
-| traktor-kontrol-screens (tipesoft) | TP 3.10-3.11 | `import QtQuick` (versionless) | Yes |
-| S4 MK3 Mod (Joe Easton) | TP 3.x (2019) | `import QtQuick 2.5` | Check compatibility |
-| X1 MK3 Performance Mod V12 | TP 4.4.1 | `import QtQuick 2.0` | No (already compatible) |
-| S3 PerformanceMod 4.0.2 (pixel) | TP 4.4.1 | `import QtQuick 2.0` / `2.5` / `2.12` (mixed) | No (already compatible) |
-| Supreme Edition / SupremeModEdit | TP 3.5-3.7 | `import QtQuick 2.0` | Check compatibility |
+| Mod                                | Built For     | Import Style                                  | Needs Fix for TP 4.x    |
+| ---------------------------------- | ------------- | --------------------------------------------- | ----------------------- |
+| traktor-kontrol-screens (tipesoft) | TP 3.10-3.11  | `import QtQuick` (versionless)                | Yes                     |
+| S4 MK3 Mod (Joe Easton)            | TP 3.x (2019) | `import QtQuick 2.5`                          | Check compatibility     |
+| X1 MK3 Performance Mod V12         | TP 4.4.1      | `import QtQuick 2.0`                          | No (already compatible) |
+| S3 PerformanceMod 4.0.2 (pixel)    | TP 4.4.1      | `import QtQuick 2.0` / `2.5` / `2.12` (mixed) | No (already compatible) |
+| Supreme Edition / SupremeModEdit   | TP 3.5-3.7    | `import QtQuick 2.0`                          | Check compatibility     |
 
 ---
 
@@ -269,31 +278,31 @@ import CSI 1.0
 
 ### The Problem
 
-Some community mods replace shared modules in `CSI/Common/` with controller-specific versions. This can cause conflicts when multiple mods are combined or when a mod is installed alongside stock files expecting the shared module.
+Some community mods replace shared modules in `CSI/Common` with controller-specific versions. This can cause conflicts when multiple mods are combined or when a mod is installed alongside stock files expecting the shared module.
 
 ### Known Module Replacements
 
 These mods replace shared modules with self-contained versions:
 
-| Shared Module | Replaced By | Mod |
-| ------------- | ----------- | --- |
-| `CSI/Common/ExtendedBrowserModule.qml` | `CSI/S4MK3/S4MK3Browse.qml` | S4 MK3 Mod (Joe Easton) |
-| `CSI/Common/DeckHelpers.js` | `CSI/S4MK3/S4MK3Functions.js` | S4 MK3 Mod (Joe Easton) |
-| `CSI/Common/ChannelFX/FourChannelFXSelector.qml` | `CSI/S4MK3/S4MK3ChannelFXSelector.qml` | S4 MK3 Mod (Joe Easton) |
-| `CSI/Common/ChannelFX/FourChannelFXSelector.qml` | `CSI/Common/ChannelFX/FourChannelFXSelectorS3.qml` | S3 PerformanceMod (pixel) |
-| `CSI/Common/ChannelFX/` (multiple) | `CSI/Common/ChannelFX/ChannelFXS3.qml`, `FXChannelsSequencerS3.qml`, `FXControlsS3.qml`, `FXToggleMixerS3.qml`, `FXUnitsSelectorS3.qml` | S3 PerformanceMod (pixel) |
-| `CSI/Common/ExtendedBrowserModule.qml` | `CSI/Common/ExtendedBrowserModuleS3.qml` | S3 PerformanceMod (pixel) |
-| `CSI/Common/HotcuesModule.qml` | `CSI/Common/HotcuesModuleS3.qml` | S3 PerformanceMod (pixel) |
-| `CSI/Common/ChannelFX/TwoChannelFXSelector.qml` | (removed) | traktor-kontrol-screens (tipesoft) |
+| Shared Module                                    | Replaced By                                                                                                                             | Mod                                |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| `CSI/Common/ExtendedBrowserModule.qml`           | `CSI/S4MK3/S4MK3Browse.qml`                                                                                                             | S4 MK3 Mod (Joe Easton)            |
+| `CSI/Common/DeckHelpers.js`                      | `CSI/S4MK3/S4MK3Functions.js`                                                                                                           | S4 MK3 Mod (Joe Easton)            |
+| `CSI/Common/ChannelFX/FourChannelFXSelector.qml` | `CSI/S4MK3/S4MK3ChannelFXSelector.qml`                                                                                                  | S4 MK3 Mod (Joe Easton)            |
+| `CSI/Common/ChannelFX/FourChannelFXSelector.qml` | `CSI/Common/ChannelFX/FourChannelFXSelectorS3.qml`                                                                                      | S3 PerformanceMod (pixel)          |
+| `CSI/Common/ChannelFX` (multiple)                | `CSI/Common/ChannelFX/ChannelFXS3.qml`, `FXChannelsSequencerS3.qml`, `FXControlsS3.qml`, `FXToggleMixerS3.qml`, `FXUnitsSelectorS3.qml` | S3 PerformanceMod (pixel)          |
+| `CSI/Common/ExtendedBrowserModule.qml`           | `CSI/Common/ExtendedBrowserModuleS3.qml`                                                                                                | S3 PerformanceMod (pixel)          |
+| `CSI/Common/HotcuesModule.qml`                   | `CSI/Common/HotcuesModuleS3.qml`                                                                                                        | S3 PerformanceMod (pixel)          |
+| `CSI/Common/ChannelFX/TwoChannelFXSelector.qml`  | (removed)                                                                                                                               | traktor-kontrol-screens (tipesoft) |
 
 ### The Fix
 
 When installing these mods:
 
-1. **Check if the mod replaces shared modules** -- look for new files in the controller-specific directory that have similar names to files in `CSI/Common/`
+1. **Check if the mod replaces shared modules** -- look for new files in the controller-specific directory that have similar names to files in `CSI/Common`
 2. **Don't mix mods that replace the same shared module** in different ways
 3. **If combining mods**, ensure each mod's controller-specific replacements don't conflict with other controllers' imports of the shared module
-4. **Backup `CSI/Common/`** separately -- it's the most fragile area when combining mods
+4. **Backup `CSI/Common`** separately -- it's the most fragile area when combining mods
 
 ---
 
@@ -306,19 +315,19 @@ When installing these mods:
 
 Traktor Pro 4.x added QML support for new controllers not present in TP 3.x:
 
-- `CSI/Z1MK2/` -- Z1 MK2 controller
-- `CSI/MX2/` -- MX2 controller
-- `Screens/Z1MK2/` -- Z1 MK2 screen definitions
+- `CSI/Z1MK2` -- Z1 MK2 controller
+- `CSI/MX2` -- MX2 controller
+- `Screens/Z1MK2` -- Z1 MK2 screen definitions
 
-Community mods built for TP 3.x don't include these directories. If you replace the entire `qml/` folder with a mod's files, these controllers will stop working.
+Community mods built for TP 3.x don't include these directories. If you replace the entire `qml` folder with a mod's files, these controllers will stop working.
 
 ### The Fix
 
 **Always use the overlay method** when installing mods:
 
-1. Start with the current stock TP 4.x `qml/` folder as your base
+1. Start with the current stock TP 4.x `qml` folder as your base
 2. Copy only the mod's changed files on top, overwriting when prompted
-3. **Never** replace the entire `qml/` folder with just the mod's files
+3. **Never** replace the entire `qml` folder with just the mod's files
 
 This ensures new controller support files remain intact.
 
@@ -360,8 +369,12 @@ MappingProperty { id: deckFocusProp; path: "mapping.settings.deck_focus" }
 
 Properties under `mapping.state.*` are transient — they reset when the controller disconnects. Properties under `mapping.settings.*` are saved in Traktor's mapping file and persist across restarts. Both files (CSI and Screen) must use the same path for the screen to display the correct state.
 
-**See also**: [PRACTICAL_EXAMPLES.md - Example 41](PRACTICAL_EXAMPLES.md#-example-41-persistent-deck-focus-d2-settingspath-fix) for the full explanation of `mapping.state` vs `mapping.settings`.
+**See also**: [03_PRACTICAL_EXAMPLES.md - Example 41](03_PRACTICAL_EXAMPLES.md#example-41-persistent-deck-focus-d2-settingspath-fix) for the full explanation of `mapping.state` vs `mapping.settings`.
 
 ---
 
 **Have a fix for a version-specific issue?** Add it to this file following the format above: Problem, Affected versions, Fix, and Explanation.
+
+---
+
+**Next:** [07_GLOSSARY.md](07_GLOSSARY.md)

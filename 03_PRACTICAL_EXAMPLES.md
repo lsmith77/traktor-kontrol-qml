@@ -1,8 +1,9 @@
 # Traktor QML Practical Examples
 
-**Purpose**: Real-world customization examples from community modifications
+**Purpose**: Real-world customization examples from community modifications (41 full code examples)
+**Use when**: Looking for a concrete working code sample to adapt for your own mods
 
-## 📋 Table of Contents
+## 🧭 Quick Navigation
 
 **📖 Getting Started:**
 
@@ -10,6 +11,7 @@
 - [Before You Start](#before-you-start) - Prerequisites & safety checklist
 - [Example Categories](#example-categories) - Overview table
 - [How to Apply an Example](#how-to-apply-an-example) - Step-by-step process
+- [Getting Help](#getting-help) - What to do when an example doesn’t work
 
 **🗂️ Find Examples By:**
 
@@ -30,14 +32,6 @@
 - [Examples 28-32](#example-28-beat-counter-phrasebarbeat-display) - 🟢🟠 Beginner-Advanced (Community mod patterns)
 - [Examples 33-39](#example-33-soft-takeover-with-visual-direction-feedback) - 🟡🔴 Intermediate-Expert (S3 PerformanceMod patterns)
 - [Examples 40-41](#example-40-multi-deck-assignment-cycling-z1-mk2-channel-select) - 🟢🟡 Beginner-Intermediate (Deck assignment & persistence)
-
-**💡 Getting Help:**
-
-- [Customizing Examples](#customizing-examples-for-your-needs) - How to adapt for your needs
-- [Getting Help](#getting-help) - Troubleshooting & error messages
-- See also: [README.md](README.md) for architecture overview
-- See also: [QUICK_REFERENCE.md](QUICK_REFERENCE.md) for syntax lookup
-- See also: [COMPATIBILITY_FIXES.md](COMPATIBILITY_FIXES.md) for version-specific bug fixes
 
 ---
 
@@ -79,29 +73,84 @@ Each example follows this structure:
 
 ### Before You Start
 
-**Essential Prerequisites**:
+Keep this open while applying examples:
 
-- ✅ Backup your QML folder (`Resources64/qml/`)
-- ✅ Read README.md for architecture overview
-- ✅ Keep QUICK_REFERENCE.md open for syntax lookup
-- ✅ Test changes on one controller first
-- ✅ Restart Traktor after every modification
+- Safe install/backup/restore workflow + paths: [01_BASICS.md](01_BASICS.md#install--backup--restore-the-safe-workflow)
+- Debugging/testing checklists: [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md)
+- Version-specific gotchas (e.g. `import QtQuick` differences): [06_COMPATIBILITY_FIXES.md](06_COMPATIBILITY_FIXES.md#fix-3-qtquick-import-version-compatibility)
 
-**Understanding File Paths**:
-All file paths in examples are relative to your Traktor installation:
+---
 
-- Windows: `C:\Program Files\Native Instruments\Traktor Pro 3\Resources64\qml\`
-- macOS: `/Applications/Native Instruments/Traktor Pro 3.app/Contents/Resources/qml/`
+## 🎯 Success Criteria: Knowing When You're Done
+
+Each difficulty level has specific success criteria so you know when an example is working correctly:
+
+### Beginner (🟢 Examples 1-5, 26, 40-41)
+
+**Objective**: Make a single-file change and see it work in Traktor.
+
+**You'll know it's working when:**
+
+- ✓ Change is visible in Traktor after restart
+- ✓ No error messages in Traktor's console/logs
+- ✓ Behavior matches the example description
+- ✓ You can restore your backup if something breaks
+
+**Typical time**: 15-30 minutes per example  
+**Success metric**: One clear, intentional behavior change
+
+### Intermediate (🟡 Examples 6-10, 14-16, 28-32)
+
+**Objective**: Combine CSI (controller) and Screens (visual) changes, understand data flow between them.
+
+**You'll know it's working when:**
+
+- ✓ Visual feedback appears on screen (colors, text, icons change)
+- ✓ Controller behavior matches expected function
+- ✓ No lag or performance issues
+- ✓ You can explain why you edited those specific files
+
+**Typical time**: 30 minutes to 1 hour per example  
+**Success metric**: Coordinated behavior between hardware and display
+
+### Advanced (🟠 Examples 11-13, 17-20, 33-39)
+
+**Objective**: Build complex logic systems (complex timers, state machines, multi-gesture handling).
+
+**You'll know it's working when:**
+
+- ✓ Complex behavior is stable across repeated use
+- ✓ Edge cases are handled (e.g., button held down, rapid clicks)
+- ✓ No memory leaks or performance degradation
+- ✓ Error messages are helpful and don't crash Traktor
+
+**Typical time**: 1-2 hours per example  
+**Success metric**: Robust, repeatable behavior under various conditions
+
+### Expert (🔴 Examples 21-25, 35-36)
+
+**Objective**: Integrate external systems, build modular frameworks, optimize for production use.
+
+**You'll know it's working when:**
+
+- ✓ Feature integrates seamlessly with Traktor workflow
+- ✓ Error handling is comprehensive (network failures, invalid data, etc.)
+- ✓ Framework is reusable across projects
+- ✓ Code is maintainable by other users (comments, clear naming)
+- ✓ Works across Traktor versions (or gracefully degrades)
+
+**Typical time**: 4+ hours per example  
+**Success metric**: Production-ready feature ready for sharing
 
 ### Example Categories
 
-| Category                | Examples               | Focus                                 |
-| ----------------------- | ---------------------- | ------------------------------------- |
-| **Controller Behavior** | 1, 17-18, 31, 33, 37-38, 40-41 | Button/encoder mappings, Wire logic   |
-| **Timing & Gestures**   | 2, 17, 19-20, 26, 34    | Timers, double-tap, long-hold         |
-| **Visual Display**      | 5-10, 12-13, 15-16, 27-28, 30, 32 | Screen layouts, colors, indicators |
-| **Settings Systems**    | 4, 11, 22, 29, 32, 39   | Preferences, configuration            |
-| **Advanced Features**   | 21, 23-25, 31, 35-36, 39 | API integration, LED control, effects, FX sequencer |
+| Category                | Examples                          | Focus                                               |
+| ----------------------- | --------------------------------- | --------------------------------------------------- |
+| **Controller Behavior** | 1, 17-18, 31, 33, 37-38, 40-41    | Button/encoder mappings, Wire logic                 |
+| **Timing & Gestures**   | 2, 17, 19-20, 26, 34              | Timers, double-tap, long-hold                       |
+| **Visual Display**      | 5-10, 12-13, 15-16, 27-28, 30, 32 | Screen layouts, colors, indicators                  |
+| **Settings Systems**    | 4, 11, 22, 29, 32, 39             | Preferences, configuration                          |
+| **Advanced Features**   | 21, 23-25, 31, 35-36, 39          | API integration, LED control, effects, FX sequencer |
 
 ### How to Apply an Example
 
@@ -124,182 +173,75 @@ Most examples can be adapted:
 
 ### Getting Help
 
-**If something doesn't work**:
+Use this section when an example doesn’t work and you want to get unstuck fast.
 
-1. Check QUICK_REFERENCE.md → Testing Checklist
-2. Review the example's "Explanation" section
-3. Verify file paths match your controller
-4. Check for typos in property paths
-5. Use QUICK_REFERENCE.md → Rollback Instructions
+- Debugging workflow + checklists: [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md)
+- Restore stock QML files if Traktor becomes unstable: [01_BASICS.md](01_BASICS.md#restore-stock-rollback)
 
-**Understanding Error Messages**:
+If you’re asking someone else for help, include:
 
-- Traktor logs QML errors to console (enable developer mode)
-- Missing properties = wrong path or controller mismatch
-- Syntax errors = typo in QML code
+- Your Traktor version (e.g. TP 4.4.1) and controller model (e.g. S4MK3)
+- Which example number you followed
+- The exact file path you edited and what you changed (ideally a small snippet or diff)
+- What you expected vs what actually happened (and whether Traktor restarted cleanly)
+
+If you plan to share your change as a patch/overlay, see: [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md)
 
 ---
 
-## Examples Quick Index
+## Master Examples Reference
 
-### By Difficulty
+The table below consolidates all examples by difficulty, layer, category, and audience. Use the **Difficulty** and **Layer** columns for quick filtering.
 
-**Beginner** (Start here):
+| #   | Name                         | Difficulty  | Layer           | Category            | Applicable To      | Time     |
+| --- | ---------------------------- | ----------- | --------------- | ------------------- | ------------------ | -------- |
+| 1   | Tempo Swap                   | 🟢 Easy     | CSI             | Controller Behavior | All                | 5 min    |
+| 2   | Overlay Timeout              | 🟢 Easy     | CSI             | Timing & Gestures   | All                | 5 min    |
+| 3   | Mixer FX Overlay             | 🟢 Easy     | CSI             | Controller Behavior | All                | 10 min   |
+| 4   | Preferences                  | 🟢 Easy     | Defines         | Settings & Config   | All                | 15 min   |
+| 5   | Reusable Widgets             | 🟢 Easy     | Screens         | Visual Display      | All                | 20 min   |
+| 6   | Browser Sorting              | 🟡 Medium   | Screens         | Visual Display      | Screen Controllers | 30 min   |
+| 7   | Deck Header                  | 🟡 Medium   | Screens         | Visual Display      | Screen Controllers | 30 min   |
+| 8   | Key Display Format           | 🟡 Medium   | Screens         | Visual Display      | Screen Controllers | 20 min   |
+| 9   | Tempo Display                | 🟡 Medium   | Screens         | Visual Display      | Screen Controllers | 20 min   |
+| 10  | Color Customization          | 🟢 Easy     | Screens         | Visual Display      | Screen Controllers | 15 min   |
+| 11  | JSON Settings                | 🟠 Advanced | Defines         | Settings & Config   | All                | 2 hrs    |
+| 12  | Theme System                 | 🟠 Advanced | Screens         | Visual Display      | Screen Controllers | 2 hrs    |
+| 13  | Phase Meter                  | 🟡 Medium   | Screens         | Visual Display      | S4 MK3             | 45 min   |
+| 14  | BPM Warnings                 | 🟡 Medium   | Screens         | Visual Display      | Screen Controllers | 45 min   |
+| 15  | Touch Menu                   | 🟡 Medium   | Screens         | Visual Display      | S4 MK3             | 1 hr     |
+| 16  | Time Warnings                | 🟡 Medium   | Screens         | Visual Display      | Screen Controllers | 45 min   |
+| 17  | Custom Jump Modes            | 🟠 Advanced | CSI             | Controller Behavior | S4 MK3             | 1 hr     |
+| 18  | Auto-Sync                    | 🟡 Medium   | CSI             | Controller Behavior | All                | 30 min   |
+| 19  | Long-Hold Patterns           | 🟠 Advanced | CSI             | Timing & Gestures   | All                | 1 hr     |
+| 20  | Double-Tap Gestures          | 🟠 Advanced | CSI             | Timing & Gestures   | All                | 1 hr     |
+| 21  | HTTP API Integration         | 🔴 Expert   | CSI/External    | Advanced Features   | All                | 4 hrs    |
+| 22  | Modular Settings             | 🔴 Expert   | Defines/Screens | Settings & Config   | Screen Controllers | 4 hrs    |
+| 23  | LED Blinkers                 | 🟠 Advanced | CSI             | Advanced Features   | All                | 2 hrs    |
+| 24  | Vinyl Break                  | 🟠 Advanced | CSI             | Controller Behavior | All                | 2 hrs    |
+| 25  | Fader Start                  | 🟠 Advanced | CSI             | Controller Behavior | All                | 2 hrs    |
+| 26  | ButtonGestures Module        | 🟢 Easy     | CSI             | Timing & Gestures   | All                | 15 min   |
+| 27  | UI Innovations (19 features) | 🔴 Expert   | All Layers      | Visual Display      | Screen Controllers | Full day |
+| 28  | Beat Counter                 | 🟡 Medium   | Screens         | Visual Display      | Screen Controllers | 30 min   |
+| 29  | Per-Deck Colors              | 🟡 Medium   | Defines/Screens | Settings & Config   | S4 MK3             | 45 min   |
+| 30  | Camelot Key Conversion       | 🟢 Easy     | Screens         | Visual Display      | Screen Controllers | 20 min   |
+| 31  | Device Setup System          | 🟠 Advanced | CSI/Screens     | Advanced Features   | All                | 2 hrs    |
+| 32  | Waveform Themes              | 🟢 Easy     | Defines/Screens | Visual Display      | Screen Controllers | 15 min   |
+| 33  | Soft Takeover Feedback       | 🟠 Advanced | CSI             | Controller Behavior | Screen Controllers | 1 hr     |
+| 34  | Sync LED Colors              | 🟡 Medium   | CSI             | Controller Behavior | All                | 30 min   |
+| 35  | FX Sequencer                 | 🔴 Expert   | CSI             | Advanced Features   | Screen Controllers | 3 hrs    |
+| 36  | Stem Pad Controls            | 🟠 Advanced | CSI             | Controller Behavior | All                | 2 hrs    |
+| 37  | Loop Fine-Tuning             | 🟠 Advanced | CSI             | Controller Behavior | All                | 1 hr     |
+| 38  | Deck Type Cycling            | 🟡 Medium   | CSI             | Controller Behavior | All                | 30 min   |
+| 39  | FX Memory Banks              | 🔴 Expert   | CSI             | Advanced Features   | Screen Controllers | 4 hrs    |
+| 40  | Deck Assignment Cycling      | 🟡 Medium   | CSI             | Controller Behavior | Z1 MK2             | 45 min   |
+| 41  | Persistent Deck Focus        | 🟢 Easy     | CSI             | Settings & Config   | D2                 | 15 min   |
 
-- Example 1: BPM Coarse/Fine Swap
-- Example 2: Extended Overlay Timeout
-- Example 3: Mixer FX Overlay
-- Example 4: Preferences System
-- Example 5: Reusable Widgets
+**Legend**:
 
-**Intermediate**:
-
-- Examples 6-10: Visual Customization (browser, headers, colors)
-- Examples 11-13: Settings & Theme Systems
-- Examples 14-16: Warning & Indicator Systems
-- Example 26: Native ButtonGestures
-- Example 28: Beat Counter (Phrase.Bar.Beat)
-- Example 29: Per-Deck Color Customization
-- Example 30: Camelot Key Conversion
-- Example 34: Multi-State Sync LED Feedback
-- Example 38: Deck Type Cycling
-- Example 40: Z1 MK2 Deck Assignment Cycling
-
-**Advanced**:
-
-- Examples 17-20: Custom Gestures & Automation
-- Example 21: HTTP API Integration
-- Examples 22-25: Modular Systems & Effects
-- Example 27: Comprehensive UI Innovations (19 features)
-- Example 31: On-Device Multi-Page Setup System
-- Example 32: Spectrum Waveform Color Themes
-- Example 33: Soft Takeover with Visual Feedback
-- Example 41: Persistent Deck Focus (D2)
-- Example 36: Stem Deck Pad Controls with SuperKnobs
-- Example 37: Loop Boundary Fine-Tuning
-- Examples 35, 39: FX Sequencer & Memory Banks (Expert)
-
-### By Category
-
-**Controller Behavior** (CSI Layer):
-
-- Example 1: Tempo swap
-- Example 3: Overlay timing
-- Example 17: Custom jump modes
-- Example 18: Auto-sync
-- Example 19: Long-hold patterns
-- Example 20: Double-tap gestures
-- Example 24: Vinyl break
-- Example 25: Fader start
-- Example 26: ButtonGestures module
-- Example 33: Soft takeover
-- Example 34: Sync LED feedback
-- Example 36: Stem pad controls
-- Example 37: Loop fine-tuning
-- Example 38: Deck type cycling
-
-**Visual Display** (Screens Layer):
-
-- Example 5: Reusable widgets
-- Example 6: Browser sorting
-- Example 7: Deck header layout
-- Example 8: Key display format
-- Example 9: Tempo display
-- Example 10: Color customization
-- Example 12: Theme system
-- Example 13: Phase meter
-- Example 15: Touch menu
-- Example 16: Time warnings
-- Example 27: Dynamic waveforms & UI
-- Example 28: Beat counter
-- Example 30: Camelot key conversion
-- Example 32: Spectrum waveform themes
-
-**Settings & Configuration** (Defines Layer):
-
-- Example 4: Preferences system
-- Example 11: JSON settings
-- Example 22: Modular settings
-- Example 29: Per-deck color settings
-- Example 32: Waveform color themes
-
-**Advanced Features**:
-
-- Example 14: BPM difference warnings
-- Example 21: External HTTP API
-- Example 23: LED blinkers
-- Example 27: 19 advanced UI features
-- Example 31: On-device setup system
-- Example 35: FX channel sequencer
-- Example 39: FX memory bank snapshots
-
-### By Controller Focus
-
-**All Controllers**:
-
-- Examples 1-5, 11-14, 17-26, 33-39
-
-**Screen Controllers** (D2/S5/S8/S4MK3):
-
-- Examples 6-10, 15-16, 22, 27-32, 41
-
-**Z1 MK2 Specific**:
-
-- Example 40: Deck assignment cycling
-
-**D2 Specific**:
-
-- Example 41: Persistent deck focus
-
-**S4 MK3 Specific**:
-
-- Examples 13, 15, 17-18, 28-29
-
-### Quick Reference Table
-
-| #   | Name             | Difficulty | Layer           | Time     |
-| --- | ---------------- | ---------- | --------------- | -------- |
-| 1   | Tempo Swap       | Easy       | CSI             | 5 min    |
-| 2   | Overlay Timeout  | Easy       | CSI             | 5 min    |
-| 3   | Mixer FX Overlay | Easy       | CSI             | 10 min   |
-| 4   | Preferences      | Easy       | Defines         | 15 min   |
-| 5   | Reusable Widgets | Easy       | Screens         | 20 min   |
-| 6   | Browser Sorting  | Medium     | Screens         | 30 min   |
-| 7   | Deck Header      | Medium     | Screens         | 30 min   |
-| 8   | Key Display      | Medium     | Screens         | 20 min   |
-| 9   | Tempo Display    | Medium     | Screens         | 20 min   |
-| 10  | Color Scheme     | Easy       | Screens         | 15 min   |
-| 11  | JSON Settings    | Advanced   | Defines         | 2 hrs    |
-| 12  | Theme System     | Advanced   | Screens         | 2 hrs    |
-| 13  | Phase Meter      | Medium     | Screens         | 45 min   |
-| 14  | BPM Warnings     | Medium     | Screens         | 45 min   |
-| 15  | Touch Menu       | Medium     | Screens         | 1 hr     |
-| 16  | Time Warnings    | Medium     | Screens         | 45 min   |
-| 17  | Custom Jump      | Advanced   | CSI             | 1 hr     |
-| 18  | Auto-Sync        | Medium     | CSI             | 30 min   |
-| 19  | Long-Hold        | Advanced   | CSI             | 1 hr     |
-| 20  | Double-Tap       | Advanced   | CSI             | 1 hr     |
-| 21  | HTTP API         | Expert     | CSI/External    | 4 hrs    |
-| 22  | Modular Settings | Expert     | Defines/Screens | 4 hrs    |
-| 23  | LED Blinkers     | Advanced   | CSI             | 2 hrs    |
-| 24  | Vinyl Break      | Advanced   | CSI             | 2 hrs    |
-| 25  | Fader Start      | Advanced   | CSI             | 2 hrs    |
-| 26  | ButtonGestures   | Easy       | CSI             | 15 min   |
-| 27  | UI Innovations   | Expert     | All Layers      | Full day |
-| 28  | Beat Counter     | Medium     | Screens         | 30 min   |
-| 29  | Per-Deck Colors  | Medium     | Defines/Screens | 45 min   |
-| 30  | Camelot Keys     | Easy       | Screens         | 20 min   |
-| 31  | Device Setup     | Advanced   | CSI/Screens     | 2 hrs    |
-| 32  | Waveform Themes  | Easy       | Defines/Screens | 15 min   |
-| 33  | Soft Takeover    | Advanced   | CSI             | 1 hr     |
-| 34  | Sync LED Color   | Medium     | CSI             | 30 min   |
-| 35  | FX Sequencer     | Expert     | CSI             | 3 hrs    |
-| 36  | Stem Pad Ctrl    | Advanced   | CSI             | 2 hrs    |
-| 37  | Loop Fine-Tune   | Advanced   | CSI             | 1 hr     |
-| 38  | Deck Type Cycle  | Medium     | CSI             | 30 min   |
-| 39  | FX Memory Banks  | Expert     | CSI             | 4 hrs    |
-| 40  | Deck Assignment  | Medium     | CSI             | 45 min   |
-| 41  | Deck Focus Fix   | Easy       | CSI             | 15 min   |
+- **Difficulty**: 🟢 Easy (< 30 min) | 🟡 Medium (30 min–2 hrs) | 🟠 Advanced (2–4 hrs) | 🔴 Expert (4+ hrs)
+- **Layer**: CSI (controller behavior), Screens (visual), Defines (settings), or mixed
+- **Applicable To**: All controllers, specific controller types, or specific features
 
 ---
 
@@ -391,8 +333,8 @@ The `enabled` property on each `Wire` controls when that connection is active. B
 
 **Quick Reference:**
 
-- [QUICK_REFERENCE.md → Swap Shift Behavior](#2-swap-shift-behavior) - Copy-paste template for this pattern
-- [QUICK_REFERENCE.md → Wire Adapters Reference](#wire-adapters-quick-reference) - Understanding Wire types and enabled conditions
+- [02_API_REFERENCE.md → Swap Shift Behavior](02_API_REFERENCE.md#2-swap-shift-behavior) - Copy-paste template for this pattern
+- [02_API_REFERENCE.md → Wire Adapters Reference](02_API_REFERENCE.md#wire-adapters-quick-reference) - Understanding Wire types and enabled conditions
 
 **Prerequisites/Background:**
 
@@ -477,8 +419,8 @@ When the timer triggers after the interval, it sets the overlay back to `Overlay
 
 **Quick Reference:**
 
-- [QUICK_REFERENCE.md → Change Timer Duration](#1-change-timer-duration) - Simple pattern for modifying any timer interval
-- [QUICK_REFERENCE.md → Modify Timer Duration Template](#template-4-modify-timer-duration) - Step-by-step template
+- [02_API_REFERENCE.md → Change Timer Duration](02_API_REFERENCE.md#1-change-timer-duration) - Simple pattern for modifying any timer interval
+- [02_API_REFERENCE.md → Modify Timer Duration Template](02_API_REFERENCE.md#template-4-modify-timer-duration) - Step-by-step template
 
 **Prerequisites/Background:**
 
@@ -579,9 +521,9 @@ This allows the Mixer FX overlay to behave like the BPM and Key overlays - appea
 
 **Quick Reference:**
 
-- [QUICK_REFERENCE.md → Bind to Traktor Property](#4-bind-to-traktor-property) - Understanding AppProperty bindings
-- [QUICK_REFERENCE.md → Common Property Paths](#common-property-paths) - Reference for mixer and deck property paths
-- [QUICK_REFERENCE.md → Conditionals](#conditionals) - Syntax for multi-condition logic
+- [02_API_REFERENCE.md → Bind to Traktor Property](02_API_REFERENCE.md#4-bind-to-traktor-property) - Understanding AppProperty bindings
+- [02_API_REFERENCE.md → Common Property Paths](02_API_REFERENCE.md#common-property-paths) - Reference for mixer and deck property paths
+- [02_API_REFERENCE.md → Conditionals](02_API_REFERENCE.md#conditionals) - Syntax for multi-condition logic
 
 **Prerequisites/Background:**
 
@@ -753,8 +695,8 @@ Rectangle {
 
 **Quick Reference:**
 
-- [QUICK_REFERENCE.md → Add New Preference](#3-add-new-preference) - How to add properties to this file
-- [QUICK_REFERENCE.md → Property Types Reference](#property-types-reference) - Understanding readonly, var, int, bool types
+- [02_API_REFERENCE.md → Add New Preference](02_API_REFERENCE.md#3-add-new-preference) - How to add properties to this file
+- [02_API_REFERENCE.md → Property Types Reference](02_API_REFERENCE.md#property-types-reference) - Understanding readonly, var, int, bool types
 
 **Prerequisites/Background:**
 
@@ -884,14 +826,14 @@ DeckHeaderText {
 
 **Quick Reference:**
 
-- [QUICK_REFERENCE.md → Position Element](#8-position-element) - Anchoring and positioning syntax
-- [QUICK_REFERENCE.md → Change Font](#7-change-font) - Font properties and scaling
-- [QUICK_REFERENCE.md → File Locations → Screen header layout](#file-locations-quick-map) - Where to find DeckHeader.qml
+- [02_API_REFERENCE.md → Position Element](02_API_REFERENCE.md#8-position-element) - Anchoring and positioning syntax
+- [02_API_REFERENCE.md → Change Font](02_API_REFERENCE.md#7-change-font) - Font properties and scaling
+- [02_API_REFERENCE.md → File Locations → Screen header layout](02_API_REFERENCE.md#file-locations-quick-map) - Where to find DeckHeader.qml
 
 **Prerequisites/Background:**
 
-- [INDEX.md → Screens Layer](#✅-🖥️-visual-display-screens-layer) - Understanding visual display customization
-- [INDEX.md → Decision Tree → Visual Display](#decision-tree-finding-the-right-file) - Finding the right Screens files
+- [Background: Screens layer](#✅-🖥️-visual-display-screens-layer) - Understanding visual display customization
+- [Background: File decision tree (visual display)](#decision-tree-finding-the-right-file) - Finding the right Screens files
 
 ---
 
@@ -977,13 +919,13 @@ readonly property variant sortNames: [
 
 **Quick Reference:**
 
-- [QUICK_REFERENCE.md → File Locations → Browser appearance](#file-locations-quick-map) - Where to find browser files
-- [QUICK_REFERENCE.md → Property Types Reference](#property-types-reference) - Working with variant (array) types
+- [02_API_REFERENCE.md → File Locations → Browser appearance](02_API_REFERENCE.md#file-locations-quick-map) - Where to find browser files
+- [02_API_REFERENCE.md → Property Types Reference](02_API_REFERENCE.md#property-types-reference) - Working with variant (array) types
 
 **Prerequisites/Background:**
 
-- [INDEX.md → Screens Layer](#✅-🖥️-visual-display-screens-layer) - Understanding visual customization
-- [INDEX.md → Decision Tree → Visual Display](#decision-tree-finding-the-right-file) - Finding browser files
+- [Background: Screens layer](#✅-🖥️-visual-display-screens-layer) - Understanding visual customization
+- [Background: File decision tree (visual display)](#decision-tree-finding-the-right-file) - Finding browser files
 
 ---
 
@@ -1071,14 +1013,14 @@ function toCamelotNumber(openKey) {
 
 **Quick Reference:**
 
-- [QUICK_REFERENCE.md → Change Color](#6-change-color) - Conditional color syntax
-- [QUICK_REFERENCE.md → Conditionals](#conditionals) - If/else and ternary operators
-- [QUICK_REFERENCE.md → Common Property Paths → Deck Properties](#deck-properties) - musical_key property path
+- [02_API_REFERENCE.md → Change Color](02_API_REFERENCE.md#6-change-color) - Conditional color syntax
+- [02_API_REFERENCE.md → Conditionals](02_API_REFERENCE.md#conditionals) - If/else and ternary operators
+- [02_API_REFERENCE.md → Common Property Paths → Deck Properties](02_API_REFERENCE.md#deck-properties) - musical_key property path
 
 **Prerequisites/Background:**
 
-- [INDEX.md → Screens Layer](#✅-🖥️-visual-display-screens-layer) - Visual display fundamentals
-- [INDEX.md → Key Concepts](#key-concepts) - AppProperty bindings for track data
+- [Background: Screens layer](#✅-🖥️-visual-display-screens-layer) - Visual display fundamentals
+- [Background: Key concepts](#key-concepts) - AppProperty bindings for track data
 
 ---
 
@@ -1160,9 +1102,9 @@ Wire {
 
 **Quick Reference:**
 
-- [QUICK_REFERENCE.md → Multi-Function Button](#5-multi-function-button) - Template for shift-based buttons
-- [QUICK_REFERENCE.md → Swap Shift Behavior](#2-swap-shift-behavior) - Pattern used here
-- [QUICK_REFERENCE.md → Common Property Paths → Deck Properties](#deck-properties) - flux property paths
+- [02_API_REFERENCE.md → Multi-Function Button](02_API_REFERENCE.md#5-multi-function-button) - Template for shift-based buttons
+- [02_API_REFERENCE.md → Swap Shift Behavior](02_API_REFERENCE.md#2-swap-shift-behavior) - Pattern used here
+- [02_API_REFERENCE.md → Common Property Paths → Deck Properties](02_API_REFERENCE.md#deck-properties) - flux property paths
 
 **Prerequisites/Background:**
 
@@ -1247,9 +1189,9 @@ Wire {
 
 **Quick Reference:**
 
-- [QUICK_REFERENCE.md → Wire Adapters → EncoderScriptAdapter](#wire-adapters-quick-reference) - How encoders work
-- [QUICK_REFERENCE.md → Common Property Paths → Deck Properties](#deck-properties) - waveform_zoom property
-- [QUICK_REFERENCE.md → Conditionals](#conditionals) - enabled: conditions with deck types
+- [02_API_REFERENCE.md → Wire Adapters → EncoderScriptAdapter](02_API_REFERENCE.md#wire-adapters-quick-reference) - How encoders work
+- [02_API_REFERENCE.md → Common Property Paths → Deck Properties](02_API_REFERENCE.md#deck-properties) - waveform_zoom property
+- [02_API_REFERENCE.md → Conditionals](02_API_REFERENCE.md#conditionals) - enabled: conditions with deck types
 
 **Prerequisites/Background:**
 
@@ -1359,9 +1301,9 @@ function executeDoubleTap() {
 
 **Quick Reference:**
 
-- [QUICK_REFERENCE.md → Change Timer Duration](#1-change-timer-duration) - Basic timer syntax
-- [QUICK_REFERENCE.md → Multi-Function Button](#5-multi-function-button) - ButtonScriptAdapter pattern
-- [QUICK_REFERENCE.md → Functions](#functions) - JavaScript function syntax in QML
+- [02_API_REFERENCE.md → Change Timer Duration](02_API_REFERENCE.md#1-change-timer-duration) - Basic timer syntax
+- [02_API_REFERENCE.md → Multi-Function Button](02_API_REFERENCE.md#5-multi-function-button) - ButtonScriptAdapter pattern
+- [02_API_REFERENCE.md → Functions](02_API_REFERENCE.md#functions) - JavaScript function syntax in QML
 
 **Prerequisites/Background:**
 
@@ -4674,15 +4616,7 @@ WiresGroup {
 
 **Note**: This fix resolves encoder conflicts in legacy-remix-pad-mode and stems-pad-mode where volume/filter controls are visible on screen.
 
-**Debugging encoder conflicts**: When isolating which condition is blocking your encoder, these related properties help narrow the problem:
-
-| Property                | Type | Description                                                                   |
-| ----------------------- | ---- | ----------------------------------------------------------------------------- |
-| `slotState.value`       | bool | True when any stem/sample slot button is toggled or held                      |
-| `deck.focusedSlotstate` | bool | True when a specific slot has focus (more granular than `slotState`)          |
-| `deck.footerControlled` | bool | True when the footer panel (stem/remix controls) is actively being controlled |
-
-Test each independently in your `WiresGroup enabled:` condition to find the right granularity. For example, `enabled: active && !deck.focusedSlotstate` is more specific than `!slotState.value` — it only disables stock controls when a particular slot is focused, rather than whenever any slot is selected.
+If you’re debugging why a `WiresGroup enabled:` condition is blocking an encoder, use: [04_TROUBLESHOOTING.md → Debugging `enabled:` conditions](04_TROUBLESHOOTING.md#debugging-enabled-conditions-conflicts-and-nothing-happens).
 
 ### Feature 18: Screen Button 7 Alternative Toggle
 
@@ -4863,14 +4797,14 @@ function computeBarsBeatsFromPosition(beat) {
 
 The formula converts elapsed time to beat position:
 
-| Step | Formula | Purpose |
-| ---- | ------- | ------- |
-| 1 | `elapsed * 1000 - gridOffset` | Time in ms, aligned to beatgrid |
-| 2 | `* bpm / 60000` | Convert ms to beat number |
-| 3 | `beat / 4` | Convert beats to bars |
-| 4 | `bars / phraseLen` | Convert bars to phrases |
-| 5 | `bars % phraseLen` | Bar position within phrase |
-| 6 | `beat % 4` | Beat position within bar |
+| Step | Formula                       | Purpose                         |
+| ---- | ----------------------------- | ------------------------------- |
+| 1    | `elapsed * 1000 - gridOffset` | Time in ms, aligned to beatgrid |
+| 2    | `* bpm / 60000`               | Convert ms to beat number       |
+| 3    | `beat / 4`                    | Convert beats to bars           |
+| 4    | `bars / phraseLen`            | Convert bars to phrases         |
+| 5    | `bars % phraseLen`            | Bar position within phrase      |
+| 6    | `beat % 4`                    | Beat position within bar        |
 
 **Beats-to-cue variant** (S4 MK3 Mod): Replace `propElapsedTime` with distance to next cue point for a countdown:
 
@@ -4901,7 +4835,7 @@ Traktor uses a fixed color scheme for decks, jog wheels, and FX indicators. User
 
 ### Customized Behavior
 
-A centralized `Settings.qml` file in `Screens/Defines/` allows per-deck color assignment for waveforms, jog wheels, phase meters, and FX indicators using a 16-color palette.
+A centralized `Settings.qml` file in `Screens/Defines` allows per-deck color assignment for waveforms, jog wheels, phase meters, and FX indicators using a 16-color palette.
 
 **Step 1: Create the Settings file**
 
@@ -5268,14 +5202,15 @@ Module {
 
 This pattern uses two types of mapping properties:
 
-| Type | Path Prefix | Purpose | Lifetime |
-| ---- | ----------- | ------- | -------- |
-| `mapping.settings.*` | Settings | User preferences (deck assignment, phrase length) | Persist while Traktor runs |
-| `mapping.state.*` | State | UI state (setup page number, current mode) | Transient, reset on reconnect |
+| Type                 | Path Prefix | Purpose                                           | Lifetime                      |
+| -------------------- | ----------- | ------------------------------------------------- | ----------------------------- |
+| `mapping.settings.*` | Settings    | User preferences (deck assignment, phrase length) | Persist while Traktor runs    |
+| `mapping.state.*`    | State       | UI state (setup page number, current mode)        | Transient, reset on reconnect |
 
 The `MappingPropertyDescriptor` (CSI side) **declares and writes** the property, while `MappingProperty` (Screen side) **reads** it. This separation allows the controller logic to manage state while the screen simply displays it.
 
 **Key design choices from the X1 MK3 mod**:
+
 - Use `DeviceSetupState` enum (unassigned/just_assigned/assigned) to gate screen visibility
 - Each setup page maps to a specific `Loader` component so pages are independent
 - Encoder rotation adjusts the current page's setting without button combinations
@@ -5502,13 +5437,13 @@ Wire {
 
 The `SoftTakeover` component is a built-in CSI element that acts as a gate between hardware input and software output. It holds back the hardware value until the physical knob position crosses (catches up to) the current software value. The key innovation here is the `direction_monitor` output, which reports whether the knob needs to move up (+1), down (-1), or is matched (0). By wiring this to LED button brightness with a blink timer, the DJ gets immediate visual feedback about which way to turn each knob.
 
-| Component | Role |
-| --------- | ---- |
-| `SoftTakeover` | Built-in CSI gate — blocks value until knob catches up |
-| `.input` | Hardware knob position (raw) |
-| `.output` | Filtered value (only passes through after catch-up) |
+| Component            | Role                                                      |
+| -------------------- | --------------------------------------------------------- |
+| `SoftTakeover`       | Built-in CSI gate — blocks value until knob catches up    |
+| `.input`             | Hardware knob position (raw)                              |
+| `.output`            | Filtered value (only passes through after catch-up)       |
 | `.direction_monitor` | Reports needed direction: -1 (down), 0 (matched), +1 (up) |
-| `KnobScriptAdapter` | Detects knob activity for LED routing |
+| `KnobScriptAdapter`  | Detects knob activity for LED routing                     |
 
 **Adaptation**: This pattern works on any controller with knobs. Replace `surface_prefix` and `app_prefix` with your controller's paths. The `SoftTakeover` component is part of CSI 1.0 and available on all controllers.
 
@@ -5527,6 +5462,7 @@ The Sync button LED is binary: on when sync is enabled, off when disabled. No vi
 ### Customized Behavior
 
 The Sync LED shows three colors based on actual sync state:
+
 - **GREEN**: Tempo AND phase are in sync (safe to mix)
 - **LIME**: Tempo matches but phase is drifting (beat offset)
 - **RED**: Neither tempo nor phase are matched (not in sync)
@@ -5636,11 +5572,11 @@ Timer { id: tapSync_countdown; interval: 200 }
 
 The tri-state color comes from two computed booleans:
 
-| State | `syncInTempo` | `syncInPhase` | Color | Meaning |
-| ----- | ------------- | ------------- | ----- | ------- |
-| In sync | true | true | GREEN | Safe to mix — tempo and beats aligned |
-| Tempo only | true | false | LIME | BPM matches but beats are offset |
-| Out of sync | false | (any) | RED | BPM doesn't match master |
+| State       | `syncInTempo` | `syncInPhase` | Color | Meaning                               |
+| ----------- | ------------- | ------------- | ----- | ------------------------------------- |
+| In sync     | true          | true          | GREEN | Safe to mix — tempo and beats aligned |
+| Tempo only  | true          | false         | LIME  | BPM matches but beats are offset      |
+| Out of sync | false         | (any)         | RED   | BPM doesn't match master              |
 
 The tolerances (0.01% for tempo, 2.5% for phase) provide small error margins that accommodate beat juggling. The phase calculation `(tempoPhaseProp.value * 2).toFixed(4)` normalizes the raw phase value to a -1.0 to +1.0 range.
 
@@ -5794,11 +5730,11 @@ The sequencer uses a string-based approach to store timestamped value snapshots:
 
 **Recording format**: `%/0.45/1706123456789%/0.52/1706123456801%/0.58/1706123456815`
 
-| Part | Example | Purpose |
-| ---- | ------- | ------- |
-| `%` | Delimiter | Splits entries |
-| `/value/` | `0.45` | FX amount at this point (0.0-1.0) |
-| `/timestamp` | `1706123456789` | `Date.getTime()` in milliseconds |
+| Part         | Example         | Purpose                           |
+| ------------ | --------------- | --------------------------------- |
+| `%`          | Delimiter       | Splits entries                    |
+| `/value/`    | `0.45`          | FX amount at this point (0.0-1.0) |
+| `/timestamp` | `1706123456789` | `Date.getTime()` in milliseconds  |
 
 **Playback**: The timer parses entries, calculates the interval between consecutive timestamps (`dist = nextTimestamp - currentTimestamp`), and applies each value at the correct moment. When it reaches the end, it loops back to the start.
 
@@ -5960,16 +5896,16 @@ This pattern layers three concepts:
 
 **Key stem AppProperty paths**:
 
-| Path | Type | Description |
-| ---- | ---- | ----------- |
-| `app.traktor.decks.X.stems.Y.muted` | bool | Stem mute state |
-| `app.traktor.decks.X.stems.Y.volume` | float | Stem volume (0.0-1.0) |
-| `app.traktor.decks.X.stems.Y.filter_value` | float | Filter position (0.0-1.0, 0.5=center) |
-| `app.traktor.decks.X.stems.Y.filter_on` | bool | Filter enabled |
-| `app.traktor.decks.X.stems.Y.fx_send` | float | FX send level (0.0-1.0) |
-| `app.traktor.decks.X.stems.Y.fx_send_on` | bool | FX send enabled |
-| `app.traktor.decks.X.stems.Y.color_id` | int | Stem color (from track metadata) |
-| `app.traktor.decks.X.is_loaded_signal` | signal | Fires once when track loads |
+| Path                                       | Type   | Description                           |
+| ------------------------------------------ | ------ | ------------------------------------- |
+| `app.traktor.decks.X.stems.Y.muted`        | bool   | Stem mute state                       |
+| `app.traktor.decks.X.stems.Y.volume`       | float  | Stem volume (0.0-1.0)                 |
+| `app.traktor.decks.X.stems.Y.filter_value` | float  | Filter position (0.0-1.0, 0.5=center) |
+| `app.traktor.decks.X.stems.Y.filter_on`    | bool   | Filter enabled                        |
+| `app.traktor.decks.X.stems.Y.fx_send`      | float  | FX send level (0.0-1.0)               |
+| `app.traktor.decks.X.stems.Y.fx_send_on`   | bool   | FX send enabled                       |
+| `app.traktor.decks.X.stems.Y.color_id`     | int    | Stem color (from track metadata)      |
+| `app.traktor.decks.X.is_loaded_signal`     | signal | Fires once when track loads           |
 
 ---
 
@@ -6080,12 +6016,12 @@ Wire {
 
 Traktor exposes loop boundary control through the `move.mode` property:
 
-| `move.mode` value | Effect |
-| ------------------ | ------ |
-| 0 | Beatjump (default) |
-| 1 | Move entire Loop |
-| 2 | Move Loop-In point |
-| 3 | Move Loop-Out point |
+| `move.mode` value | Effect              |
+| ----------------- | ------------------- |
+| 0                 | Beatjump (default)  |
+| 1                 | Move entire Loop    |
+| 2                 | Move Loop-In point  |
+| 3                 | Move Loop-Out point |
 
 The pattern combines `HoldPropertyAdapter` (tracks button hold state) with `ButtonScriptAdapter` (switches move mode based on which buttons are held). The jogwheel provides continuous sub-beat precision via `rotationScaleFactor`, while the encoder provides quantized beat-level adjustments.
 
@@ -6221,12 +6157,12 @@ WiresGroup {
 
 The `DeckType` enum values are built into CSI:
 
-| DeckType | Value | Description |
-| -------- | ----- | ----------- |
-| `DeckType.Track` | 0 | Standard track playback |
-| `DeckType.Remix` | 1 | Remix deck with sample slots |
-| `DeckType.Stem` | 2 | Stem deck with 4 stem channels |
-| `DeckType.Live` | 3 | Live audio input |
+| DeckType         | Value | Description                    |
+| ---------------- | ----- | ------------------------------ |
+| `DeckType.Track` | 0     | Standard track playback        |
+| `DeckType.Remix` | 1     | Remix deck with sample slots   |
+| `DeckType.Stem`  | 2     | Stem deck with 4 stem channels |
+| `DeckType.Live`  | 3     | Live audio input               |
 
 Setting `deckType.value` directly changes the deck type in Traktor. The safety check `!isPlaying.value` prevents type changes during playback, which would interrupt audio.
 
@@ -6377,10 +6313,10 @@ The memory bank system works by mirroring the entire FX unit state (4 units × ~
 
 **Staggered loading** is critical: when restoring a snapshot, the FX type must load first (50ms delay), then the pattern player configuration (75ms), then knob values (80ms), and finally button states (100ms). Without these delays, Traktor's FX engine may discard parameter values that arrive before the effect type is fully loaded.
 
-| Gesture | Action | Visual Feedback |
-| ------- | ------ | --------------- |
-| SHIFT + Hold pad | Save snapshot | Pad turns GREEN |
-| SHIFT + Tap green pad | Load snapshot | Pad blinks (loaded) |
+| Gesture                      | Action          | Visual Feedback                 |
+| ---------------------------- | --------------- | ------------------------------- |
+| SHIFT + Hold pad             | Save snapshot   | Pad turns GREEN                 |
+| SHIFT + Tap green pad        | Load snapshot   | Pad blinks (loaded)             |
 | SHIFT + Double-tap green pad | Delete snapshot | Pad turns RED briefly, then OFF |
 
 **Scale**: The full implementation uses ~1920 `MappingPropertyDescriptor` instances (16 banks × 4 units × 30 params). This is a large footprint but necessary because QML has no built-in serialization.
@@ -6393,7 +6329,7 @@ The memory bank system works by mirroring the entire FX unit state (4 units × ~
 
 **Difficulty**: 🟡 Intermediate | **Layer**: 🔌 CSI | **Time**: 45 min | **Controllers**: Z1 MK2 (adaptable to others)
 
-**Source**: [Z1 MK2 Channel Select QML](Z1%20MK2%20Channel%20Select%20QML/) (AlfredSoul) — see also [Instructions.txt](Z1%20MK2%20Channel%20Select%20QML/Instructions.txt) for installation
+**Source**: [Z1 MK2 Channel Select QML](Z1 MK2 Channel Select QML/) (AlfredSoul) — see also [Instructions.txt](Z1 MK2 Channel Select QML/Instructions.txt) for installation
 
 ### Default Behavior (Native Instruments)
 
@@ -6524,16 +6460,16 @@ The key technique is **indirection through a singleton lookup table**:
 
 **Comparison with stock Z1 MK2**: The stock QML uses `SetPropertyAdapter` with only 2 assignments (A-B / C-D toggle). This mod replaces that with `RelativePropertyAdapter` + 6 assignments for much more flexibility.
 
-| Component | Purpose |
-| --------- | ------- |
-| `DeviceAssignment` (singleton) | Maps assignment number → deck indices |
-| `RelativePropertyAdapter` | Increment with wrap for cycling |
-| `MappingPropertyDescriptor` with `min`/`max` | Bounds the cycling range |
-| `readonly property` | Auto-recomputing deck index binding |
+| Component                                    | Purpose                               |
+| -------------------------------------------- | ------------------------------------- |
+| `DeviceAssignment` (singleton)               | Maps assignment number → deck indices |
+| `RelativePropertyAdapter`                    | Increment with wrap for cycling       |
+| `MappingPropertyDescriptor` with `min`/`max` | Bounds the cycling range              |
+| `readonly property`                          | Auto-recomputing deck index binding   |
 
 **Adaptation**: This pattern works for any controller that needs dynamic deck assignment. Replace the `leftDeckIdx`/`rightDeckIdx` functions with your desired deck combinations. For a simpler 2-way toggle, use `SetPropertyAdapter` instead of `RelativePropertyAdapter`.
 
-**See also**: [Example 38 (Deck Type Cycling)](#-example-38-deck-type-cycling-track--remix--stem--live) for cycling through deck *types* instead of deck *assignments*.
+**See also**: [Example 38 (Deck Type Cycling)](#-example-38-deck-type-cycling-track--remix--stem--live) for cycling through deck _types_ instead of deck _assignments_.
 
 ---
 
@@ -6601,9 +6537,9 @@ MappingProperty { id: deckFocusProp; path: "mapping.settings.deck_focus" }
 
 This fix exploits the difference between two `MappingPropertyDescriptor` path namespaces:
 
-| Namespace | Persistence | Use Case |
-| --------- | ----------- | -------- |
-| `mapping.state.*` | Transient — resets on reconnect/restart | UI state (current page, temporary modes) |
+| Namespace            | Persistence                                  | Use Case                                   |
+| -------------------- | -------------------------------------------- | ------------------------------------------ |
+| `mapping.state.*`    | Transient — resets on reconnect/restart      | UI state (current page, temporary modes)   |
 | `mapping.settings.*` | Persistent — saved in Traktor's mapping file | User preferences (deck assignment, colors) |
 
 By moving `deck_focus` from `propertiesPath` (which points to `mapping.state`) to `settingsPath` (which points to `mapping.settings`), the value is written to Traktor's internal mapping storage and reloaded automatically.
@@ -6624,3 +6560,7 @@ Deck_S8Style {
 **Files to modify**: `Deck_S8Style.qml` (CSI side) and `DeckView.qml` (Screen side) — both must use the same path or the screen won't reflect the saved state.
 
 **See also**: [Example 31 (On-Device Setup)](#-example-31-on-device-multi-page-setup-system) for the `mapping.state` vs `mapping.settings` distinction in detail.
+
+---
+
+**Next:** [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md)

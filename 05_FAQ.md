@@ -58,10 +58,7 @@ They conflict. QML files are text—if two mods edit the same lines, you can't e
 
 ### Why did my mod disappear after updating Traktor?
 
-Traktor updates can replace the entire `qml` folder with stock files.
-
-- **Always keep a backup copy of your modded `qml` folder outside the Traktor install** (not in the Applications directory).
-- After updating Traktor, re-apply mods using the overlay method (see [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md)).
+Traktor updates can replace the entire `qml` folder with stock files. But Native Access automatically creates a backup of the previous Traktor install, which can help restore your setup after an update.
 
 ### Can I undo changes?
 

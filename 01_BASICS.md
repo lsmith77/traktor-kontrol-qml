@@ -237,6 +237,10 @@ For a complete glossary, see [07_GLOSSARY.md](07_GLOSSARY.md).
 
 Before you change anything, copy Traktor's `qml` folder somewhere safe (see ["The Traktor `qml` folder"](#the-traktor-qml-folder) above for the path on your system).
 
+**Tip:** There is a [GitHub repository](https://github.com/lsmith77/traktor-kontrol-qml-files) that offers a tag for each Traktor Pro release (since version 4.4.1), containing the stock `qml` directory for that release. This can be useful for reference or restoring stock files, but does not replace your own backup.
+
+**Note:** These backups do not help if a Traktor Pro update is installed, as updates overwrite the `qml` folder. However, Native Access automatically creates a backup of the previous Traktor install, which can help restore your setup after an update.
+
 **macOS terminal:**
 
 ```bash

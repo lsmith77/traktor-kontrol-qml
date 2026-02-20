@@ -809,6 +809,8 @@ app.traktor.[context].[id/index].[category].[property]
 
 ### Effects
 
+> **Reference**: See the official [Traktor Effect Reference](https://www.native-instruments.com/ni-tech-manuals/traktor-pro-manual/en/effect-reference) for detailed effect descriptions and parameters.
+
 #### FX Unit Controls
 
 | Path                         | Type    | Purpose                |

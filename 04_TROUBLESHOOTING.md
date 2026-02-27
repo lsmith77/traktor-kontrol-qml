@@ -111,6 +111,35 @@ If you’re working from an example in [03_PRACTICAL_EXAMPLES.md](03_PRACTICAL_E
 
 ### 🔍 Common Issues (Check These Next)
 
+**Issue:** Changes to a custom setting (like a toggle or delay) don't have any effect after restarting Traktor.
+
+**Cause:** The `mapping.settings` vs `mapping.state` Persistence Trap.
+When creating custom settings for a mod, it is common to use `MappingPropertyDescriptor` with a path like `mapping.settings.my_custom_setting`. However, properties under `mapping.settings` are **persistent** and are saved into Traktor's permanent `Traktor Settings.tsi` file the first time they are loaded. Once Traktor saves the setting to the `.tsi` file, it will **ignore** any future changes you make to the `value:` field in your QML file. The QML `value:` is only treated as a *default* if the setting doesn't exist yet.
+
+**Fix:**
+For mod settings that you want to hardcode and tweak directly via QML files (especially for controllers without custom UI settings tabs), use `mapping.state` instead of `mapping.settings`.
+```qml
+// BAD: Traktor saves this once and ignores future QML edits
+MappingPropertyDescriptor { id: mySetting; path: "mapping.settings.my_setting"; type: MappingPropertyDescriptor.Boolean; value: true; }
+
+// GOOD: Traktor reads the exact value from QML every time it loads
+MappingPropertyDescriptor { id: mySetting; path: "mapping.state.my_setting"; type: MappingPropertyDescriptor.Boolean; value: true; }
+```
+
+---
+
+**Issue:** Controller fails to light up or screens stay blank after an edit, but Traktor shows no error.
+
+**Cause:** QML Errors Fail Silently at Runtime.
+Traktor's QML engine does not always provide visible error messages when a QML file fails to compile or load. If you make a syntax error, reference a non-existent property, or use an unsupported module, the controller might simply fail to initialize without any warning in the Traktor UI.
+
+**Fix:**
+- Always keep a clean backup of the original QML files.
+- Make small, incremental changes and test frequently by restarting Traktor.
+- If a controller fails to light up after an edit, immediately roll back the last change to isolate the issue.
+
+---
+
 **Issue:** Changes don't appear after restart
 
 **Check in this order** (most likely first):

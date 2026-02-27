@@ -80,6 +80,15 @@ See [06_COMPATIBILITY_FIXES.md](06_COMPATIBILITY_FIXES.md#version-compatibility-
 2. If your Traktor version isn't listed, use [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md) to debug the issue.
 3. Compare your mod against examples in [03_PRACTICAL_EXAMPLES.md](03_PRACTICAL_EXAMPLES.md) to see if the syntax changed.
 
+### Why did my controller stop lighting up after I added a Timer or other standard component?
+
+You are likely missing a `QtQuick` import. Some standard QML components (like `Timer`) require explicit imports that might not be present in the stock Traktor QML files. If you add a `Timer` to a file without importing `QtQuick`, the file will fail to load silently, and the controller will not initialize.
+
+**Solution**: Always ensure you have the necessary imports at the top of your file when adding new QML components:
+```qml
+import QtQuick 2.0
+```
+
 ---
 
 ## Getting Help

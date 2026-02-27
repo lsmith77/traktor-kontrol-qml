@@ -17,7 +17,6 @@ Appendices:
 - Frequently asked questions: [05_FAQ.md](05_FAQ.md)
 - Glossary: [07_GLOSSARY.md](07_GLOSSARY.md)
 - Sharing changes: [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md)
-- Caveats & Gotchas: [09_CAVEATS.md](09_CAVEATS.md)
 
 ## Suggested learning path
 

@@ -24,7 +24,8 @@ This guide translates MIDI concepts to QML so you can leverage your existing kno
 This is the "basics" section of the handbook.
 
 - API reference & patterns: [02_API_REFERENCE.md](02_API_REFERENCE.md)
-- Examples (copy/adapt real code): [03_PRACTICAL_EXAMPLES.md](03_PRACTICAL_EXAMPLES.md)
+- Real-world examples to learn from: [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) → [X1MK3 Performance Mod](https://github.com/lsmith77/X1MK3_PerformanceMod)
+- Community mods & complete projects: [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md)
 - Troubleshooting (debugging + testing): [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md)
 - Version compatibility + known fixes: [06_COMPATIBILITY_FIXES.md](06_COMPATIBILITY_FIXES.md)
 - How to package & share mods: [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md)
@@ -74,15 +75,15 @@ Scope (on purpose):
 
 ### Key Concepts
 
-| Component               | Purpose                                    | Example                                  |
-| ----------------------- | ------------------------------------------ | ---------------------------------------- |
-| **AppProperty**         | Read/write Traktor's internal state        | Deck tempo, track title, play state      |
-| **MappingProperty**     | Controller mapping configuration           | Shift state, browse mode settings        |
-| **Wire**                | Connect hardware control to function       | Button press → Load track                |
-| **PropertyAdapter**     | Transform data between hardware and app    | Encoder rotation → Volume change         |
-| **Timer**               | Delayed or repeated actions                | Auto-hide overlay after 5 seconds        |
-| **ButtonScriptAdapter** | Custom button logic                        | Multi-function: single/double/long-press |
-| **WiresGroup**          | Group wires with enable/disable conditions | Shift mode: enable different wire set    |
+| Component                 | Purpose                                 | Example                                  |
+| ------------------------- | --------------------------------------- | ---------------------------------------- |
+| **Traktor Control Value** | Read/write Traktor's internal state     | Deck tempo, track title, play state      |
+| **Controller Setting**    | Controller mapping configuration        | Shift state, browse mode settings        |
+| **Connection**            | Connect hardware control to function    | Button press → Load track                |
+| **Value Converter**       | Transform data between hardware and app | Encoder rotation → Volume change         |
+| **Timer**                 | Delayed or repeated actions             | Auto-hide overlay after 5 seconds        |
+| **Button Handler**        | Custom button logic                     | Multi-function: single/double/long-press |
+| **Control Group**         | Group connections with enable/disable   | Shift mode: enable different set         |
 
 ---
 
@@ -129,12 +130,12 @@ You don't need to learn all of QML—just the basics that Traktor uses. Here's w
 
 ### The Four Concepts You'll Use 80% of the Time
 
-| Concept      | MIDI Analogy             | QML Example                      |
-| ------------ | ------------------------ | -------------------------------- |
-| **Property** | MIDI CC value or state   | `enabled: deck.is_playing`       |
-| **Binding**  | MIDI conditional mapping | `visible: deck.is_playing`       |
-| **Wire**     | MIDI assignment          | Button press → Load track action |
-| **Adapter**  | MIDI transformer/script  | Convert 0-127 to 0-100% volume   |
+| Concept             | MIDI Analogy             | QML Example                      |
+| ------------------- | ------------------------ | -------------------------------- |
+| **Property**        | MIDI CC value or state   | `enabled: deck.is_playing`       |
+| **Automatic Link**  | MIDI conditional mapping | `visible: deck.is_playing`       |
+| **Connection**      | MIDI assignment          | Button press → Load track action |
+| **Value Converter** | MIDI transformer/script  | Convert 0-127 to 0-100% volume   |
 
 ### 1) Imports
 
@@ -213,15 +214,15 @@ This section defines the core concepts you'll see throughout the handbook. For d
 
 **Traktor-specific concepts:**
 
-- **AppProperty**: A bridge to Traktor's internal state (play status, track name, tempo) — see [02_API_REFERENCE.md](02_API_REFERENCE.md#appproperty)
-- **Wire**: Connects a hardware control to an action or property — see [02_API_REFERENCE.md](02_API_REFERENCE.md#wire)
-- **Adapter**: A component that transforms data in a Wire connection (e.g., `ButtonScriptAdapter`) — see [02_API_REFERENCE.md](02_API_REFERENCE.md#adapters-example-buttonscriptadapter)
-- **enabled:**: A condition on a Wire that controls whether it's active (used for "shift layers") — see [02_API_REFERENCE.md](02_API_REFERENCE.md#wire)
-- **MappingProperty**: Controller-mapping configuration like shift state or mode flags — see [02_API_REFERENCE.md](02_API_REFERENCE.md#mappingproperty)
+- **Traktor Control Value**: A bridge to Traktor's internal state (play status, track name, tempo) — see [02_API_REFERENCE.md](02_API_REFERENCE.md#appproperty)
+- **Connection**: Links a hardware control to an action or property — see [02_API_REFERENCE.md](02_API_REFERENCE.md#wire)
+- **Value Converter**: A component that transforms data in a connection (e.g., turn encoder rotation into volume change) — see [02_API_REFERENCE.md](02_API_REFERENCE.md#adapters-example-buttonscriptadapter)
+- **Condition**: A rule on a connection that controls whether it's active (used for "shift layers") — see [02_API_REFERENCE.md](02_API_REFERENCE.md#wire)
+- **Controller Setting**: Controller-mapping configuration like shift state or mode flags — see [02_API_REFERENCE.md](02_API_REFERENCE.md#mappingproperty)
 
 **Workflow terms:**
 
-- **Overlay**: A mod packaged as only the files it changes (smaller, easier to share) — see [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md)
+- **Customization Package**: A mod packaged as only the files it changes (smaller, easier to share) — see [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md)
 - **Restore**: Rolling back to a previously backed-up state when changes don't work
 - **Deck ID**: The deck number (1–4) that a piece of logic targets
 
@@ -232,6 +233,8 @@ For a complete glossary, see [07_GLOSSARY.md](07_GLOSSARY.md).
 ## Install / backup / restore (the safe workflow)
 
 **Note on terminal examples below**: The steps can be done via Finder, but terminal examples are also provided for speed and precision. A terminal is a text-based command interface (macOS: "Terminal" app; Windows: "Command Prompt" or "PowerShell"). Simply copy & paste the command lines shown.
+
+**Windows shortcut**: An `install-windows.bat` script is included in this repository. Place it in the same folder as your `qml` folder, double-click it, and it will copy the `qml` folder into Traktor's install directory with admin elevation automatically. ([Community forum post](https://community.native-instruments.com/discussion/36677/small-bat-script-to-install-qml-mods#latest))
 
 ### Back up first
 
@@ -257,7 +260,7 @@ xcopy qml qml.backup /E /I /H
 
 ### Install a mod (overlay approach)
 
-Most community mods are not complete replacements; they are **overlays**:
+Most community mods are not complete replacements; they are **customization packages**:
 
 1. Start from the correct stock `qml` base (matching the Traktor version the mod targets)
 2. Copy the mod’s files over the base `qml`, overwriting when asked
@@ -277,9 +280,9 @@ Two safe approaches:
 - When Finder asks about folders, choose **Merge** (keeps files the mod doesn’t include).
 - When Finder asks about individual files, choose **Replace** for the files you actually want to override.
 
-**Option B (Terminal): use `rsync` to merge an overlay**
+**Option B (Terminal): use `rsync` to merge a customization package**
 
-If the mod overlay is a folder that contains `CSI`, `Defines`, `Screens` (etc.), you can merge it into the target `qml` (see ["The Traktor `qml` folder"](#the-traktor-qml-folder) for your path):
+If the customization package is a folder that contains the controller setup files, you can merge it into the target `qml` (see ["The Traktor `qml` folder"](#the-traktor-qml-folder) for your path):
 
 ```bash
 sudo rsync -a "path/to/mod-overlay/" \
@@ -288,7 +291,7 @@ sudo rsync -a "path/to/mod-overlay/" \
 
 Notes:
 
-- The trailing `/` on the source path matters: it copies the _contents_ of the overlay.
+- The trailing `/` on the source path matters: it copies the _contents_ of the customization package.
 - `sudo` is often required because Traktor’s `qml` is inside the app bundle.
 
 ### Restore stock QML files

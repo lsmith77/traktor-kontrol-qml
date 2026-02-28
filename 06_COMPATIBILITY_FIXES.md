@@ -14,7 +14,7 @@ For debugging + testing, use: [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md)
 
 - [Version Compatibility Matrix](#version-compatibility-matrix) - Which versions break what
 - [Fix 1: Flux Marker on Hardware Screens](#fix-1-flux-marker-not-appearing-on-hardware-screens) - Traktor 3.5+
-- [Fix 2: QML Mod Base Version Requirements](#fix-2-qml-mod-base-version-requirements) - Overlay installation method
+- [Fix 2: QML Mod Base Version Requirements](#fix-2-qml-mod-base-version-requirements) - Installation method
 - [General Version Migration Tips](#general-version-migration-tips) - What to check after updates
 
 ## Version Compatibility Matrix
@@ -369,7 +369,7 @@ MappingProperty { id: deckFocusProp; path: "mapping.settings.deck_focus" }
 
 Properties under `mapping.state.*` are transient — they reset when the controller disconnects. Properties under `mapping.settings.*` are saved in Traktor's mapping file and persist across restarts. Both files (CSI and Screen) must use the same path for the screen to display the correct state.
 
-**See also**: [03_PRACTICAL_EXAMPLES.md - Example 41](03_PRACTICAL_EXAMPLES.md#example-41-persistent-deck-focus-d2-settingspath-fix) for the full explanation of `mapping.state` vs `mapping.settings`.
+**See also**: [X1MK3 Screen Feedback](03_COMMUNITY_RESOURCES.md#x1mk3-performance-mod) for examples of state synchronization across overlays.
 
 ---
 

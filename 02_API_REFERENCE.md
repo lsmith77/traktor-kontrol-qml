@@ -6,10 +6,12 @@
 This is the “API/reference” section of the handbook.
 
 - Basics (syntax + folder layout + install/restore): [01_BASICS.md](01_BASICS.md)
-- Examples (copy/adapt real code): [03_PRACTICAL_EXAMPLES.md](03_PRACTICAL_EXAMPLES.md)
+- Community mods & working examples: [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md)
 - Troubleshooting (debugging + testing): [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md)
 - Version compatibility + known fixes: [06_COMPATIBILITY_FIXES.md](06_COMPATIBILITY_FIXES.md)
 - How to package & share mods: [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md)
+
+For real-world code examples, see [**Chapter 03: Community Resources**](03_COMMUNITY_RESOURCES.md) for links to working mods and their documentation.
 
 ---
 
@@ -17,15 +19,15 @@ This is the “API/reference” section of the handbook.
 
 If you already know QML basics and just need a **quick lookup table**:
 
-| I want to...                    | File to edit             | Key building block     |
-| ------------------------------- | ------------------------ | ---------------------- |
-| Map a button to a function      | CSI/[Controller].qml     | Wire + AppProperty     |
-| Change something on screen      | Screens/[Controller]/... | Rectangle + binding    |
-| Add a global setting            | Defines/Prefs.qml        | QtObject + AppProperty |
-| Transform data (e.g., 0-127→0%) | CSI/[Controller].qml     | PropertyAdapter        |
-| React to a button hold          | CSI/[Controller].qml     | ButtonScriptAdapter    |
-| Show/hide a component           | Screens/.../...          | visible: binding       |
-| Store persistent state          | CSI/Common/...           | mapping.settings path  |
+| I want to...                    | File to edit             | Key building block         |
+| ------------------------------- | ------------------------ | -------------------------- |
+| Map a button to a function      | CSI/[Controller].qml     | Connection + Control Value |
+| Change something on screen      | Screens/[Controller]/... | Rectangle + link           |
+| Add a global setting            | Defines/Prefs.qml        | QtObject + Control Value   |
+| Transform data (e.g., 0-127→0%) | CSI/[Controller].qml     | Value Converter            |
+| React to a button hold          | CSI/[Controller].qml     | Button Handler             |
+| Show/hide a component           | Screens/.../...          | visible: link              |
+| Store persistent state          | CSI/Common/...           | mapping.settings path      |
 
 **Jump to property paths**: [Common Property Paths](#common-property-paths)  
 **Need code template?**: [Common Tasks Cheat Sheet](#common-tasks-cheat-sheet)  
@@ -183,7 +185,7 @@ Module {
 Property paths live under `app.traktor...`.
 
 - For the full path catalog, see [Full AppProperty Path Catalog](#full-appproperty-path-catalog)
-- For examples of using paths in real code, use [03_PRACTICAL_EXAMPLES.md](03_PRACTICAL_EXAMPLES.md)
+- For examples of using paths in real code, see [community resources and working mods](03_COMMUNITY_RESOURCES.md)
 
 Common pattern (per-deck):
 
@@ -1092,7 +1094,7 @@ Timer {
 }
 ```
 
-**See**: [Example 17](03_PRACTICAL_EXAMPLES.md#🎯-example-17-custom-jump-mode-with-pad-layout), [Example 19](03_PRACTICAL_EXAMPLES.md#👆-example-19-touch-hotcues-with-long-press), [Example 26](03_PRACTICAL_EXAMPLES.md#👆-example-26-native-buttongestures-module-traktor-pro-4)
+**See**: Refer to [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) for real-world examples and patterns
 
 ---
 
@@ -1117,7 +1119,7 @@ Text {
 }
 ```
 
-**See**: [Example 13](03_PRACTICAL_EXAMPLES.md#📊-example-13-phase-meter-with-configurable-height), [Example 14](03_PRACTICAL_EXAMPLES.md#⚠️-example-14-bpm-difference-warning-system), [Example 16](03_PRACTICAL_EXAMPLES.md#⏰-example-16-time-warning-system-with-color-indicators)
+**See**: Refer to [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) for real-world examples and patterns
 
 ---
 
@@ -1146,7 +1148,7 @@ Text {
 }
 ```
 
-**See**: [Example 14](03_PRACTICAL_EXAMPLES.md#⚠️-example-14-bpm-difference-warning-system), [Example 16](03_PRACTICAL_EXAMPLES.md#⏰-example-16-time-warning-system-with-color-indicators)
+**See**: Refer to [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) for real-world examples
 
 ---
 
@@ -1182,7 +1184,7 @@ WiresGroup {
 }
 ```
 
-**See**: [Example 16](03_PRACTICAL_EXAMPLES.md#⏰-example-16-time-warning-system-with-color-indicators), [Example 27](03_PRACTICAL_EXAMPLES.md#🚀-example-27-advanced-ui-innovations)
+**See**: Study [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) for real-world implementations
 
 ---
 
@@ -1212,7 +1214,7 @@ Text {
 }
 ```
 
-**See**: [Example 11](03_PRACTICAL_EXAMPLES.md#📁-example-11-json-based-settings-system), [Example 22](03_PRACTICAL_EXAMPLES.md#🏗️-example-22-modular-settings-system), [Example 27](03_PRACTICAL_EXAMPLES.md#🚀-example-27-advanced-ui-innovations)
+**See**: Study [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) for real-world implementations
 
 ---
 
@@ -1237,7 +1239,7 @@ Text {
 }
 ```
 
-**See**: [Example 14](03_PRACTICAL_EXAMPLES.md#⚠️-example-14-bpm-difference-warning-system), [Example 27](03_PRACTICAL_EXAMPLES.md#🚀-example-27-advanced-ui-innovations)
+**See**: Study [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) for real-world implementations
 
 ---
 
@@ -1280,7 +1282,7 @@ Rectangle {
 }
 ```
 
-**See**: [Example 15](03_PRACTICAL_EXAMPLES.md#👆-example-15-touch-based-settings-menu), [Example 22](03_PRACTICAL_EXAMPLES.md#🏗️-example-22-modular-settings-system)
+**See**: Study [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) for real-world implementations
 
 ---
 
@@ -1362,4 +1364,4 @@ WiresGroup {
 
 ---
 
-**Next:** [03_PRACTICAL_EXAMPLES.md](03_PRACTICAL_EXAMPLES.md)
+**Next**: Start with [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) to see real-world implementations

@@ -371,7 +371,40 @@ Mod 3: Community Z1    v0.8.0  (versioned ✓)
 
 **Expected outcome**: Over time, more mods adopt versioning. Your setup gradually becomes more updatable. Community naturally incentivizes developers to version (musicians ask "what version?").
 
-#### Using Git to Understand Updates (Optional)
+---
+
+## Forum Snippets: Simple Approach
+
+Many QML mods are shared as **code snippets directly in forum discussions** (like the [MX2 QML Mods thread](https://community.native-instruments.com/discussion/50150/mx2-qml-mods-discussion)) rather than complete GitHub repositories.
+
+**Simple rule**: When you use a forum snippet, preserve the direct forum link for attribution and reference. Treat it as an unversioned mod where the forum URL is its documentation.
+
+**In your `/mods/` directory**, create a minimal directory entry:
+
+```
+~/my-traktor-setup/mods/MX2_GridAdjustBPM/
+├── SNIPPET_SOURCE.md
+└── qml/
+    └── (code snippet files)
+```
+
+**SNIPPET_SOURCE.md** (minimal):
+
+```markdown
+# MX2 Grid Adjust BPM
+
+**Source**: https://community.native-instruments.com/discussion/comment/257277#Comment_257277  
+**Posted**: Sûlherokhh (Feb 24, 2026)  
+**What**: Adds x2 and /2 BPM to SHIFT+SYNC/MASTER buttons
+```
+
+The forum URL links to the full context. Optionally, you can also paste the code snippet into `SNIPPET_SOURCE.md` at the bottom of the file.
+
+**In your mod combination prompt**: Reference the forum snippet by its `/mods` directory name, just like any other mod. The `SNIPPET_SOURCE.md` inside that directory contains the source URL or the source code.
+
+**See also**: [Chapter 10 — Brief Reference](10_MOD_COMBINATION_PROMPT.md#forum-snippets-simple-approach) and [Chapter 11 — Optional: Forum Snippets](11_COMBINING_MODS_WORKFLOW.md#optional-organizing-forum-snippets)
+
+---
 
 **Do you need git?**
 

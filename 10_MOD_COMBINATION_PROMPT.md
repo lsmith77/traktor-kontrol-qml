@@ -49,15 +49,12 @@ Then in the prompt, tell the AI: `My baseline: [mod name + version] — I'll pas
 
 ```bash
 mkdir -p ~/my-traktor-setup
-
-# Copy baseline to /qml/
 cp -r [your-baseline-directory] ~/my-traktor-setup/qml
 
-# Initialize git in /qml/ only
 cd ~/my-traktor-setup/qml
 git init
 git add .
-git commit -m "Initial: baseline (traktor-kontrol-qml-files v4.4.1)"  # or your baseline name
+git commit -m "Initial: baseline (traktor-kontrol-qml-files v4.4.1)"
 ```
 
 **Directory structure:**
@@ -102,12 +99,24 @@ mv mod-temp ~/my-traktor-setup/mods/ModName-vX.Y.Z
 
 ---
 
+## Forum Snippets: Simple Approach
+
+If using forum snippets (from discussions like the [MX2 QML Mods thread](https://community.native-instruments.com/discussion/50150/mx2-qml-mods-discussion)):
+
+1. **Create SNIPPET_SOURCE.md** minimal file with the forum link (see [Chapter 09](09_MOD_DOCUMENTATION_GUIDE.md#forum-snippets-simple-approach) for example)
+2. **In your prompt**, reference like any other mod with the forum URL
+3. **Paste the code snippet** directly from the forum into the prompt
+
+No complex files needed — the forum URL is the documentation.
+
+---
+
 ## Copy This Entire Prompt
 
 **Before running the prompt**: Open your workspace at the root directory (`~/my-traktor-setup/`) in your editor (VS Code, etc.). This gives the prompt access to both:
 
 - `/qml/` (your baseline)
-- `/mods/` (your mod sources)
+- `/mods/` (your mod sources, including forum snippets)
 
 **Copy everything between the triple backticks below** (from `I'm combining...` to `...Fallback options`) **and paste into your AI tool (Claude, ChatGPT, Copilot):**
 

@@ -95,6 +95,16 @@ Community S4 MK3 modifications.
 
 ---
 
+### MX2 QML Mods
+
+**Status**: Community Discussion • **Traktor**: 4.4.1+ • **Controller**: Native Instruments MX2
+
+Community-contributed QML modifications with code snippets and implementation guides.
+
+- **Forum**: https://community.native-instruments.com/discussion/50150/mx2-qml-mods-discussion
+
+---
+
 ## Premium/Subscription Resources
 
 Premium Traktor QML mods and customization available through subscription services:

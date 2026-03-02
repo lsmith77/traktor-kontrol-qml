@@ -4,15 +4,25 @@
 **Use when**: Starting your QML modding journey or navigating between docs
 This handbook is for people who want to **create, understand, or maintain Traktor QML mods** in a structured way.
 
+> **New & Easy**: Want to combine mods without coding? Check out the **Mod Combination System** section below. It’s designed for musicians, not programmers.
+
 ## How this handbook is organized
 
-1. [01_BASICS.md](01_BASICS.md) — Basics (QML + Traktor’s QML layout + install/restore)
-2. [02_API_REFERENCE.md](02_API_REFERENCE.md) — API reference (Traktor QML building blocks + AppProperty paths)
-3. [03_PRACTICAL_EXAMPLES.md](03_PRACTICAL_EXAMPLES.md) — Practical examples (copy/adapt real patterns)
+**Core modding guides**:
+
+1. [01_BASICS.md](01_BASICS.md) — Basics (QML fundamentals + Traktor's folder structure + install/restore)
+2. [02_API_REFERENCE.md](02_API_REFERENCE.md) — API reference (Traktor building blocks + control value paths)
+3. [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) — Community mods + working examples (GitHub repos and forum discussions)
 4. [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md) — Troubleshooting (debugging + testing)
 5. [06_COMPATIBILITY_FIXES.md](06_COMPATIBILITY_FIXES.md) — Compatibility fixes (version-specific issues)
 
-Appendices:
+**Advanced guides**:
+
+- How to document mods for sharing: [09_MOD_DOCUMENTATION_GUIDE.md](09_MOD_DOCUMENTATION_GUIDE.md)
+- How to combine multiple mods (musician's guide): [11_COMBINING_MODS_WORKFLOW.md](11_COMBINING_MODS_WORKFLOW.md)
+- Mod combination prompt (AI template): [10_MOD_COMBINATION_PROMPT.md](10_MOD_COMBINATION_PROMPT.md)
+
+**Appendices**:
 
 - Frequently asked questions: [05_FAQ.md](05_FAQ.md)
 - Glossary: [07_GLOSSARY.md](07_GLOSSARY.md)
@@ -20,12 +30,34 @@ Appendices:
 
 ## Suggested learning path
 
+**For individual mod creation**:
+
 - Start with [01_BASICS.md](01_BASICS.md) (you only need the first half to do safe edits)
 - Keep [02_API_REFERENCE.md](02_API_REFERENCE.md) open while making changes
-- Pick one small change from [03_PRACTICAL_EXAMPLES.md](03_PRACTICAL_EXAMPLES.md)
+- Pick one small change from a [community mod example](03_COMMUNITY_RESOURCES.md) (like X1MK3)
 - If a change doesn't work, go to [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md)
 - For common questions, check [05_FAQ.md](05_FAQ.md)
 - If anything breaks after a Traktor update, go to [06_COMPATIBILITY_FIXES.md](06_COMPATIBILITY_FIXES.md)
+
+**For combining multiple community mods**:
+
+- Read [09_MOD_DOCUMENTATION_GUIDE.md](09_MOD_DOCUMENTATION_GUIDE.md) to understand the **metadata lock file** pattern — your key to safe, incremental updates
+- Follow the complete workflow in [11_COMBINING_MODS_WORKFLOW.md](11_COMBINING_MODS_WORKFLOW.md) (4 phases: preparation, AI generation, save, deploy)
+- Use [10_MOD_COMBINATION_PROMPT.md](10_MOD_COMBINATION_PROMPT.md) template with Claude or Copilot to:
+  - Gather version information from each mod
+  - Create a metadata comment block in your QML (the lock file)
+  - Check for compatibility conflicts
+  - Generate your complete QML directory
+- Learn from professional implementations in [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md)
+- When mods update, use metadata lock files to understand which components changed and whether you need the update
+
+**For mod authors creating features for community**:
+
+- Read [09_MOD_DOCUMENTATION_GUIDE.md](09_MOD_DOCUMENTATION_GUIDE.md) to understand the documentation-first approach used by community feature creators
+- Follow the feature documentation template to create shareable .md files
+- Use AI tools (Copilot, Claude) with your documentation to generate code
+- See [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) for real examples of documented features
+- Use [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md) to track and share your mods via git
 
 ---
 

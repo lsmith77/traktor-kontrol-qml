@@ -7,14 +7,14 @@ Short definitions for common terms you’ll see when working with Traktor QML mo
 ## Traktor + modding
 
 - **QML**: A UI and logic language from Qt. Traktor uses it to define controller behavior and screen layouts.
-- **QML mod**: A set of changes to Traktor’s `qml` folder (usually a small overlay of edited files).
-- **Overlay install**: Installing a mod by copying its files “on top of” a complete base `qml` folder, overwriting only the files it changes.
+- **QML Mod**: A set of changes to Traktor's controller setup folder (usually a small collection of edited files, called an "add-on package" or "customization package").
+- **Customization Package Install**: Installing a mod by copying its files "on top of" a complete base controller setup, overwriting only the files it changes. Safer because your other customizations stay intact.
 - **Base version**: The Traktor version a mod was built for. Overlay mods often require a specific base to work.
 
 ## Folder structure
 
-- **`qml`**: The folder inside the Traktor installation that contains all QML files.
-- **`CSI`**: Controller Surface Interface. “What the hardware does.” Buttons, encoders, wiring, adapters.
+- **`qml``**: The folder inside a Traktor installation containing all the QML files that control your hardware. Changes here customize button behavior, screen layout, and visual feedback.
+- **`CSI`**: Where hardware button and encoder behavior is defined. "What the hardware does." Buttons, encoders, control pathways, signal transformation.
 - **`Screens`**: “What you see.” Layouts, colors, fonts, waveform UI, browser columns.
 - **`Defines`**: Shared definitions. Constants, enums, preferences/singletons, shared helper components.
 - **`qmldir`**: A module index file that enables `import`-ing a folder as a QML module.
@@ -23,17 +23,17 @@ Short definitions for common terms you’ll see when working with Traktor QML mo
 
 - **Component**: A QML element like `Rectangle`, `Text`, or a Traktor-specific component.
 - **Property**: A named value on a component, e.g. `visible: true` or `property int deckId: 1`.
-- **Binding**: A property value defined by an expression that updates automatically, e.g. `visible: shift.value`.
+- **Binding**: A property value defined by an expression that updates automatically. Like an "assignment" in MIDI logic—when the condition changes, the property updates. Example: `visible: shift.value` (show this button only when Shift is pressed).
 - **Signal / handler**: An event and the code that reacts to it, e.g. `onTriggered: { ... }`.
 - **`id`**: A local name you can use to reference an object within the same QML file.
 
 ## Traktor-specific building blocks
 
-- **`AppProperty`**: A bridge to Traktor’s internal state. Reads/writes values via a `path` like `app.traktor.decks.1.play`.
+- **`AppProperty`**: A bridge to Traktor's internal state. Reads/writes values you can control in Traktor, like deck play state, track name, or tempo. You reference them by a `path` like `app.traktor.decks.1.play` (deck 1's play button status).
 - **AppProperty path**: The string that identifies a Traktor state value you can read/write.
 - **`MappingProperty`**: A property exposed by Traktor’s mapping layer (often used for mode flags).
-- **`Wire`**: Connects a source (`from`) to a destination (`to`). Used to link hardware controls to actions/properties. Think of it as a MIDI assignment or mapping in Traktor's mapping panel.
-- **Adapter**: A component used in a `Wire` when you need logic or transformation (e.g. scripts, scaling, toggles). Similar to a MIDI transformer or script in Traktor's mapping system.
+- **`Wire`**: Connects a source (`from`) to a destination (`to`). Think of it like a MIDI assignment or mapping in Traktor—you say "when this button is pressed, do that action." Wires link hardware controls to functions.
+- **Adapter**: A component used in a `Wire` when you need custom logic or data transformation. Examples: convert button presses into toggles, scale encoder rotation to volume change, create multi-touch logic (single-press vs long-press). Similar to a MIDI transformer or script in Traktor's mapping.
 
 ## Mapping layer concepts
 
@@ -41,7 +41,7 @@ Short definitions for common terms you’ll see when working with Traktor QML mo
 - **`mapping.settings`**: Persistent mapping settings. Survives restarts; commonly used for user preferences stored in mappings.
 - **`propertiesPath`**: A variable some mods use to point at a mapping root (often `mapping.state`).
 - **`settingsPath`**: A variable some mods use to point at a persistent mapping root (often `mapping.settings`).
-- **`enabled:`**: A condition used on `Wire` / `WiresGroup` to decide whether that connection/group is active. Think of it as a layer or conditional MIDI mapping in Traktor—the wire only works when the condition is true.
+- **`enabled:`**: A condition used on connections to decide whether they're active. Think of it as a shift layer or conditional mapping—the wire only works when the condition is true. Example: "only mute stems when in Stem mode."
 - **`WiresGroup`**: Groups multiple wires behind a single `enabled:` gate. Like a mapping shift layer—all wires in the group activate/deactivate together based on the condition.
 
 ## Common workflow terms

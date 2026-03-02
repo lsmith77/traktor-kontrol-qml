@@ -6,10 +6,12 @@
 This is the “API/reference” section of the handbook.
 
 - Basics (syntax + folder layout + install/restore): [01_BASICS.md](01_BASICS.md)
-- Examples (copy/adapt real code): [03_PRACTICAL_EXAMPLES.md](03_PRACTICAL_EXAMPLES.md)
+- Community mods & working examples: [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md)
 - Troubleshooting (debugging + testing): [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md)
 - Version compatibility + known fixes: [06_COMPATIBILITY_FIXES.md](06_COMPATIBILITY_FIXES.md)
 - How to package & share mods: [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md)
+
+For real-world code examples, see [**Chapter 03: Community Resources**](03_COMMUNITY_RESOURCES.md) for links to working mods and their documentation.
 
 ---
 
@@ -17,15 +19,15 @@ This is the “API/reference” section of the handbook.
 
 If you already know QML basics and just need a **quick lookup table**:
 
-| I want to...                    | File to edit             | Key building block     |
-| ------------------------------- | ------------------------ | ---------------------- |
-| Map a button to a function      | CSI/[Controller].qml     | Wire + AppProperty     |
-| Change something on screen      | Screens/[Controller]/... | Rectangle + binding    |
-| Add a global setting            | Defines/Prefs.qml        | QtObject + AppProperty |
-| Transform data (e.g., 0-127→0%) | CSI/[Controller].qml     | PropertyAdapter        |
-| React to a button hold          | CSI/[Controller].qml     | ButtonScriptAdapter    |
-| Show/hide a component           | Screens/.../...          | visible: binding       |
-| Store persistent state          | CSI/Common/...           | mapping.settings path  |
+| I want to...                    | File to edit             | Key building block         |
+| ------------------------------- | ------------------------ | -------------------------- |
+| Map a button to a function      | CSI/[Controller].qml     | Connection + Control Value |
+| Change something on screen      | Screens/[Controller]/... | Rectangle + link           |
+| Add a global setting            | Defines/Prefs.qml        | QtObject + Control Value   |
+| Transform data (e.g., 0-127→0%) | CSI/[Controller].qml     | Value Converter            |
+| React to a button hold          | CSI/[Controller].qml     | Button Handler             |
+| Show/hide a component           | Screens/.../...          | visible: link              |
+| Store persistent state          | CSI/Common/...           | mapping.settings path      |
 
 **Jump to property paths**: [Common Property Paths](#common-property-paths)  
 **Need code template?**: [Common Tasks Cheat Sheet](#common-tasks-cheat-sheet)  
@@ -183,7 +185,7 @@ Module {
 Property paths live under `app.traktor...`.
 
 - For the full path catalog, see [Full AppProperty Path Catalog](#full-appproperty-path-catalog)
-- For examples of using paths in real code, use [03_PRACTICAL_EXAMPLES.md](03_PRACTICAL_EXAMPLES.md)
+- For examples of using paths in real code, see [community resources and working mods](03_COMMUNITY_RESOURCES.md)
 
 Common pattern (per-deck):
 
@@ -1033,6 +1035,38 @@ property int waveformColors: X
 
 The examples below expand on the quick tasks in [Common Tasks Cheat Sheet](#common-tasks-cheat-sheet). For each pattern, start with the quick recipe above, then use these deep dives to understand the advanced mechanics.
 
+### Understanding Settings vs States
+
+**Critical distinction**: QML differentiates between `mapping.settings` (persistent) and `mapping.state` (temporary).
+
+| Aspect                                  | `mapping.settings.*`                      | `mapping.state.*`                                          |
+| --------------------------------------- | ----------------------------------------- | ---------------------------------------------------------- |
+| **Persistence**                         | Saved between Traktor sessions            | Lost when Traktor closes                                   |
+| **Access**                              | QML via `MappingProperty`                 | QML via `AppProperty`                                      |
+| **Appears in Preferences Device Panel** | ✅ Only the hardcoded options             | ❌ Never                                                   |
+| **How to add**                          | Add to QML, but won't appear in Panel     | Add to QML                                                 |
+| **Use cases**                           | User preferences, toggleable features     | Temporary runtime flags (shift pressed, mode active, etc.) |
+| **Example**                             | `mapping.settings.custom_feature_enabled` | `mapping.state.shift`                                      |
+
+**Important limitation**: The Preferences device panel only shows **hardcoded options**. If you add custom settings to QML, they will persist and work in code, but won't appear in the Preferences UI. The panel is limited to options built into Traktor itself, plus some hardcoded functions (like S4 platter functions).
+
+**Practical example**:
+
+```qml
+// This will work and persist, but won't show in Preferences panel
+MappingProperty { id: myCustomSetting; path: "mapping.settings.my_custom_feature" }
+
+// This will work for temporary runtime state (lost on restart)
+AppProperty { id: shiftActive; path: "mapping.state.shift" }
+```
+
+**When to use which**:
+
+- **Settings**: User toggles a feature ON/OFF and expects it remembered next session
+- **States**: Temporary internal flags that change frequently during playback (shift mode, menu level, animation state)
+
+---
+
 ### Design Patterns for Common Modifications
 
 #### Pattern 1: Multi-Function Button (Single/Double/Long Press)
@@ -1092,7 +1126,7 @@ Timer {
 }
 ```
 
-**See**: [Example 17](03_PRACTICAL_EXAMPLES.md#🎯-example-17-custom-jump-mode-with-pad-layout), [Example 19](03_PRACTICAL_EXAMPLES.md#👆-example-19-touch-hotcues-with-long-press), [Example 26](03_PRACTICAL_EXAMPLES.md#👆-example-26-native-buttongestures-module-traktor-pro-4)
+**See**: Refer to [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) for real-world examples and patterns
 
 ---
 
@@ -1117,7 +1151,7 @@ Text {
 }
 ```
 
-**See**: [Example 13](03_PRACTICAL_EXAMPLES.md#📊-example-13-phase-meter-with-configurable-height), [Example 14](03_PRACTICAL_EXAMPLES.md#⚠️-example-14-bpm-difference-warning-system), [Example 16](03_PRACTICAL_EXAMPLES.md#⏰-example-16-time-warning-system-with-color-indicators)
+**See**: Refer to [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) for real-world examples and patterns
 
 ---
 
@@ -1146,21 +1180,26 @@ Text {
 }
 ```
 
-**See**: [Example 14](03_PRACTICAL_EXAMPLES.md#⚠️-example-14-bpm-difference-warning-system), [Example 16](03_PRACTICAL_EXAMPLES.md#⏰-example-16-time-warning-system-with-color-indicators)
+**See**: Refer to [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) for real-world examples
 
 ---
 
-#### Pattern 4: Encoder Context Switching
+#### Pattern 4: Encoder Context Switching (States vs Settings)
 
-**When to use**: Same encoder controls different functions in different modes
+**When to use**: Same encoder controls different functions based on temporary runtime modes
+
+**Key concept**: Use `mapping.state.*` for temporary shifts (shift pressed, layer active). Use `mapping.settings.*` for user preferences that persist.
 
 ```qml
+// Temporary state: Changes during session, lost on restart
 AppProperty { id: shiftPressed; path: "mapping.state.shift" }
+
+// Persistent setting: User preference that survives restart
 MappingProperty { id: browseMode; path: "mapping.settings.browse_mode" }
 
-// Encoder routing based on context
+// Encoder routing based on shift state (temporary)
 WiresGroup {
-    enabled: !shiftPressed.value
+    enabled: !shiftPressed.value  // Normal mode
     Wire {
         from: "%surface%.browse"
         to: EncoderScriptAdapter {
@@ -1171,7 +1210,7 @@ WiresGroup {
 }
 
 WiresGroup {
-    enabled: shiftPressed.value
+    enabled: shiftPressed.value  // Shift mode (temporary override)
     Wire {
         from: "%surface%.browse"
         to: EncoderScriptAdapter {
@@ -1180,43 +1219,200 @@ WiresGroup {
         }
     }
 }
-```
 
-**See**: [Example 16](03_PRACTICAL_EXAMPLES.md#⏰-example-16-time-warning-system-with-color-indicators), [Example 27](03_PRACTICAL_EXAMPLES.md#🚀-example-27-advanced-ui-innovations)
-
----
-
-#### Pattern 5: Setting Toggle with Visual Feedback
-
-**When to use**: Button toggles setting + shows current state
-
-```qml
-MappingProperty { id: customSetting; path: "mapping.settings.custom" }
-
-Wire {
-    from: "%surface%.button"
-    to: ButtonScriptAdapter {
-        brightness: customSetting.value ? 1.0 : 0.0  // LED feedback
-
-        onPress: {
-            customSetting.value = !customSetting.value
+// Alternative: Encoder behavior switches based on user's persistent setting
+WiresGroup {
+    enabled: browseMode.value === 0  // Classic mode (user's persistent choice)
+    Wire {
+        from: "%surface%.browse"
+        to: EncoderScriptAdapter {
+            onIncrement: { scrollBy(1) }
+            onDecrement: { scrollBy(-1) }
         }
     }
 }
 
-// Optional: Screen feedback
+WiresGroup {
+    enabled: browseMode.value === 1  // Grid mode (user's persistent choice)
+    Wire {
+        from: "%surface%.browse"
+        to: EncoderScriptAdapter {
+            onIncrement: { moveGrid(1, 0) }
+            onDecrement: { moveGrid(0, 1) }
+        }
+    }
+}
+```
+
+**Key difference in this pattern**:
+
+- `mapping.state.shift` changes during playback (temporary) → use for shift layers that don't persist
+- `mapping.settings.browse_mode` is user's preference → persists across sessions, won't appear in Preferences panel but will work reliably
+
+**See**: Study [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) for real-world implementations
+
+---
+
+#### Pattern 5: Persistent Settings with Visual Feedback
+
+**When to use**: Button toggles a user preference (stays ON/OFF across sessions) + provide visual feedback
+
+**Key concept**: Use `MappingProperty` for settings that should persist. The user's choice is saved even after Traktor restarts.
+
+```qml
+// Persistent setting: Saved to Traktor's state file
+MappingProperty { id: customFeatureSetting; path: "mapping.settings.custom_feature_enabled" }
+
+// Toggle the setting with LED feedback
+Wire {
+    from: "%surface%.button"
+    to: ButtonScriptAdapter {
+        // LED matches setting state
+        brightness: customFeatureSetting.value ? 1.0 : 0.0
+
+        onPress: {
+            // Toggle persists across sessions
+            customFeatureSetting.value = !customFeatureSetting.value
+        }
+    }
+}
+
+// Screen feedback reflecting persistent setting
 Text {
-    visible: customSetting.value
-    text: "Custom Mode: ON"
+    visible: customFeatureSetting.value
+    text: "Custom Feature: ON (will persist after restart)"
     color: colors.green
 }
 ```
 
-**See**: [Example 11](03_PRACTICAL_EXAMPLES.md#📁-example-11-json-based-settings-system), [Example 22](03_PRACTICAL_EXAMPLES.md#🏗️-example-22-modular-settings-system), [Example 27](03_PRACTICAL_EXAMPLES.md#🚀-example-27-advanced-ui-innovations)
+**Contrast with temporary state**:
+
+```qml
+// Temporary state: Lost when Traktor closes
+property bool temporaryFlag: false  // Local property, not persistent
+
+// Persistent setting: Survives Traktor restart
+MappingProperty { id: userPreference; path: "mapping.settings.my_preference" }
+
+// Use temporary states for things that change during session
+Wire {
+    from: "%surface%.button"
+    to: ButtonScriptAdapter {
+        onPress: {
+            temporaryFlag = !temporaryFlag  // Lost on restart
+        }
+    }
+}
+
+// Use settings for user preferences
+Wire {
+    from: "%surface%.other_button"
+    to: ButtonScriptAdapter {
+        onPress: {
+            userPreference.value = !userPreference.value  // Persists
+        }
+    }
+}
+```
+
+**Important**: If you add a custom setting to QML, it will persist and work in code, but it won't appear in the Traktor Preferences device panel. The panel only shows hardcoded options.
+
+**See**: Study [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) for real-world implementations
 
 ---
 
-#### Pattern 6: Computed Property (Derived Values)
+#### Pattern 6: Managing Persistent State (Settings that Survive Restart)
+
+**When to use**: You need to save user choices/state that should be remembered between Traktor sessions
+
+**Key concept**: Any `MappingProperty` with a `mapping.settings.*` path automatically persists to Traktor's state file. No additional code needed.
+
+```qml
+// Create a persistent setting for any preference
+MappingProperty {
+    id: enableAdvancedMode
+    path: "mapping.settings.advanced_mode_enabled"
+}
+
+// Create multiple related settings
+MappingProperty {
+    id: advancedBrightness
+    path: "mapping.settings.advanced_brightness"
+}
+
+MappingProperty {
+    id: lastSelectedDeck
+    path: "mapping.settings.last_deck"
+}
+
+// Use settings just like any other property
+Wire {
+    from: "%surface%.mode_button"
+    to: ButtonScriptAdapter {
+        brightness: enableAdvancedMode.value ? 1.0 : 0.3
+        onPress: {
+            enableAdvancedMode.value = !enableAdvancedMode.value
+            // This change is instantly written to Traktor's persistent state
+        }
+    }
+}
+
+// Settings work in conditionals and expressions
+WiresGroup {
+    enabled: enableAdvancedMode.value
+    // All wires in this group only active when setting is true
+}
+
+// Read settings from screen components
+Rectangle {
+    opacity: advancedBrightness.value  // 0.0 to 1.0, persists
+}
+```
+
+**What persists**:
+
+- Boolean values (true/false)
+- Numbers (integers, floats)
+- Strings
+- Lists (encoded as delimited strings)
+
+**What does NOT appear in Preferences panel**:
+
+- Any custom settings you add to QML won't show in the device panel UI
+- Only hardcoded Traktor options appear in the panel
+- BUT your settings still persist and work perfectly in code
+
+**Example: Custom setting that persists but invisible in panel**:
+
+```qml
+// Add to CSI/[Controller]/[Controller].qml
+MappingProperty {
+    id: customJumpSize
+    path: "mapping.settings.custom_jump_size"
+}
+
+// This works and persists across restarts,
+// but users must toggle it via a button/encoder,
+// not via the Preferences panel.
+
+Wire {
+    from: "%surface%.encoder"
+    to: EncoderScriptAdapter {
+        onIncrement: {
+            customJumpSize.value = Math.min(100, customJumpSize.value + 5)
+        }
+        onDecrement: {
+            customJumpSize.value = Math.max(0, customJumpSize.value - 5)
+        }
+    }
+}
+```
+
+**See**: Study [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) for real-world implementations
+
+---
+
+#### Pattern 7: Computed Property (Derived Values)
 
 **When to use**: Calculate new values from existing properties
 
@@ -1237,11 +1433,11 @@ Text {
 }
 ```
 
-**See**: [Example 14](03_PRACTICAL_EXAMPLES.md#⚠️-example-14-bpm-difference-warning-system), [Example 27](03_PRACTICAL_EXAMPLES.md#🚀-example-27-advanced-ui-innovations)
+**See**: Study [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) for real-world implementations
 
 ---
 
-#### Pattern 7: State Machine (Multiple Modes)
+#### Pattern 8: State Machine (Multiple Modes)
 
 **When to use**: Complex behavior with distinct states
 
@@ -1280,7 +1476,37 @@ Rectangle {
 }
 ```
 
-**See**: [Example 15](03_PRACTICAL_EXAMPLES.md#👆-example-15-touch-based-settings-menu), [Example 22](03_PRACTICAL_EXAMPLES.md#🏗️-example-22-modular-settings-system)
+**See**: Study [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) for real-world implementations
+
+---
+
+### Settings vs States: Decision Framework
+
+**Use this decision tree when deciding which to use**:
+
+```
+Does the user need to remember this choice after restart?
+├── YES → Use mapping.settings (persistent)
+│   └── Will it ONLY work via code/buttons (not Preferences panel)?
+│       └── YES → That's OK! Just add to QML. It will persist.
+│       └── NO → Consider if it should be hardcoded in Preferences
+│
+└── NO → Use mapping.state or local property (temporary)
+    └── Is it a framework concept (shift, layer, menu)?
+        ├── YES → Check if mapping.state.* exists for it
+        └── NO → Create as local property { } in QML
+```
+
+**Real-world examples**:
+
+| Feature                   | Setting/State | Path                                | Reason                                                 |
+| ------------------------- | ------------- | ----------------------------------- | ------------------------------------------------------ |
+| User toggles "Beat Sync"  | ✅ Setting    | `mapping.settings.beat_sync_auto`   | User prefers it across sessions                        |
+| Shift button pressed      | ❌ State      | `mapping.state.shift`               | Temporary during playback, resets each session         |
+| Browser tree position     | ✅ Setting    | `mapping.settings.browser_position` | User expects to resume where they left off             |
+| "Now playing" mode active | ❌ State      | Local `property bool`               | Temporary during current mix, doesn't need persistence |
+| Colorblind-friendly mode  | ✅ Setting    | `mapping.settings.colorblind_mode`  | Accessibility preference, should persist               |
+| Waveform currently zoomed | ❌ State      | Local `property real`               | Temporary view state during session                    |
 
 ---
 
@@ -1362,4 +1588,4 @@ WiresGroup {
 
 ---
 
-**Next:** [03_PRACTICAL_EXAMPLES.md](03_PRACTICAL_EXAMPLES.md)
+**Next**: Start with [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) to see real-world implementations

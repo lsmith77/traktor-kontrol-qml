@@ -1,6 +1,6 @@
 # Traktor QML Mods (Documentation)
 
-This repo is a **friendly documentation set** for customizing Native Instruments **Traktor Pro** using **QML**.
+This repo is a **friendly documentation set** for customizing Native Instruments **Traktor Pro** using **QML** (a programming language for UI customization).
 
 You don’t need to be a programmer to get value from QML mods.
 
@@ -14,13 +14,19 @@ You don’t need to be a programmer to get value from QML mods.
 
 - [00_HANDBOOK.md](00_HANDBOOK.md) — index and suggested reading order
 - [01_BASICS.md](01_BASICS.md) — beginner QML + Traktor `qml` folder structure + install/restore
-- [02_API_REFERENCE.md](02_API_REFERENCE.md) — API reference + patterns/templates (includes the full `AppProperty` path catalog)
-- [03_PRACTICAL_EXAMPLES.md](03_PRACTICAL_EXAMPLES.md) — lots of real-world examples
+- [02_API_REFERENCE.md](02_API_REFERENCE.md) — reference guide + copy-paste code patterns (includes the full control value path catalog)
+- [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) — Real working mods from the community (GitHub repos + forum discussions)
 - [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md) — debugging + testing when something breaks
 - [05_FAQ.md](05_FAQ.md) — frequently asked questions (safety, installation, mods, updates)
 - [06_COMPATIBILITY_FIXES.md](06_COMPATIBILITY_FIXES.md) — version compatibility + known fixes
 - [07_GLOSSARY.md](07_GLOSSARY.md) — quick definitions
 - [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md) — how to share your changes (basics)
+- [09_MOD_DOCUMENTATION_GUIDE.md](09_MOD_DOCUMENTATION_GUIDE.md) — how to document mods + metadata lock files
+- [10_MOD_COMBINATION_PROMPT.md](10_MOD_COMBINATION_PROMPT.md) — combining multiple mods with version tracking and metadata
+
+## Combining Multiple Mods?
+
+When mixing features from different mods, read [**Chapter 10: MOD_COMBINATION_PROMPT**](10_MOD_COMBINATION_PROMPT.md). Copy the prompt template and use it with Claude, Copilot, or your preferred AI to capture version information and create metadata lock files automatically. It helps track versions, identify conflicts, and enable incremental updates.
 
 ## The one rule: back up before editing
 

@@ -44,16 +44,16 @@ The most common failures are basic:
 
 - missing `{` / `}`
 - missing commas or quotes
-- wrong `import` style for your Traktor version
-- typo in an `AppProperty` path
+- wrong import style for your Traktor version
+- typo in a control value path
 
 ### 4) Validate your assumptions
 
-- Is the property path available in your Traktor version?
+- Is the control value path available in your Traktor version?
 - Is the deck ID variable what you think it is?
-- Is a `Wire` disabled by an `enabled:` condition?
+- Is a connection disabled by a condition?
 
-Tip: confirm property names/paths using the catalog embedded in [02_API_REFERENCE.md](02_API_REFERENCE.md#full-appproperty-path-catalog), and compare against working examples in [03_PRACTICAL_EXAMPLES.md](03_PRACTICAL_EXAMPLES.md).
+Tip: confirm control value paths using the catalog embedded in [02_API_REFERENCE.md](02_API_REFERENCE.md#full-appproperty-path-catalog), and compare against working examples in the [X1MK3 Performance Mod](https://github.com/lsmith77/X1MK3_PerformanceMod) (see [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) for feature-by-feature breakdown).
 
 ### 4b) Add debug logging to see what's happening
 
@@ -79,12 +79,12 @@ Look for your `console.log()` messages to understand what your code is doing.
 
 If Traktor becomes unstable:
 
-- restore stock QML files from backup (see [01_BASICS.md](01_BASICS.md#restore-stock-rollback))
+- restore factory defaults from backup (see [01_BASICS.md](01_BASICS.md#restore-stock-rollback))
 - re-apply changes one at a time
 
-### Quick path when following an example
+### Quick path when following a community example
 
-If you’re working from an example in [03_PRACTICAL_EXAMPLES.md](03_PRACTICAL_EXAMPLES.md) and it doesn’t work:
+If you're working from an example in [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) (such as the X1MK3 mod) and it doesn't work:
 
 1. Re-read that example’s “Explanation” section.
 2. Confirm you edited the correct controller and layer (CSI vs Screens vs Defines).
@@ -432,7 +432,7 @@ Rectangle {
 
 - Handbook index: [00_HANDBOOK.md](00_HANDBOOK.md)
 - API reference: [02_API_REFERENCE.md](02_API_REFERENCE.md)
-- Examples: [03_PRACTICAL_EXAMPLES.md](03_PRACTICAL_EXAMPLES.md)
+- Resources: [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md)
 
 **External**:
 

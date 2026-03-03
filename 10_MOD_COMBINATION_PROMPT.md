@@ -2,10 +2,6 @@
 
 **Purpose**: Copy-paste prompt template for combining multiple Traktor QML mods using AI tools.
 
-**Chapter**: 10 of the Traktor QML Handbook  
-**Handbook Version**: v0.4.0  
-**Date**: 1 March 2026
-
 ---
 
 ## Quick Start
@@ -215,11 +211,11 @@ Place this `Integration Options:` block after `My Setup` and before any pasted d
    - Include all files needed for all controllers I listed
    - Insert metadata comment block at the top of the main controller file (e.g., `CSI/X1MK3/X1MK3.qml`) showing:
      - Components included (name + version + source)
-     - Prompt version used (v1.0.0)
+     - Prompt version used (v0.5.0)
      - Last updated date
      - Application order
    - Create `METADATA.md` in root of directory with:
-     - Prompt version used (v1.0.0)
+     - Prompt version used (v0.5.0)
      - Full version details for each component
      - Conflict resolutions applied
      - Testing checklist (which features to test, in what order)
@@ -308,17 +304,4 @@ Before or after using this prompt, read:
 
 ---
 
-## Changelog
-
-### v1.0.0 (1 March 2026)
-
-- Initial release
-- Standardized prompt for Claude, ChatGPT, Copilot
-- Integrated metadata generation (comment block + METADATA.md)
-- Clean/legacy baseline options
-- Example filled-in prompt included
-
----
-
-**Location**: [Root of handbook](.)  
 **Questions?** See [Chapter 09: Mod Documentation Guide](09_MOD_DOCUMENTATION_GUIDE.md)

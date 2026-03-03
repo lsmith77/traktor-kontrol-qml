@@ -119,7 +119,3 @@ Premium Traktor QML mods and customization available through subscription servic
 
 - **Native Instruments QML Community**: https://community.native-instruments.com/search?q=tag:qml
 - **Qt QML Documentation**: https://doc.qt.io/qt-5/qmlreference.html
-
----
-
-**Last Updated**: February 28, 2026

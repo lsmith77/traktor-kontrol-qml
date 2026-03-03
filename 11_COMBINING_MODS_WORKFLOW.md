@@ -2,10 +2,6 @@
 
 **Purpose**: Step-by-step guide for combining multiple Traktor QML mods and deploying to your controller.
 
-**Chapter**: 11 of the Traktor QML Handbook  
-**Handbook Version**: v0.4.0  
-**Date**: 1 March 2026
-
 **Use this chapter when**: You want to combine multiple mods from different authors into a single unified QML setup.
 
 **Quick Navigation**:
@@ -353,8 +349,4 @@ After deployment, check (in two places):
 
 ---
 
-**Last Updated**: 1 March 2026
-
-**Location**: [Root directory of handbook](.)
-
-**Questions?** See Chapter 09 (Mod Documentation Guide)
+**Questions?** See [Chapter 09](09_MOD_DOCUMENTATION_GUIDE.md) (Mod Documentation Guide)

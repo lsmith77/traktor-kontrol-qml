@@ -1,5 +1,5 @@
 # Traktor QML Modder’s Handbook
-**Handbook Version**: v0.4.0 | **Last Updated**: 2 March 2026
+**Handbook Version**: v0.5.0
 **Purpose**: Index and reading guide for the handbook docs
 **Use when**: Starting your QML modding journey or navigating between docs
 This handbook is for people who want to **create, understand, or maintain Traktor QML mods** in a structured way.

@@ -434,7 +434,7 @@ Musicians use the prompt template when combining mods:
 5. **Checks compatibility** between mods
 6. **Suggests updates** when versions change
 
-**See Chapter 10** for using the prompt with AI tools (Claude, Copilot, etc.).
+**See [Chapter 10](10_MOD_COMBINATION_PROMPT.md)** for using the prompt with AI tools (Claude, Copilot, etc.).
 
 ### Why These Three Parts Work Together
 

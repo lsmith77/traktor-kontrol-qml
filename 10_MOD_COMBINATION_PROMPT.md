@@ -173,6 +173,22 @@ Provide the directory listing or key file paths from `/mods/` so I can generate 
 
 ## Please generate:
 
+---
+
+### Integration Options (how to state them in the prompt)
+
+When you paste the prompt, add a short plain-text block under **My Setup** titled `Integration Options:` that lists your desired inclusions, exclusions, and conflict controls. Use simple phrases — no JSON. Example lines to include verbatim:
+
+- `Include features: vinyl break, loop roll`
+- `Exclude features: auto_sync`
+- `Global conflict policy: prefer_baseline`
+- `Per-feature policy: vinyl break -> prefer_mod:D2; loop roll -> combine_behavior: preserve baseline timing; add toggle`
+- `Target controllers: X1MK3, S4MK3`
+
+Place this `Integration Options:` block after `My Setup` and before any pasted documentation or file listings. The AI will use these plain-text directives when producing the combined QML.
+
+---
+
 1. **Version Identification**: Identify exact versions of all mods (or assign tracking IDs for unversioned ones)
 
 2. **Compatibility Analysis**:

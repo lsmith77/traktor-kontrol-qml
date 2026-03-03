@@ -35,9 +35,31 @@
 
 **→ At this point**: You have information, not code. No tools needed.
 
+Baseline (what this means)
+
+- A "baseline" is the upstream Traktor QML state you are comparing mods against. It can be either:
+  - a `traktor-kontrol-qml-files` tag or file tree (recommended for determinism), or
+  - a legacy baseline mod directory that contains a full `qml/` tree representing the Traktor version the mod targets.
+- Why it matters: using a correct baseline lets you compute exactly what changed so the AI (or you) only focuses on the mod's real changes instead of unrelated upstream differences.
+
 ---
 
 ### Phase 2: AI Generation (Prompt → Output)
+
+#### Main prompt prerequisites & options
+
+When to use the main Mod Combination Prompt: this is the preferred path when you can provide one baseline (the Traktor QML baseline tag or file tree) plus one or more mods where each mod's features are already described as an author-provided feature list or as small, reviewable feature files. Providing reviewed feature lists makes the AI output deterministic and safe to apply.
+
+Required inputs for the main prompt
+
+- **Baseline**: one of the following:
+  - a tag or file tree from `traktor-kontrol-qml-files` (e.g., `tags/4.4.1` or `tags/4.4.2`) — preferred; or
+  - a legacy baseline mod directory containing a full `qml/` tree (the upstream QML state the mod targets). If you supply a legacy mod as baseline, include its source/version/date for traceability.
+- **Mods**: for each mod give either: (A) a reviewed feature list (bulleted list), or (B) a mod file tree plus a short author feature list. If you only have raw file changes (a single consolidated change list showing exact file changes), run the feature-extraction prompts below first.
+
+When prerequisites are missing
+
+- If you don't have reviewed feature lists from the mod authors, run the feature-extraction prompt (or the single-feature variant) from the [AI Prompt Templates: Feature extraction and feature splitting](11_COMBINING_MODS_WORKFLOW.md#ai-prompt-templates-feature-extraction-and-feature-splitting) section. Review and edit the extracted feature lists, then re-run the main prompt with the reviewed lists.
 
 **3. Open your AI tool** (Claude, ChatGPT, Copilot):
 
@@ -53,7 +75,12 @@
 
 - Open a new chat
 - Paste the prompt template
-- Fill in the `[PLACEHOLDERS]` with your mod information (versions, sources, etc.)
+
+Integration options (includes/excludes/conflict policies): see the `Integration Options` section in [Chapter 10: Mod Combination Prompt](10_MOD_COMBINATION_PROMPT.md#integration-options) for the simple plain-text directives to add under **My Setup**. Keep Chapter 11 concise — the detailed option examples live in Chapter 10.
+
+How to phrase integration instructions in the prompt
+
+- Be explicit: "Include features X,Y; exclude feature Z because it conflicts with baseline feature B." or "Prefer D2 implementation of loop-roll; keep X1MK3 screen behavior from mod B." The main template will use these directives when producing the combined directory and METADATA.
 
 **6. Run the prompt**:
 
@@ -65,6 +92,90 @@
   - Testing checklist
 
 **→ At this point**: You have AI-generated code and directory structure (displayed in chat).
+
+### Expectation Management — merging large "baseline" mods
+
+- **Realistic effort:** Merging two large, baseline-style mods is often non-trivial. AI can accelerate refactoring and generation, but expect manual work: splitting monolithic files, reconciling behavior, and thorough testing.
+- **Recommended first step:** Use AI (or manual refactoring) to separate at least one mod into smaller feature modules (feature-level QML/JS files) before attempting a merge. Smaller units make conflicts visible and easier to resolve.
+- **Handling overlapping modifications:** If both mods change the same button/mode/handler, follow a disciplined approach:
+  - Extract both implementations into separate feature files so you can compare behavior side-by-side.
+  - Decide on a merge strategy: pick one implementation, combine behaviors behind a toggle, or namespace/adapter-wrap one so both can coexist.
+  - Prefer preserving metadata and authorship in comments so you can revert or trace choices.
+- **Merge process:** Integrate feature modules incrementally (one feature at a time), run Traktor tests after each change, and keep small commits/branches so you can rollback easily.
+- **When to stop:** If resolving semantic conflicts would require rewriting large portions of either mod (hundreds of lines or core architecture changes), consider keeping the mods as separate profiles or contacting the authors for guidance.
+
+#### AI Prompt Templates: Feature extraction and feature splitting
+
+Note: If the mod author provides a detailed feature list, use that instead of running extraction — it's the most accurate split source. If not, run the feature-extraction prompt first and review the result, then feed the reviewed feature list into the feature-splitting prompt.
+
+Quick links to prompts (jump to the prompt you need):
+
+- [Feature-extraction prompt](11_COMBINING_MODS_WORKFLOW.md#feature-extraction-prompt)
+- [Single-feature extraction variant](11_COMBINING_MODS_WORKFLOW.md#feature-extraction-prompt---single-feature-variant)
+- [Feature-splitting prompt](11_COMBINING_MODS_WORKFLOW.md#feature-splitting-prompt)
+
+1. Feature-extraction prompt (use this when no author feature list exists)
+
+##### Feature-extraction prompt
+
+Use this when no author feature list exists. Provide either a consolidated list of file changes (mod vs baseline) or the mod file tree plus the baseline file tree. The AI should return a concise, reviewable feature list for human verification.
+
+Prompt:
+"You are an expert Traktor QML analyst. I will provide either (A) a consolidated list of file changes (mod vs baseline) or (B) the mod file tree plus the baseline file tree. Your task: produce a concise, reviewable feature list for human verification.
+
+Output format: bulleted feature list + short human summary:
+
+- Features: for each feature provide an ID, title, one-line description, primary files, UI elements, key handlers/events, global side-effects, and a rough risk (low/med/high).
+- Notes: list any ambiguous areas and recommended sample files to inspect.
+
+Baseline info: include baseline tag used (e.g., `traktor-kontrol-qml-files` tag `4.4.1`). Return a concise bulleted list and a 6-line human summary.
+"
+
+##### Feature-extraction prompt — single-feature variant
+
+Use this variant when you only need details about one feature. Provide the baseline and either a consolidated list of file changes or the mod file tree, and specify the feature name.
+
+Prompt:
+"You are an expert Traktor QML analyst. I will provide a baseline (tag or file tree) and either a consolidated list of file changes or the mod file tree. I only want information about one specific feature: `[FEATURE_NAME]` (e.g., `vinyl break`, `library view in Browse mode`, `screen display in REL mode`).
+
+Tasks:
+
+- Locate files and exact changed lines implementing or affecting `[FEATURE_NAME]`.
+- List UI elements, key handlers/events, signals, and any global state affected by this feature.
+- Describe dependencies (other features, helper modules) and a short risk rating (low/med/high).
+- Produce a 3-step test checklist to verify the feature in Traktor.
+
+Output: bulleted feature details (`id, title, description, primary_files, key_handlers, ui_elements, side_effects, risk`) and `notes`. Return a concise bulleted list and a 4-line human summary.
+"
+
+2. Feature-splitting prompt
+
+Use this prompt after you have an author feature list OR a reviewed feature list from step 1.
+
+Prompt:
+"You are an expert QML refactoring assistant. Inputs:
+
+- Baseline version: `[TRAKTOR_VERSION]` (baseline repo tag: `traktor-kontrol-qml-files` tags such as `4.4.1` or `4.4.2`).
+  -- Reviewed feature list (bulleted list) produced by the previous step or provided by the mod author.
+
+Consolidated change list or modified file tree for the mod.
+
+Tasks (produce short plan + bulleted outputs):
+
+- For each feature in the reviewed feature list: propose a target feature-file path/name and a minimal QML/JS skeleton (component names, signals, bindings), list dependencies, and list exact changed lines/files that the feature covers.
+- Identify conflicts with baseline (same handler/button/mode) with severity and recommended merge strategy: `pick-one`, `combine-behavior` (describe how), `toggle`, `namespace/adapter`, or `keep-separate-profile`.
+- Produce a commit plan: one commit per feature with commit message template and testing checklist entries.
+  -- Output format: bulleted sections: `features`, `conflicts`, `commits`, `tests`, `notes`. Also include a 6-line human summary.
+
+Placeholders:
+
+- `[TRAKTOR_VERSION]` → e.g., `4.4.1`
+- Attach the consolidated change list or a list of changed files when invoking.
+
+Practical notes:
+
+- Use the baseline repo tags (e.g., `tags/4.4.1`, `tags/4.4.2`) from `traktor-kontrol-qml-files` to compute exact changes; create local branches from tags only when you need a mutable baseline copy.
+- For very large change sets, run the feature-extraction prompt per folder (CSI/, Defines/, Screens/) and then merge results.
 
 ---
 

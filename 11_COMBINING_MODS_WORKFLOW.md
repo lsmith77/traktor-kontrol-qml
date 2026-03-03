@@ -201,13 +201,13 @@ mkdir -p ~/my-traktor-setup/qml
 **9. Initialize git** to track changes:
 
 ```bash
-cd ~/my-traktor-setup
+cd ~/my-traktor-setup/qml
 git init
 git add .
-git commit -m "Initial: Combined mods (D2 v1.2.3 + X1MK3 v0.12.0)"
+git commit -m "Initial: Combined mods (D2 v1.2.3 + X1MK3 v0.12.0 + forum snippet MX2-GridAdjust)"
 ```
 
-**→ At this point**: You have a local directory with git tracking.
+**→ At this point**: You have a local directory with git tracking and METADATA.md documenting all sources (including forum snippet URLs).
 
 ---
 
@@ -232,7 +232,7 @@ git commit -m "Initial: Combined mods (D2 v1.2.3 + X1MK3 v0.12.0)"
 **13. Commit your deployment**:
 
 ```bash
-cd ~/my-traktor-setup
+cd ~/my-traktor-setup/qml
 git commit -m "deployed: all tests passing"
 ```
 
@@ -242,28 +242,59 @@ git commit -m "deployed: all tests passing"
 
 ## Quick Reference: File Organization
 
-After AI generates and you save:
+After AI generates and you save (**recommended structure with git inside /qml/**):
 
 ```
 Your computer home directory:
   ~/my-traktor-setup/
-    ├── .git/ (created when you run "git init")
-    └── qml/
-        ├── CSI/
-        │   ├── Common/
-        │   ├── S4MK3/
-        │   ├── X1MK3/
-        │   └── ...
-        ├── Defines/
-        ├── Screens/
-        └── METADATA.md
+    ├── qml/                    (YOUR ACTUAL QML — has its own .git/)
+    │   ├── .git/              ← Git repo lives here only
+    │   ├── CSI/
+    │   │   ├── Common/
+    │   │   ├── S4MK3/
+    │   │   ├── X1MK3/
+    │   │   └── ...
+    │   ├── Defines/
+    │   ├── Screens/
+    │   └── METADATA.md
+    │
+    └── mods/                   (SOURCE REFERENCE — no git tracking)
+        ├── D2-v1.2.3/
+        │   └── qml/
+        │
+        ├── X1MK3-v0.12.0/
+        │   └── qml/
+        │
+        └── MX2_GridAdjustBPM/
+          ├── SNIPPET_SOURCE.md
+          └── qml/
 
-Traktor Pro installation directory (separate):
+Traktor Pro directory (separate, on your system):
   ~/Library/Application Support/Native Instruments/Traktor Pro 4.4.1/qml/
     └── (you copy ~/my-traktor-setup/qml/* here)
 ```
 
-The handbook? You just read it online — no need to have a copy in ~/my-traktor-setup/.
+**Key points**:
+
+- Only `/qml/` has `.git/` — contains your actual combined QML (what deploys to Traktor)
+- `/mods/` is completely separate — stores source mods and forum snippets for reference
+- METADATA.md (in `/qml/`) documents all mod sources, including direct forum links
+- This structure is clean, simple, and works perfectly with git
+
+---
+
+## Optional: Organizing Forum Snippets
+
+If using forum snippets, create a minimal entry in `/mods/`:
+
+```
+~/my-traktor-setup/mods/MX2_GridAdjustBPM/
+└── SNIPPET_SOURCE.md    # Just the forum link
+```
+
+(See [Chapter 09 — Forum Snippets](09_MOD_DOCUMENTATION_GUIDE.md#forum-snippets-simple-approach) for the format)
+
+No need for complex patch files — reference the forum URL directly in your prompt, and paste the code snippet from the forum itself.
 
 ---
 
@@ -272,12 +303,14 @@ The handbook? You just read it online — no need to have a copy in ~/my-traktor
 When a mod you used updates (e.g., D2 v1.2.3 → v1.2.4):
 
 ```bash
+cd ~/my-traktor-setup/qml
+
 # 1. See what changed
 git diff v1.2.3..v1.2.4
 
 # 2. Decide: Do I need this update?
 
-# 3. If yes: Update your ~/my-traktor-setup/qml/
+# 3. If yes: Update your qml/ directory
 #    (Use the MOD_COMBINATION_PROMPT again with the new version)
 
 # 4. Commit the change

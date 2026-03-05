@@ -1,6 +1,6 @@
 # Traktor QML Mods (Documentation)
 
-**Handbook Version**: v0.5.0
+**Handbook Version**: v0.6.0
 
 This repo is a **friendly documentation set** for customizing Native Instruments **Traktor Pro** using **QML** — the language Traktor uses for its controller UI. No deep programming knowledge required.
 
@@ -56,7 +56,7 @@ Right now most Traktor mods are shared as ZIP files with no feature listing, no 
 
 Two changes fix this:
 
-**1. Use git and semantic version tags** — tag your releases (`v1.2.3`). Users can then run `git diff v1.2.2..v1.2.3` to see exactly what changed. No changelog needed — the diff *is* the changelog.
+**1. Use git and semantic version tags** — tag your releases (`v1.2.3`). Users can then run `git diff v1.2.2..v1.2.3` to see exactly what changed. No changelog needed — the diff _is_ the changelog.
 
 **2. One feature = one markdown file** — document each feature alongside your QML:
 
@@ -73,6 +73,7 @@ your-mod/
 Each file lists: what the feature does, which QML files it touches, settings/toggles, and a 3-step test checklist.
 
 **Why this matters for your users:**
+
 - They can apply just the features they want
 - AI tools (Claude, Copilot) can read your feature files and combine mods automatically — tracking exactly which version of which feature came from your mod
 - Conflict detection is visible before anyone starts editing

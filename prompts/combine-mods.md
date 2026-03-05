@@ -3,6 +3,7 @@
 **When to use**: Combining two or more mods into a unified `/qml/` for the first time.
 
 **Prerequisites**:
+
 - One baseline: a `traktor-kontrol-qml-files` tag/file tree, or a legacy mod directory with a full `qml/` tree
 - For each mod: either a reviewed feature list (bulleted), or the mod file tree + author feature list
 - If you only have raw file changes with no feature list, run [list-features.md](list-features.md) first, review the output, then return here
@@ -106,11 +107,11 @@ Provide the directory listing or key file paths from /mods/ so I can generate th
    - Include all files needed for all controllers I listed
    - Insert metadata comment block at the top of the main controller file (e.g., CSI/X1MK3/X1MK3.qml) showing:
      - Components included (name + version + source)
-     - Prompt version used (v0.5.0)
+   - Prompt/handbook version used (e.g., v0.5.0)
      - Last updated date
      - Application order
    - Create METADATA.md in root of directory with:
-     - Prompt version used (v0.5.0)
+   - Prompt/handbook version used (e.g., v0.5.0)
      - Full version details for each component
      - Conflict resolutions applied
      - Testing checklist (which features to test, in what order)

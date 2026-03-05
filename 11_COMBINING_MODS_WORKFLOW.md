@@ -62,7 +62,7 @@ When prerequisites are missing
 - Web browser, desktop app, or IDE plugin — your choice
 - **No need to download or check out anything** — you're just using an AI chat interface
 
-**4. Get the prompt** from [Chapter 10: Mod Combination Prompt](10_MOD_COMBINATION_PROMPT.md#the-prompt):
+**4. Get the prompt** from [prompts/combine-mods.md](prompts/combine-mods.md):
 
 - The prompt is self-contained — it doesn't reference files
 - Just copy the text block
@@ -72,7 +72,7 @@ When prerequisites are missing
 - Open a new chat
 - Paste the prompt template
 
-Integration options (includes/excludes/conflict policies): see the `Integration Options` section in [Chapter 10: Mod Combination Prompt](10_MOD_COMBINATION_PROMPT.md#integration-options) for the simple plain-text directives to add under **My Setup**. Keep Chapter 11 concise — the detailed option examples live in Chapter 10.
+Integration options (includes/excludes/conflict policies): see the `Integration Options` section in [prompts/combine-mods.md](prompts/combine-mods.md#integration-options) for the simple plain-text directives to add under **My Setup**.
 
 How to phrase integration instructions in the prompt
 
@@ -104,74 +104,11 @@ How to phrase integration instructions in the prompt
 
 Note: If the mod author provides a detailed feature list, use that instead of running extraction — it's the most accurate split source. If not, run the feature-extraction prompt first and review the result, then feed the reviewed feature list into the feature-splitting prompt.
 
-Quick links to prompts (jump to the prompt you need):
+Prompts (open the file, copy the prompt block):
 
-- [Feature-extraction prompt](11_COMBINING_MODS_WORKFLOW.md#feature-extraction-prompt)
-- [Single-feature extraction variant](11_COMBINING_MODS_WORKFLOW.md#feature-extraction-prompt---single-feature-variant)
-- [Feature-splitting prompt](11_COMBINING_MODS_WORKFLOW.md#feature-splitting-prompt)
-
-1. Feature-extraction prompt (use this when no author feature list exists)
-
-##### Feature-extraction prompt
-
-Use this when no author feature list exists. Provide either a consolidated list of file changes (mod vs baseline) or the mod file tree plus the baseline file tree. The AI should return a concise, reviewable feature list for human verification.
-
-Prompt:
-"You are an expert Traktor QML analyst. I will provide either (A) a consolidated list of file changes (mod vs baseline) or (B) the mod file tree plus the baseline file tree. Your task: produce a concise, reviewable feature list for human verification.
-
-Output format: bulleted feature list + short human summary:
-
-- Features: for each feature provide an ID, title, one-line description, primary files, UI elements, key handlers/events, global side-effects, and a rough risk (low/med/high).
-- Notes: list any ambiguous areas and recommended sample files to inspect.
-
-Baseline info: include baseline tag used (e.g., `traktor-kontrol-qml-files` tag `4.4.1`). Return a concise bulleted list and a 6-line human summary.
-"
-
-##### Feature-extraction prompt — single-feature variant
-
-Use this variant when you only need details about one feature. Provide the baseline and either a consolidated list of file changes or the mod file tree, and specify the feature name.
-
-Prompt:
-"You are an expert Traktor QML analyst. I will provide a baseline (tag or file tree) and either a consolidated list of file changes or the mod file tree. I only want information about one specific feature: `[FEATURE_NAME]` (e.g., `vinyl break`, `library view in Browse mode`, `screen display in REL mode`).
-
-Tasks:
-
-- Locate files and exact changed lines implementing or affecting `[FEATURE_NAME]`.
-- List UI elements, key handlers/events, signals, and any global state affected by this feature.
-- Describe dependencies (other features, helper modules) and a short risk rating (low/med/high).
-- Produce a 3-step test checklist to verify the feature in Traktor.
-
-Output: bulleted feature details (`id, title, description, primary_files, key_handlers, ui_elements, side_effects, risk`) and `notes`. Return a concise bulleted list and a 4-line human summary.
-"
-
-2. Feature-splitting prompt
-
-Use this prompt after you have an author feature list OR a reviewed feature list from step 1.
-
-Prompt:
-"You are an expert QML refactoring assistant. Inputs:
-
-- Baseline version: `[TRAKTOR_VERSION]` (baseline repo tag: `traktor-kontrol-qml-files` tags such as `4.4.1` or `4.4.2`).
-  -- Reviewed feature list (bulleted list) produced by the previous step or provided by the mod author.
-
-Consolidated change list or modified file tree for the mod.
-
-Tasks (produce short plan + bulleted outputs):
-
-- For each feature in the reviewed feature list: propose a target feature-file path/name and a minimal QML/JS skeleton (component names, signals, bindings), list dependencies, and list exact changed lines/files that the feature covers.
-- Identify conflicts with baseline (same handler/button/mode) with severity and recommended merge strategy: `pick-one`, `combine-behavior` (describe how), `toggle`, `namespace/adapter`, or `keep-separate-profile`.
-- Produce a commit plan: one commit per feature with commit message template and testing checklist entries.
-  -- Output format: bulleted sections: `features`, `conflicts`, `commits`, `tests`, `notes`. Also include a 6-line human summary.
-
-Placeholders:
-
-- `[TRAKTOR_VERSION]` → e.g., `4.4.1`
-- Attach the consolidated change list or a list of changed files when invoking.
-
-Practical notes:
-
-- Use the baseline repo tags (e.g., `tags/4.4.1`, `tags/4.4.2`) from `traktor-kontrol-qml-files` to compute exact changes; create local branches from tags only when you need a mutable baseline copy.
-- For very large change sets, run the feature-extraction prompt per folder (CSI/, Defines/, Screens/) and then merge results.
+- [list-features.md](prompts/list-features.md) — generate a feature list from raw file changes
+- [inspect-feature.md](prompts/inspect-feature.md) — details on one specific feature
+- [split-mod.md](prompts/split-mod.md) — split a mod into feature-level modules
 
 ---
 
@@ -296,18 +233,19 @@ No need for complex patch files — reference the forum URL directly in your pro
 
 ## Updating Later (When Mods Release New Versions)
 
-When a mod you used updates (e.g., D2 v1.2.3 → v1.2.4):
+### Updating: Mods in Git (with tags)
+
+When a git-tracked mod updates (e.g., D2 v1.2.3 → v1.2.4):
 
 ```bash
 cd ~/my-traktor-setup/qml
 
-# 1. See what changed
-git diff v1.2.3..v1.2.4
+# 1. See what changed in the upstream mod repo
+git -C ../mods/D2-v1.2.3 diff v1.2.3..v1.2.4
 
 # 2. Decide: Do I need this update?
 
-# 3. If yes: Update your qml/ directory
-#    (Use the MOD_COMBINATION_PROMPT again with the new version)
+# 3. If yes: Update your qml/ using the Mod Update Prompt (prompts/update-mod.md)
 
 # 4. Commit the change
 git commit -m "Update: D2 v1.2.3 -> v1.2.4 (FX routing fix)"
@@ -317,7 +255,76 @@ git commit -m "Update: D2 v1.2.3 -> v1.2.4 (FX routing fix)"
 # 6. Test in Traktor (Step 12 above)
 ```
 
-Your metadata comment in the QML file tracks which versions are installed (update the "Last Updated" date).
+Your METADATA.md tracks which versions are installed — update it after each mod change.
+
+---
+
+### Updating: Non-Git Mods (ZIPs, forum posts)
+
+For mods that don't use git, use version numbers in the directory name (this is already the recommended convention in the `/mods/` layout). When a new version is released:
+
+```bash
+# 1. Download the new version alongside the old one
+unzip ModName-v1.2.4.zip -d ~/my-traktor-setup/mods/ModName-v1.2.4/
+
+# You now have both versions side by side:
+#   mods/ModName-v1.2.3/   ← old (keep during transition for comparison)
+#   mods/ModName-v1.2.4/   ← new
+
+# 2. Use the Mod Update Prompt (prompts/update-mod.md) — reference both directories
+#    so the AI can compute what changed and update /qml/ accordingly
+
+# 3. Commit the change
+git commit -m "Update: ModName v1.2.3 -> v1.2.4 (description)"
+
+# 4. Copy to Traktor and test (Steps 11-12 above)
+
+# 5. Optional: remove the old version once satisfied
+rm -rf ~/my-traktor-setup/mods/ModName-v1.2.3/
+```
+
+**Are separate version directories confusing?** No — the shared name prefix (`ModName-`) plus the METADATA.md entry (which records the logical mod name alongside the version) makes the old→new relationship unambiguous. The AI update prompt also references both directories explicitly, so there is no risk of treating them as separate mods.
+
+---
+
+## Removing or Switching Features
+
+### Simple feature removal
+
+To remove a single feature from your combined mod, use [prompts/remove-feature.md](prompts/remove-feature.md). Tell the AI which feature to remove and which mod it came from. The AI will:
+
+1. Locate the relevant files and handlers introduced by that feature
+2. Revert them to the baseline state
+3. Update METADATA.md to reflect the removal
+
+Commit the result with a message like:
+```
+git commit -m "Remove: vinyl-break from D2 v1.2.3 (no longer needed)"
+```
+
+### Cascading removal (feature required conflict resolution in another mod)
+
+This is the more complex case. When you originally added feature X, it may have conflicted with a behavior in mod B — so the AI applied a conflict resolution (e.g., remapped a pad in mod B, disabled a toggle in mod B, or split a handler). If you now remove feature X, that conflict resolution also needs to be reverted.
+
+**How to know if there's a cascade**: Check the `Conflict resolutions applied` section of your METADATA.md. If feature X appears there (or caused an entry there), removing it has cascading effects.
+
+Example METADATA.md entry to look for:
+```
+## Conflict Resolutions Applied
+- vinyl-break (D2) vs loop-roll (X1MK3): disabled loop-roll long-press on X1MK3 pad 4
+  → If vinyl-break is removed, restore X1MK3 pad 4 long-press to baseline behavior
+```
+
+Use [prompts/remove-feature.md](prompts/remove-feature.md) and include the relevant `Conflict resolutions applied` entries. The AI will revert both the feature itself and the accommodations made for it.
+
+### Switching: replace feature A with feature B from a different mod
+
+If you want to swap one mod's implementation of a feature for another's (e.g., replace D2's loop-roll with X1MK3's implementation):
+
+1. Check METADATA.md for any conflict resolutions tied to the feature being removed
+2. Use [prompts/remove-feature.md](prompts/remove-feature.md) to remove the old implementation (including cascades)
+3. Then use [prompts/combine-mods.md](prompts/combine-mods.md) to add the new implementation
+4. Commit both steps separately so you can rollback cleanly if needed
 
 ---
 
@@ -337,14 +344,14 @@ After deployment, check (in two places):
 **Want to understand the full system?** See:
 
 - [Chapter 09: Mod Documentation Guide](https://github.com/lsmith77/traktor-kontrol-qml/blob/main/09_MOD_DOCUMENTATION_GUIDE.md) — Understand versioning, metadata lock files, how to find version info, mixing versions
-- [Chapter 10: Mod Combination Prompt](10_MOD_COMBINATION_PROMPT.md) — The actual prompt template to use with AI
+- [Chapter 10: Prompt Templates](10_PROMPT_TEMPLATES.md) — Index of all AI prompt templates
 
 ---
 
 ## Related Chapters
 
 - **Chapter 09** — Mod documentation, versioning, metadata patterns
-- **Chapter 10** — Mod combination prompt template
+- **Chapter 10** — Prompt templates index
 - **Chapter 03** — Community resources and featured mods
 
 ---

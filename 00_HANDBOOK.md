@@ -20,7 +20,7 @@ This handbook is for people who want to **create, understand, or maintain Trakto
 
 - How to document mods for sharing: [09_MOD_DOCUMENTATION_GUIDE.md](09_MOD_DOCUMENTATION_GUIDE.md)
 - How to combine multiple mods (musician's guide): [11_COMBINING_MODS_WORKFLOW.md](11_COMBINING_MODS_WORKFLOW.md)
-- Mod combination prompt (AI template): [10_MOD_COMBINATION_PROMPT.md](10_MOD_COMBINATION_PROMPT.md)
+- Prompt templates (AI prompts for combining, updating, removing): [10_PROMPT_TEMPLATES.md](10_PROMPT_TEMPLATES.md)
 
 **Appendices**:
 
@@ -43,11 +43,10 @@ This handbook is for people who want to **create, understand, or maintain Trakto
 
 - Read [09_MOD_DOCUMENTATION_GUIDE.md](09_MOD_DOCUMENTATION_GUIDE.md) to understand the **metadata lock file** pattern — your key to safe, incremental updates
 - Follow the complete workflow in [11_COMBINING_MODS_WORKFLOW.md](11_COMBINING_MODS_WORKFLOW.md) (4 phases: preparation, AI generation, save, deploy)
-- Use [10_MOD_COMBINATION_PROMPT.md](10_MOD_COMBINATION_PROMPT.md) template with Claude or Copilot to:
-  - Gather version information from each mod
-  - Create a metadata comment block in your QML (the lock file)
-  - Check for compatibility conflicts
-  - Generate your complete QML directory
+- Use the prompt templates in [10_PROMPT_TEMPLATES.md](10_PROMPT_TEMPLATES.md) with Claude or Copilot to:
+  - Gather version information and combine mods ([prompts/combine-mods.md](prompts/combine-mods.md))
+  - Update a mod to a new version ([prompts/update-mod.md](prompts/update-mod.md))
+  - Remove or swap a feature ([prompts/remove-feature.md](prompts/remove-feature.md))
 - Learn from professional implementations in [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md)
 - When mods update, use metadata lock files to understand which components changed and whether you need the update
 

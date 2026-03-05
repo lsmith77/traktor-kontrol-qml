@@ -13,7 +13,7 @@
 
 1. **Learn the concepts**: Read [Chapter 09: Mod Documentation Guide](09_MOD_DOCUMENTATION_GUIDE.md)
 2. **Execute the workflow**: See [Chapter 11: Combining Mods — Complete Workflow](11_COMBINING_MODS_WORKFLOW.md)
-3. **Copy the prompt template**: Use [Chapter 10: Mod Combination Prompt](10_MOD_COMBINATION_PROMPT.md)
+3. **Copy the prompt template**: Use [Chapter 10: Prompt Templates](10_PROMPT_TEMPLATES.md)
 
 The prompt template and workflow help you:
 

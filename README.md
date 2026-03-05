@@ -24,11 +24,11 @@ You don’t need to be a programmer to get value from QML mods.
 - [07_GLOSSARY.md](07_GLOSSARY.md) — quick definitions
 - [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md) — how to share your changes (basics)
 - [09_MOD_DOCUMENTATION_GUIDE.md](09_MOD_DOCUMENTATION_GUIDE.md) — how to document mods + metadata lock files
-- [10_MOD_COMBINATION_PROMPT.md](10_MOD_COMBINATION_PROMPT.md) — combining multiple mods with version tracking and metadata
+- [10_PROMPT_TEMPLATES.md](10_PROMPT_TEMPLATES.md) — AI prompt templates for combining, updating, and removing mods
 
 ## Combining Multiple Mods?
 
-When mixing features from different mods, read [**Chapter 10: MOD_COMBINATION_PROMPT**](10_MOD_COMBINATION_PROMPT.md). Copy the prompt template and use it with Claude, Copilot, or your preferred AI to capture version information and create metadata lock files automatically. It helps track versions, identify conflicts, and enable incremental updates.
+When mixing features from different mods, see [**Chapter 10: Prompt Templates**](10_PROMPT_TEMPLATES.md) for the index of AI prompts. Use them with Claude, Copilot, or your preferred AI to capture version information, create metadata lock files, update mods incrementally, or remove features cleanly.
 
 ## The one rule: back up before editing
 

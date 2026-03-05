@@ -402,7 +402,7 @@ The forum URL links to the full context. Optionally, you can also paste the code
 
 **In your mod combination prompt**: Reference the forum snippet by its `/mods` directory name, just like any other mod. The `SNIPPET_SOURCE.md` inside that directory contains the source URL or the source code.
 
-**See also**: [Chapter 10 — Brief Reference](10_MOD_COMBINATION_PROMPT.md#forum-snippets-simple-approach) and [Chapter 11 — Optional: Forum Snippets](11_COMBINING_MODS_WORKFLOW.md#optional-organizing-forum-snippets)
+**See also**: [Chapter 10 — Forum Snippets](10_PROMPT_TEMPLATES.md#forum-snippets) and [Chapter 11 — Optional: Forum Snippets](11_COMBINING_MODS_WORKFLOW.md#optional-organizing-forum-snippets)
 
 ---
 
@@ -423,7 +423,7 @@ The forum URL links to the full context. Optionally, you can also paste the code
 
 **Recommendation**: Install git (free) so you can `git diff` if needed. Not required, but helpful for detailed analysis.
 
-#### Part 3: Tool — MOD_COMBINATION_PROMPT (Chapter 10)
+#### Part 3: Tool — Prompt Templates (Chapter 10)
 
 Musicians use the prompt template when combining mods:
 
@@ -434,7 +434,7 @@ Musicians use the prompt template when combining mods:
 5. **Checks compatibility** between mods
 6. **Suggests updates** when versions change
 
-**See [Chapter 10](10_MOD_COMBINATION_PROMPT.md)** for using the prompt with AI tools (Claude, Copilot, etc.).
+**See [Chapter 10](10_PROMPT_TEMPLATES.md)** for the full index of prompt templates and when to use each one.
 
 ### Why These Three Parts Work Together
 
@@ -442,7 +442,7 @@ Musicians use the prompt template when combining mods:
 | ---------------------------------- | ----------- | ------------------------------------------- | -------------------------------------------------------- |
 | **Semantic Versioning + Git Tags** | Mod Authors | Release v1.2.3 with clear version numbers   | Musicians understand versions, `git diff` works          |
 | **Metadata Lock File in QML**      | Musicians   | Comment block documenting combined setup    | No external tool, self-documenting, incremental updates  |
-| **MOD_COMBINATION_PROMPT**         | Musicians   | Tool/template to create & maintain metadata | AI helps gather info, check compatibility, track updates |
+| **Prompt Templates** ([Ch 10](10_PROMPT_TEMPLATES.md)) | Musicians   | AI prompts to combine, update, and remove mods | Automates gathering info, checking compatibility, tracking updates |
 
 ### Real-World Example
 
@@ -454,7 +454,7 @@ Musician combines:
 - X1MK3 v0.12.0
 - Z1 Mod [forum-2026-03]
 
-Uses MOD_COMBINATION_PROMPT to gather versions,
+Uses combine prompt to gather versions,
 Adds this to QML file:
   // --- MOD COMBINATION METADATA ---
   // D2: v1.2.3, X1MK3: v0.12.0, Z1: forum-2026-03
@@ -838,9 +838,9 @@ Write your feature .md file (Steps 1-5 above: title, features, files, settings, 
 
 **When combining features from different mods**, use the standardized prompt:
 
-**→ [MOD_COMBINATION_PROMPT.md](MOD_COMBINATION_PROMPT.md)**
+**→ [prompts/combine-mods.md](prompts/combine-mods.md)** (see [Chapter 10](10_PROMPT_TEMPLATES.md) for the full prompt index)
 
-This prompt helps you document which versions you're combining and identify conflicts. Copy it fresh each time (it updates as the versioning ecosystem evolves).
+This prompt helps you document which versions you're combining and identify conflicts.
 
 #### After AI Generates: Add Metadata Loc Filter File
 
@@ -1482,6 +1482,6 @@ This approach follows community best practices from:
 
 - **Chapter 08** — Sharing code changes (basic git workflow)
 - **Chapter 09** _(this chapter)_ — How to document mods + metadata lock files
-- **Chapter 10** — Using MOD_COMBINATION_PROMPT to combine mods and create metadata
+- **Chapter 10** — Prompt templates index (combine, update, remove, extract, split)
 - **Chapter 03** — Learning from community mods (where to find shared features)
 - **Chapter 02** — API reference for property paths you'll document

@@ -2,22 +2,91 @@
 
 **Handbook Version**: v0.5.0
 
-This repo is a **friendly documentation set** for customizing Native Instruments **Traktor Pro** using **QML** (a programming language for UI customization).
+This repo is a **friendly documentation set** for customizing Native Instruments **Traktor Pro** using **QML** — the language Traktor uses for its controller UI. No deep programming knowledge required.
 
-You don’t need to be a programmer to get value from QML mods.
+**If you've created MIDI mappings in Traktor Pro**, you understand the concept of wiring hardware controls to actions. QML works the same way — it's just more powerful: you can change what buttons do, what screens show, and how the UI behaves.
 
-- Change what your controller buttons/encoders do
-- Change what your hardware screens show
-- Tune UI details (colors, timers, overlays)
+---
 
-**If you've created MIDI mappings in Traktor Pro**, you understand the concept of wiring hardware controls to actions. QML works the same way—it's just a more powerful language that lets you customize the interface itself, not just button behavior.
+## I want to install a community mod
 
-## Start here
+Find working mods, understand what they do, and deploy them safely.
+
+1. **[Chapter 03: Community Resources](03_COMMUNITY_RESOURCES.md)** — curated list of GitHub repos and forum mods for S4 MK3, X1 MK3, and other controllers
+2. **[Chapter 01: Basics](01_BASICS.md)** — `qml` folder structure, how to install and restore
+3. **[Chapter 05: FAQ](05_FAQ.md)** — safety, Traktor updates overwriting mods, common questions
+4. **[Chapter 04: Troubleshooting](04_TROUBLESHOOTING.md)** — when something breaks
+
+**The one rule**: always back up your `qml` folder before editing. Quit Traktor, copy the folder, make one change, restart and test.
+
+---
+
+## I want to combine features from multiple mods
+
+Combining mods by hand is error-prone: the same file appears in both, conflict resolutions get lost, and there's no record of what came from where. This handbook provides **AI prompt templates** that handle this systematically.
+
+- **`combine-mods`** — give the AI a baseline (clean Traktor QML) and each mod's feature list; it outputs a merged directory plus a `METADATA.md` lock file recording every version and conflict resolution
+- **`update-mod`** — when a mod releases a new version, apply only the relevant delta to your combined setup
+- **`remove-feature`** — remove a single feature cleanly, including any conflict resolutions that were made to accommodate it
+- **`list-features`** / **`split-mod`** — if a mod has no author feature list, extract and split it before merging
+
+Paste the prompt into Claude, ChatGPT, Copilot, or any AI chat — no tooling beyond a text editor and git.
+
+**→ [Chapter 10: Prompt Templates](10_PROMPT_TEMPLATES.md)** — full index with workflow order
+**→ [Chapter 11: Combining Mods — Complete Workflow](11_COMBINING_MODS_WORKFLOW.md)** — step-by-step guide (preparation → AI generation → save → deploy)
+
+---
+
+## I'm a new mod author
+
+You want to create something and share it with the community.
+
+1. **[Chapter 01: Basics](01_BASICS.md)** — QML fundamentals, folder structure, how Traktor loads files
+2. **[Chapter 02: API Reference](02_API_REFERENCE.md)** — control value paths, copy-paste code patterns
+3. **[Chapter 08: Sharing Changes](08_SHARING_CHANGES.md)** — how to package and publish your work
+4. **[Chapter 09: Mod Documentation Guide](09_MOD_DOCUMENTATION_GUIDE.md)** — how to structure your mod so users can apply individual features, and so AI tools can combine your mod with others automatically
+
+The format in Chapter 09 — one markdown file per feature, semantic version tags in git — means your users can pick just the features they want, and understand exactly what changed in each release.
+
+---
+
+## I have an existing mod and want to adopt these conventions
+
+Right now most Traktor mods are shared as ZIP files with no feature listing, no version history, and no way to apply just one part. When you release an update, users have no idea what changed.
+
+Two changes fix this:
+
+**1. Use git and semantic version tags** — tag your releases (`v1.2.3`). Users can then run `git diff v1.2.2..v1.2.3` to see exactly what changed. No changelog needed — the diff *is* the changelog.
+
+**2. One feature = one markdown file** — document each feature alongside your QML:
+
+```
+your-mod/
+  features/
+    vinyl-break.md       ← what it does, files changed, before/after code
+    loop-roll.md
+    screen-display.md
+  qml/
+    ...
+```
+
+Each file lists: what the feature does, which QML files it touches, settings/toggles, and a 3-step test checklist.
+
+**Why this matters for your users:**
+- They can apply just the features they want
+- AI tools (Claude, Copilot) can read your feature files and combine mods automatically — tracking exactly which version of which feature came from your mod
+- Conflict detection is visible before anyone starts editing
+
+**→ [Chapter 09: Mod Documentation Guide](09_MOD_DOCUMENTATION_GUIDE.md)** — full format spec, real examples, pitfalls to avoid, and the reasoning behind each convention
+
+---
+
+## All chapters
 
 - [00_HANDBOOK.md](00_HANDBOOK.md) — index and suggested reading order
 - [01_BASICS.md](01_BASICS.md) — beginner QML + Traktor `qml` folder structure + install/restore
 - [02_API_REFERENCE.md](02_API_REFERENCE.md) — reference guide + copy-paste code patterns (includes the full control value path catalog)
-- [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) — Real working mods from the community (GitHub repos + forum discussions)
+- [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) — real working mods from the community (GitHub repos + forum discussions)
 - [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md) — debugging + testing when something breaks
 - [05_FAQ.md](05_FAQ.md) — frequently asked questions (safety, installation, mods, updates)
 - [06_COMPATIBILITY_FIXES.md](06_COMPATIBILITY_FIXES.md) — version compatibility + known fixes
@@ -25,21 +94,7 @@ You don’t need to be a programmer to get value from QML mods.
 - [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md) — how to share your changes (basics)
 - [09_MOD_DOCUMENTATION_GUIDE.md](09_MOD_DOCUMENTATION_GUIDE.md) — how to document mods + metadata lock files
 - [10_PROMPT_TEMPLATES.md](10_PROMPT_TEMPLATES.md) — AI prompt templates for combining, updating, and removing mods
-
-## Combining Multiple Mods?
-
-When mixing features from different mods, see [**Chapter 10: Prompt Templates**](10_PROMPT_TEMPLATES.md) for the index of AI prompts. Use them with Claude, Copilot, or your preferred AI to capture version information, create metadata lock files, update mods incrementally, or remove features cleanly.
-
-## The one rule: back up before editing
-
-Traktor updates can overwrite your customizations, and a syntax error can stop parts of the UI from loading.
-
-Workflow:
-
-1. Quit Traktor
-2. Back up the `qml` folder
-3. Make one small change
-4. Restart Traktor and test
+- [11_COMBINING_MODS_WORKFLOW.md](11_COMBINING_MODS_WORKFLOW.md) — complete step-by-step workflow for combining mods
 
 ---
 

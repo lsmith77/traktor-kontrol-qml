@@ -99,6 +99,7 @@ Think of Git like **version history in your DAW**—every time you make changes,
 
 **Learn more (if curious):**
 
+- Git Mastery (beginner-friendly interactive guide): https://www.gitmastery.me
 - Git basics: https://git-scm.com/book/en/v2
 - GitHub quick start: https://docs.github.com/en/get-started
 

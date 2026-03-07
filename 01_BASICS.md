@@ -345,87 +345,73 @@ An AI code assistant accelerates development by providing real-time suggestions,
 
 ## Install / backup / restore (the safe workflow)
 
-**Note on terminal examples below**: The steps can be done via Finder, but terminal examples are also provided for speed and precision. A terminal is a text-based command interface (macOS: "Terminal" app; Windows: "Command Prompt" or "PowerShell"). Simply copy & paste the command lines shown.
+**The script automates backup, installation, and restoration.** It works on macOS and Windows and prevents the most common mistakes (incomplete installs, missing files).
 
-**Windows shortcut**: An `install-windows.bat` script is included in this repository. Place it in the same folder as your `qml` folder, double-click it, and it will copy the `qml` folder into Traktor's install directory with admin elevation automatically. ([Community forum post](https://community.native-instruments.com/discussion/36677/small-bat-script-to-install-qml-mods#latest))
+**Setup** (one-time): See [08_SHARING_CHANGES.md — Setup](08_SHARING_CHANGES.md#setup-install-script-to-system-path-one-time-setup) to add the script to your PATH.
 
-### Back up first
-
-Before you change anything, copy Traktor's `qml` folder somewhere safe (see ["The Traktor `qml` folder"](#the-traktor-qml-folder) above for the path on your system).
-
-**Tip:** There is a [GitHub repository](https://github.com/lsmith77/traktor-kontrol-qml-files) that offers a tag for each Traktor Pro release (since version 4.4.1), containing the stock `qml` directory for that release. This can be useful for reference or restoring stock files, but does not replace your own backup.
-
-**Note:** These backups do not help if a Traktor Pro update is installed, as updates overwrite the `qml` folder. However, Native Access automatically creates a backup of the previous Traktor install, which can help restore your setup after an update.
-
-**macOS terminal:**
+**Quick reference** (from any mod directory):
 
 ```bash
-cd "/Applications/Native Instruments/Traktor Pro 4.app/Contents/Resources"
-cp -r qml qml.backup
+install-traktor-mod              # Install: merge mod into current qml
+install-traktor-mod --fresh      # Fresh: reset to stock, then install mod
+install-traktor-mod --symlink    # Symlink: use/edit files directly from mod repo
+install-traktor-mod restore      # Restore: reset to stock qml, remove all mods
 ```
 
-**Windows terminal:**
+Flags can be combined (e.g., `install-traktor-mod --fresh --symlink`).
 
-```bat
-cd "C:\Program Files\Native Instruments\Traktor Pro 4\Resources64"
-xcopy qml qml.backup /E /I /H
-```
+**Full documentation**: See [08_SHARING_CHANGES.md — Testing your overlay mod](08_SHARING_CHANGES.md#testing-your-overlay-mod) for how the script manages backups, all modes, and troubleshooting.
 
-### Install a mod (overlay approach)
+---
 
-Most community mods are not complete replacements; they are **customization packages**:
+## Development Setup Tip: Organization for AI-Assisted Mods
 
-1. Start from the correct stock `qml` base (matching the Traktor version the mod targets)
-2. Copy the mod’s files over the base `qml`, overwriting when asked
-3. Keep all files the mod doesn’t replace
+### The Pattern: Develop Inside the Handbook Directory
 
-This avoids missing-file crashes.
+If you're using AI assistants (Claude, Copilot, etc.) to help develop mods, organize your work like this:
 
-#### macOS note: “overlaying” folders (Merge vs Replace)
+**Setup**:
 
-On macOS, copying a folder on top of another can be confusing because the dialog offers actions like **Replace** (dangerous if it replaces the whole folder).
+1. Create a directory for your mod **inside this handbook repository**
+   - Example: `my-d2-mod/`, `my-x1-custom/`, etc.
+2. Structure it like [traktor-kontrol-d2](traktor-kontrol-d2/):
 
-Two safe approaches:
+   ```
+   my-d2-mod/
+   ├── qml/                    # The actual mod files
+   │   ├── CSI/
+   │   ├── Defines/
+   │   └── Screens/
+   ├── .claude/                # Claude-specific context (optional)
+   ├── my-feature.md           # Feature documentation
+   └── README.md               # Quick start & overview
+   ```
 
-**Option A (Finder): merge folders, replace files**
+3. The `.gitignore` already ignores it:
+   ```
+   */                          # Ignore everything by default
+   !prompts/                   # Except prompts/ and main docs
+   ```
 
-- Copy the mod’s _contents_ into the target `qml` (not the other way around).
-- When Finder asks about folders, choose **Merge** (keeps files the mod doesn’t include).
-- When Finder asks about individual files, choose **Replace** for the files you actually want to override.
+**Why this works**:
 
-**Option B (Terminal): use `rsync` to merge a customization package**
+- **AI has full context**: Your AI assistant can read all handbook chapters while analyzing your mod code
+- **No external context switching**: Everything is in one workspace (handbook + your mod + mod docs)
+- **Versioning**: As you develop, git diff shows exactly what changed
+- **Symlink option**: On macOS/Linux, create a symlink from Traktor's `qml` → your `my-mod/qml/` for live testing without copying back and forth
 
-If the customization package is a folder that contains the controller setup files, you can merge it into the target `qml` (see ["The Traktor `qml` folder"](#the-traktor-qml-folder) for your path):
+**Example: Set up symlink mode (macOS/Windows)**:
 
-```bash
-sudo rsync -a "path/to/mod-overlay/" \
-  "/Applications/Native Instruments/Traktor Pro 4.app/Contents/Resources/qml/"
-```
+Use the included `install-traktor-mod` script to create a symlink. Install instructions, all available modes, and detailed workflows are documented in [Chapter 08: Sharing Changes](08_SHARING_CHANGES.md#testing-your-overlay-mod).
 
-Notes:
+**Pro tip for AI workflows**:
 
-- The trailing `/` on the source path matters: it copies the _contents_ of the customization package.
-- `sudo` is often required because Traktor’s `qml` is inside the app bundle.
+When asking Claude or Copilot for help, include this in your prompt:
 
-### Restore stock QML files
+> I'm developing a mod in `./my-d2-mod/qml/` inside this handbook repo.
+> The handbook documents are in Chapters 01-11. Reference them by name (e.g., "see 02_API_REFERENCE.md") as they're in the same repo context.
 
-If Traktor fails to start or screens break, restore from your backup (see ["The Traktor `qml` folder"](#the-traktor-qml-folder) for the path on your system):
-
-**macOS terminal:**
-
-```bash
-cd "/Applications/Native Instruments/Traktor Pro 4.app/Contents/Resources"
-rm -rf qml
-mv qml.backup qml
-```
-
-**Windows terminal:**
-
-```bat
-cd "C:\Program Files\Native Instruments\Traktor Pro 4\Resources64"
-rmdir /s qml
-move qml.backup qml
-```
+This tells the AI that handbook chapters are nearby and available for reference during development.
 
 ---
 

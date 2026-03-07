@@ -79,7 +79,7 @@ Look for your `console.log()` messages to understand what your code is doing.
 
 If Traktor becomes unstable:
 
-- restore factory defaults from backup (see [01_BASICS.md](01_BASICS.md#restore-stock-rollback))
+- restore factory defaults: `install-traktor-mod restore` (see [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md#testing-your-overlay-mod))
 - re-apply changes one at a time
 
 ### Quick path when following a community example
@@ -90,7 +90,7 @@ If you're working from an example in [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RE
 2. Confirm you edited the correct controller and layer (CSI vs Screens vs Defines).
 3. Check for typos in `AppProperty` paths and `Wire from:` strings.
 4. Use the checklist below.
-5. If Traktor becomes unstable, restore using [Restore stock](01_BASICS.md#restore-stock-rollback).
+5. If Traktor becomes unstable, restore using `install-traktor-mod restore` (see [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md#testing-your-overlay-mod)).
 
 ---
 

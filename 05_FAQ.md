@@ -15,7 +15,7 @@ You generally can't damage the hardware by editing controller files. The typical
 - A controller screen displays incorrectly
 - Traktor becomes unstable until you restore a backup
 
-That's why backup/restore is the core safety net. See [01_BASICS.md](01_BASICS.md#install--backup--restore-the-safe-workflow).
+That's why backup/restore is the core safety net. **Use the `install-traktor-mod` script to restore in one command** — see [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md#testing-your-overlay-mod) for setup and usage.
 
 ### Do I need programming experience?
 
@@ -62,7 +62,7 @@ Traktor updates reset your custom changes to factory defaults. But Native Access
 
 ### Can I undo changes?
 
-Yes: restore your `qml` backup and restart Traktor. For detailed instructions, see [01_BASICS.md](01_BASICS.md#install--backup--restore-the-safe-workflow).
+Yes: **use `install-traktor-mod restore`** to reset to stock QML in one command (see [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md#testing-your-overlay-mod)). Or manually restore your `qml` backup and restart Traktor.
 
 ---
 
@@ -85,6 +85,7 @@ See [06_COMPATIBILITY_FIXES.md](06_COMPATIBILITY_FIXES.md#version-compatibility-
 You are likely missing a `QtQuick` import. Some standard QML components (like `Timer`) require explicit imports that might not be present in the stock Traktor QML files. If you add a `Timer` to a file without importing `QtQuick`, the file will fail to load silently, and the controller will not initialize.
 
 **Solution**: Always ensure you have the necessary imports at the top of your file when adding new QML components:
+
 ```qml
 import QtQuick 2.0
 ```

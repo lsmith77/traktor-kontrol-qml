@@ -7,7 +7,7 @@ Short definitions for common terms you’ll see when working with Traktor QML mo
 ## Traktor + modding
 
 - **QML**: A UI and logic language from Qt. Traktor uses it to define controller behavior and screen layouts.
-- **QML Mod**: A set of changes to Traktor's controller setup folder (usually a small collection of edited files, called an "add-on package" or "customization package").
+- **QML Mod**: A folder containing a `qml/` subdirectory with changes to Traktor's controller setup. Can be partial (only changed files) or a full copy. Structure: `MyMod/qml/{CSI,Screens,Defines}...`. When installed, the mod's `qml/` contents are merged into Traktor's `qml/` folder.
 - **Customization Package Install**: Installing a mod by copying its files "on top of" a complete base controller setup, overwriting only the files it changes. Safer because your other customizations stay intact.
 - **Base version**: The Traktor version a mod was built for. Overlay mods often require a specific base to work.
 

@@ -7,8 +7,19 @@
 - One baseline: a `traktor-kontrol-qml-files` tag/file tree, or a legacy mod directory with a full `qml/` tree
 - For each mod: either a reviewed feature list (bulleted), or the mod file tree + author feature list
 - If you only have raw file changes with no feature list, run [list-features.md](list-features.md) first, review the output, then return here
+- **QML Linter**: Have a QML linter installed and configured before running this prompt (see [QML Linter Setup](#qml-linter-setup) below)
 
 **Workflow context**: [Chapter 11 — Combining Mods Workflow](../11_COMBINING_MODS_WORKFLOW.md)
+
+---
+
+## QML Linter Setup (Required)
+
+Before running this prompt, ensure you have a QML linter available.
+
+→ **[See 01_BASICS.md — QML Linter for setup instructions](../01_BASICS.md#qml-linter)**
+
+Quick summary: Pick one of three options (qml-linter, VS Code, or Qt Creator). All work on macOS and Windows.
 
 ---
 
@@ -51,9 +62,39 @@ Place this block after `My Setup` and before any pasted documentation or file li
 
 ---
 
+## Prompt (copy everything below into Claude/Copilot)
+
+```
+## Instructions for AI Assistant
+
+### Configuration
+
+QML_LINTER_COMMAND = ""  # Set to your linter command (see QML_LINTER_SETUP.md for options)
+# Example: "qml-linter ./qml/ --output-format compact"
+# If left empty, linter validation will be skipped.
+
+### Behavior
+
+If QML_LINTER_COMMAND is set:
+
+- **Generate syntactically valid QML** for the target Traktor version
+- **If you have CLI access**: Run the linter command directly and report results
+- **If no CLI access**: Ask the user to run the command and paste output in format: `[filename]: [line#] [error type] [message]`
+- **Actively validate using linter output**: Review linter results, identify violations, and fix code
+- **Iterate until clean**: Continue the feedback loop until zero errors/warnings remain
+
+If QML_LINTER_COMMAND is empty:
+
+- **Generate syntactically valid QML** using your knowledge of QtQuick 2.15 and CSI 1.0 syntax
+
+---
+
+---
+
 ## Prompt (copy and fill in all bracketed zones)
 
 ```
+
 I'm combining multiple Traktor QML mods into a single unified QML directory.
 
 ## Mods Being Combined:
@@ -157,6 +198,7 @@ Provide the directory listing or key file paths from /mods/ so I can generate th
    - Which takes priority
    - How to configure both if possible
    - Fallback options
+
 ```
 
 ---
@@ -164,6 +206,7 @@ Provide the directory listing or key file paths from /mods/ so I can generate th
 ## Example (Filled In)
 
 ```
+
 I'm combining multiple Traktor QML mods into a single unified QML directory.
 
 ## Mods Being Combined:
@@ -206,6 +249,8 @@ Global conflict policy: prefer_baseline
 Target controllers: D2, X1MK3, Z1MK2
 
 [Docs and changelogs go here if available]
+
 ```
 
 Then continue with the "Please generate:" section above.
+```

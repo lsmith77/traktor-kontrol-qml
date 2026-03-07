@@ -7,10 +7,21 @@
 - Both `mods/[ModName-vOLD]/` and `mods/[ModName-vNEW]/` directories exist side by side
 - You know which features from this mod are currently integrated into your combined `/qml/`
 - See [Chapter 11 — Updating Non-Git Mods](../11_COMBINING_MODS_WORKFLOW.md#updating-non-git-mods-zips-forum-posts) for setup
+- **QML Linter**: Have a QML linter installed and configured (see [QML Linter Setup](#qml-linter-setup) below)
 
 **For git-tracked mods**: See [update-mod-git.md](update-mod-git.md)
 
 **Workflow context**: [Chapter 11 — Updating Later](../11_COMBINING_MODS_WORKFLOW.md#updating-later-when-mods-release-new-versions)
+
+---
+
+## QML Linter Setup (Required)
+
+Before running this prompt, have a QML linter available so you can validate the AI's output.
+
+→ **[See 01_BASICS.md — QML Linter for setup instructions](../01_BASICS.md#qml-linter)**
+
+Quick summary: Three options available (qml-linter, VS Code, Qt Creator). Pick one based on your workflow.
 
 ---
 
@@ -35,9 +46,33 @@ Replace these placeholders with your actual values:
 
 ---
 
-## Prompt (copy and fill in the placeholders above)
+## Prompt (copy everything below into Claude/Copilot)
 
 ```
+## Instructions for AI Assistant
+
+### Configuration
+
+QML_LINTER_COMMAND = ""  # Set to your linter command (see QML_LINTER_SETUP.md for options)
+# Example: "qml-linter ./qml/ --output-format compact"
+# If left empty, linter validation will be skipped.
+
+### Behavior
+
+If QML_LINTER_COMMAND is set:
+
+- **Generate syntactically valid QML** for the target Traktor version
+- **If you have CLI access**: Run the linter command directly and report results in format: `[filename]: [line#] [error type] [message]`
+- **If no CLI access**: Ask user to run the command and paste output in that format
+- **Actively validate using linter output**: Review results, identify violations, and fix code
+- **Iterate until clean**: Loop until zero errors/warnings
+
+If QML_LINTER_COMMAND is empty:
+
+- **Generate syntactically valid QML** using your knowledge of QtQuick 2.15 and CSI 1.0 syntax
+
+---
+
 ## Values to use:
 
 - MOD_NAME: [fill in]

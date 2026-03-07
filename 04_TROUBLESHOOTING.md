@@ -109,15 +109,40 @@ If you're working from an example in [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RE
 
 ---
 
-### 🔍 Common Issues (Check These Next)
+### �️ Prevention: Use a QML Linter _Before_ Testing
+
+The single best way to avoid debugging is to catch errors before they reach Traktor.
+
+**Before restarting Traktor, always check your editor's Problems panel** (if using VS Code with QML extension):
+
+- **Red squiggles** = syntax errors or undefined properties
+- **Yellow warnings** = unused code or type mismatches
+
+**Common linter catches:**
+
+- Missing closing brace `}`
+- Typo in property name: `enabled: undefinedSetting`
+- Missing comma between properties
+- Incorrect property type: `visible: "true"` (should be `true`, not a string)
+
+**Pro tip**: If your editor shows "0 Problems" but Traktor fails silently, then:
+
+1. Check for Traktor version-specific API changes (see [06_COMPATIBILITY_FIXES.md](06_COMPATIBILITY_FIXES.md))
+2. Search the file for `console.log()` debug statements (see [Debugging Workflow](#debugging-workflow) → step 4b)
+3. Use a clean backup and test with the smallest possible change
+
+---
+
+### �🔍 Common Issues (Check These Next)
 
 **Issue:** Changes to a custom setting (like a toggle or delay) don't have any effect after restarting Traktor.
 
 **Cause:** The `mapping.settings` vs `mapping.state` Persistence Trap.
-When creating custom settings for a mod, it is common to use `MappingPropertyDescriptor` with a path like `mapping.settings.my_custom_setting`. However, properties under `mapping.settings` are **persistent** and are saved into Traktor's permanent `Traktor Settings.tsi` file the first time they are loaded. Once Traktor saves the setting to the `.tsi` file, it will **ignore** any future changes you make to the `value:` field in your QML file. The QML `value:` is only treated as a *default* if the setting doesn't exist yet.
+When creating custom settings for a mod, it is common to use `MappingPropertyDescriptor` with a path like `mapping.settings.my_custom_setting`. However, properties under `mapping.settings` are **persistent** and are saved into Traktor's permanent `Traktor Settings.tsi` file the first time they are loaded. Once Traktor saves the setting to the `.tsi` file, it will **ignore** any future changes you make to the `value:` field in your QML file. The QML `value:` is only treated as a _default_ if the setting doesn't exist yet.
 
 **Fix:**
 For mod settings that you want to hardcode and tweak directly via QML files (especially for controllers without custom UI settings tabs), use `mapping.state` instead of `mapping.settings`.
+
 ```qml
 // BAD: Traktor saves this once and ignores future QML edits
 MappingPropertyDescriptor { id: mySetting; path: "mapping.settings.my_setting"; type: MappingPropertyDescriptor.Boolean; value: true; }
@@ -134,6 +159,7 @@ MappingPropertyDescriptor { id: mySetting; path: "mapping.state.my_setting"; typ
 Traktor's QML engine does not always provide visible error messages when a QML file fails to compile or load. If you make a syntax error, reference a non-existent property, or use an unsupported module, the controller might simply fail to initialize without any warning in the Traktor UI.
 
 **Fix:**
+
 - Always keep a clean backup of the original QML files.
 - Make small, incremental changes and test frequently by restarting Traktor.
 - If a controller fails to light up after an edit, immediately roll back the last change to isolate the issue.

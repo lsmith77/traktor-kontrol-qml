@@ -2,7 +2,19 @@
 
 **When to use**: You only need information about one specific feature from a mod — not the full feature list. Useful for targeted investigation before a partial merge or conflict analysis.
 
+**Prerequisites**:
+
+- **QML Linter**: Have a QML linter installed (optional but recommended, see [QML Linter Setup](#qml-linter-setup) below)
+
 **Workflow context**: [Chapter 11 — Feature extraction and splitting](../11_COMBINING_MODS_WORKFLOW.md#ai-prompt-templates-feature-extraction-and-feature-splitting)
+
+---
+
+## QML Linter Setup (Optional but Recommended)
+
+→ **[See 01_BASICS.md — QML Linter for setup instructions](../01_BASICS.md#qml-linter)**
+
+Three options to choose from (qml-linter, VS Code, Qt Creator). Works on macOS and Windows.
 
 ---
 
@@ -28,6 +40,30 @@ Replace this placeholder with your actual value:
 ## Prompt (copy and fill in the bracketed zone)
 
 ```
+## Instructions for AI Assistant
+
+### Configuration
+
+QML_LINTER_COMMAND = ""  # Set to your linter command (see QML_LINTER_SETUP.md for options)
+# Example: "qml-linter ./feature_code/ --output-format compact"
+# If left empty, linter validation will be skipped.
+
+### Behavior
+
+If QML_LINTER_COMMAND is set:
+
+- **Generate or analyze QML code** for the feature
+- **If you have CLI access**: Run the linter on the extracted code directly and report results in format: `[filename]: [line] [error type] [message]`
+- **If no CLI access**: Ask user to run the command and paste results in that format
+- **Actively use the output**: Review linter findings and explain implications for feature integration
+- **Reference linter findings**: Distinguish between issues the linter caught (syntax, types) vs. logic errors requiring manual review
+
+If QML_LINTER_COMMAND is empty:
+
+- **Analyze QML code** for the feature using your knowledge of QtQuick 2.15 and CSI 1.0 syntax
+
+---
+
 You are an expert Traktor QML analyst. I will provide a baseline (tag or file tree) and either a consolidated list of file changes or the mod file tree. I only want information about one specific feature: [FEATURE_NAME] (e.g., vinyl break, library view in Browse mode, screen display in REL mode).
 
 Tasks:

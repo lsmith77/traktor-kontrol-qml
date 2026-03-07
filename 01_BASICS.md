@@ -230,6 +230,119 @@ For a complete glossary, see [07_GLOSSARY.md](07_GLOSSARY.md).
 
 ---
 
+## Recommended IDE Setup
+
+### Code Editor with QML Syntax Highlighting
+
+Editing QML files in a plain text editor is error-prone. Use an IDE with QML syntax highlighting to catch typos, missing braces, and incorrect property names before you restart Traktor.
+
+**Recommended editors:**
+
+- **VS Code** (macOS/Windows/Linux) — Free, lightweight
+  - Install extension: "QML" by Qt tools (or "Qt for Python")
+  - (Optional) Install AI assistant: GitHub Copilot, Copilot Chat, or Claude (via extension)
+  - Enables syntax highlighting, basic error detection, and code completion
+- **JetBrains QML Studio** — Professional QML IDE, free community edition
+  - Built-in AI assistant support (with JetBrains AI Assistant subscription)
+- **Qt Creator** — Official Qt IDE, heavier but very powerful
+  - Built-in QML linter and refactoring tools
+  - (Optional) IDE can be paired with external AI tools for code review
+- **Sublime Text** — Fast editor with QML plugins available
+  - (Optional) AI assistant extensions available
+
+**Why it matters**: Syntax errors (missing `}`, forgotten commas, typos) cause Traktor to fail silently without warnings. Highlighting makes these visible immediately.
+
+### QML Linter
+
+A linter analyzes QML code and reports issues before you test in Traktor. Choose one of three practical options below.
+
+#### Option A: qml-linter (Command Line — Recommended for simplest setup)
+
+**Installation:**
+
+- **macOS**:
+
+  ```bash
+  pip3 install qml-linter
+  ```
+
+- **Windows**:
+  1. Install Python 3 from https://www.python.org/downloads/
+  2. Open Command Prompt and run: `pip install qml-linter`
+
+**Usage:**
+
+```bash
+qml-linter ./qml/ --output-format compact
+```
+
+**Best for**: Musicians who want a quick, standalone command-line tool.
+
+#### Option B: VS Code QML Extension (Visual — Real-time feedback)
+
+**Installation:**
+
+1. Install VS Code (https://code.visualstudio.com/)
+2. Open VS Code → Extensions (Cmd+Shift+X / Ctrl+Shift+X)
+3. Search for "QML" and install "QML" by Qt Tools
+4. Open your `/qml/` folder as a workspace
+
+**Usage:**
+
+- Errors appear in **Problems panel** (View → Problems, or Cmd/Ctrl+Shift+M)
+- Red squiggles appear inline as you edit
+
+**Best for**: Musicians using VS Code who want real-time feedback while editing.
+
+#### Option C: qmllint (Qt Official Tool)
+
+`qmllint` is included with Qt Creator. Download it from https://www.qt.io/download-qt-tools (Community Edition, free).
+
+Once installed:
+
+- **macOS**: `/Applications/Qt Creator.app/Contents/MacOS/qmllint`
+- **Windows**: `C:\Qt\Tools\QtCreator\bin\qmllint.exe`
+
+**Usage:**
+
+```bash
+qmllint -I ./Defines ./qml/
+```
+
+**Best for**: Access to the most powerful type checking available.
+
+#### Comparison
+
+| Feature       | qml-linter     | VS Code QML          | qmllint                        |
+| ------------- | -------------- | -------------------- | ------------------------------ |
+| Setup Time    | 2 minutes      | 5 minutes            | ~1 hour (includes Qt download) |
+| CLI-Friendly  | ✅ Yes         | ⚠️ GUI only          | ✅ Yes                         |
+| Real-time     | ❌ Run command | ✅ Yes (as you type) | ❌ Run command                 |
+| Type Checking | ⭐⭐⭐         | ⭐⭐⭐               | ⭐⭐⭐⭐⭐                     |
+
+**Quick start**: Not sure? Use Option A (2-minute pip install).
+
+### AI Assistant Extensions (Optional)
+
+An AI code assistant accelerates development by providing real-time suggestions, code review, and explanations directly in your editor.
+
+**Available in VS Code:**
+
+- **GitHub Copilot** or **Copilot Chat** — Real-time code suggestions and multi-line completions for QML
+- **Claude for VS Code** — Claude directly in your editor for code review, explanations, and debugging
+- **ChatGPT** — ChatGPT plugin available in VS Code marketplace
+
+**How it helps:**
+
+- Get real-time code completions as you type QML
+- Ask the AI to explain QML syntax, patterns, or suggest refactoring approaches
+- Receive context-aware code generation for common Traktor QML patterns
+- Get instant code review without waiting for manual feedback
+
+**Why it matters**: An AI assistant helps you **write code faster and understand patterns** by providing immediate, context-aware suggestions. Use it alongside the linter for comprehensive development support.
+
+---
+
 ## Install / backup / restore (the safe workflow)
 
 **Note on terminal examples below**: The steps can be done via Finder, but terminal examples are also provided for speed and precision. A terminal is a text-based command interface (macOS: "Terminal" app; Windows: "Command Prompt" or "PowerShell"). Simply copy & paste the command lines shown.

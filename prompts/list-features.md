@@ -8,9 +8,18 @@
 
 ---
 
-## Before Running This Prompt
+## Prerequisites
 
-This is a straightforward extraction prompt with no required placeholders. Just provide the baseline and mod files/changes.
+- The mod folder exists and is accessible (you can browse its `/qml/` structure)
+- **QML Linter** (optional but recommended): Have a QML linter installed
+
+\u2192 **[See 01_BASICS.md \u2014 QML Linter for setup instructions](../01_BASICS.md#qml-linter)**
+
+Three options are available. Pick whichever works best for your workflow.
+
+---
+
+## How to Use This Prompt
 
 ---
 
@@ -25,6 +34,27 @@ This is a straightforward extraction prompt with no required placeholders. Just 
 ## Prompt (copy and use as-is)
 
 ```
+## Instructions for AI Assistant
+
+### Configuration
+
+QML_LINTER_COMMAND = ""  # Set to your linter command (see QML_LINTER_SETUP.md for options)
+# Example: "qml-linter ./qml/ --output-format compact"
+# If left empty, linter validation will be skipped.
+
+### Behavior
+
+When analyzing mod source code:
+
+- **Note any QML code quality issues** you observe in the source
+- If QML_LINTER_COMMAND is set:
+  - **If you have CLI access**: Run the linter directly on proposed features and report any issues
+  - **If no CLI access**: Ask user to run the linter command and paste results
+- **Flag potential conflicts** that linters will catch (syntax) or require manual review (same file modified by multiple features)
+- **Offer iterative validation**: "Paste your linter output and I can help analyze any issues found"
+
+---
+
 You are an expert Traktor QML analyst. I will provide either (A) a consolidated list of file changes (mod vs baseline) or (B) the mod file tree plus the baseline file tree. Your task: produce a concise, reviewable feature list for human verification.
 
 Output format: bulleted feature list + short human summary:

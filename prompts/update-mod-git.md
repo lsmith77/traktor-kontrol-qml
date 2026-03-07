@@ -7,10 +7,21 @@
 - The mod repo is cloned in `/mods/[ModName]/`
 - Both the old and new version tags exist in the repo (e.g., `v1.0.0`, `v2.0.0`)
 - You know which features from this mod are currently integrated into your combined `/qml/`
+- **QML Linter**: Have a QML linter installed and configured (see [QML Linter Setup](#qml-linter-setup) below)
 
 **For non-git mods (ZIP/Forum)**: See [update-mod.md](update-mod.md)
 
 **Workflow context**: [Chapter 11 — Updating Later](../11_COMBINING_MODS_WORKFLOW.md#updating-later-when-mods-release-new-versions)
+
+---
+
+## QML Linter Setup (Required)
+
+Before running this prompt, ensure a QML linter is available to validate the AI's generated code.
+
+→ **[See 01_BASICS.md — QML Linter for setup instructions](../01_BASICS.md#qml-linter)**
+
+Quick summary: Three options (qml-linter, VS Code, Qt Creator). Works on macOS and Windows.
 
 ---
 
@@ -35,9 +46,33 @@ Replace these placeholders with your actual values:
 
 ---
 
-## Prompt (copy and fill in the placeholders above)
+## Prompt (copy everything below into Claude/Copilot)
 
 ```
+## Instructions for AI Assistant
+
+### Configuration
+
+QML_LINTER_COMMAND = ""  # Set to your linter command (see QML_LINTER_SETUP.md for options)
+# Example: "qml-linter ./qml/ --output-format compact"
+# If left empty, linter validation will be skipped.
+
+### Behavior
+
+If QML_LINTER_COMMAND is set:
+
+- **Generate syntactically valid QML** for the target Traktor version (include correct import versions)
+- **If you have CLI access**: Run the linter directly on generated files and report results in format: `[filename]: [line] [error type] [message]`
+- **If no CLI access**: Ask user to run the command and paste results in that format
+- **Actively validate using output**: Review results and fix issues
+- **Iterate until clean**: Continue until zero violations
+
+If QML_LINTER_COMMAND is empty:
+
+- **Generate syntactically valid QML** using your knowledge of QtQuick 2.15 and CSI 1.0 syntax
+
+---
+
 ## Values to use:
 
 - MOD_NAME: [fill in]

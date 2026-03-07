@@ -245,7 +245,7 @@ Look for:
 **If MOD is from ZIP File**:
 Check inside the ZIP for:
 
-- README.md or README.txt (usually has version)
+- README.md or README.md (usually has version)
 - qml-info.txt or mod-info.json (may have metadata)
 - Latest modification date in file properties
 - Use ZIP filename as fallback identifier

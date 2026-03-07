@@ -33,7 +33,7 @@ Include all of this information so people know if your mod will work for them:
   │   └── Screens/
   │       └── S4MK3/
   │           └── TestScreen.qml    ← only the files you changed
-  └── README.txt
+  └── README.md
   ```
 
 - **Full replacement mod** (complete copy with all directories):
@@ -43,7 +43,7 @@ Include all of this information so people know if your mod will work for them:
   │   ├── CSI/                       ← full CSI directory
   │   ├── Screens/                   ← full Screens directory
   │   └── Defines/                   ← full Defines directory
-  └── README.txt
+  └── README.md
   ```
 
 The `qml/` folder is the installation target. For **overlay mods**, its contents are merged into Traktor's `qml/` folder. For **full replacement mods**, it completely replaces Traktor's `qml/` folder. This structure gives installation scripts a clear, predictable entry point.
@@ -298,7 +298,7 @@ The script auto-elevates to admin via UAC, creates a stock backup on first insta
    │   └── Screens/
    │       └── S4MK3/
    │           └── TestScreen.qml
-   └── README.txt
+   └── README.md
    ```
 5. **Zip it:** Right-click the folder and select "Compress" (macOS) or "Send to > Compressed (zipped) folder" (Windows).
 

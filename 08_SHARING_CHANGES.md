@@ -50,6 +50,18 @@ The `qml/` folder is the installation target. For **overlay mods**, its contents
 
 **Note:** The `install-traktor-mod` script validates this structure automatically. If you try to install a mod without a `qml/` folder, it will show an error message with the exact path it was looking for, helping you fix the structure.
 
+## Platform-specific notes
+
+### Windows script status
+
+> ⚠️ **Windows users**: The `install-traktor-mod.bat` script is **not yet tested**. Please test it carefully and report any issues at [github.com/lsmith77/traktor-kontrol-qml/issues](https://github.com/lsmith77/traktor-kontrol-qml/issues). Your feedback helps make this tool reliable for everyone.
+
+### macOS/Linux
+
+The `install-traktor-mod.sh` script is actively maintained and used in production.
+
+---
+
 ## Two packaging styles: overlays vs. full replacements
 
 ### Overlay mods (recommended for most use cases)

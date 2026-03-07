@@ -65,6 +65,14 @@ if %errorLevel% == 0 (
 :admin
     if exist "%temp%\getadmin.vbs" ( del "%temp%\getadmin.vbs" )
 
+echo.
+echo ╔════════════════════════════════════════════════════════════════╗
+echo ║ WARNING: This script (install-traktor-mod.bat) is not yet tested ║
+echo ║ Feedback and bug reports appreciated at:                        ║
+echo ║ https://github.com/lsmith77/traktor-kontrol-qml/issues          ║
+echo ╚════════════════════════════════════════════════════════════════╝
+echo.
+
 :: Check for help flag first
 for %%A in (%*) do (
     if /I "%%A"=="/?" goto :showhelp

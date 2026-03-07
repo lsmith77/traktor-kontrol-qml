@@ -26,15 +26,12 @@ Find working mods, understand what they do, and deploy them safely.
 
 Combining mods by hand is error-prone: the same file appears in both, conflict resolutions get lost, and there's no record of what came from where. This handbook provides **AI prompt templates** that handle this systematically.
 
-- **`combine-mods`** — give the AI a baseline (clean Traktor QML) and each mod's feature list; it outputs a merged directory plus a `METADATA.md` lock file recording every version and conflict resolution
-- **`update-mod`** — when a mod releases a new version, apply only the relevant delta to your combined setup
-- **`remove-feature`** — remove a single feature cleanly, including any conflict resolutions that were made to accommodate it
-- **`list-features`** / **`split-mod`** — if a mod has no author feature list, extract and split it before merging
+1. **[Chapter 10: Prompt Templates](10_PROMPT_TEMPLATES.md)** — full index with workflow order
+2. **[Chapter 11: Combining Mods — Complete Workflow](11_COMBINING_MODS_WORKFLOW.md)** — step-by-step guide (preparation → AI generation → save → deploy)
+3. **[Chapter 08: Sharing Changes](08_SHARING_CHANGES.md)** — understand mod structure before combining
+4. **[Chapter 09: Mod Documentation Guide](09_MOD_DOCUMENTATION_GUIDE.md)** — how to read feature documentation in well-documented mods
 
 Paste the prompt into Claude, ChatGPT, Copilot, or any AI chat — no tooling beyond a text editor and git.
-
-**→ [Chapter 10: Prompt Templates](10_PROMPT_TEMPLATES.md)** — full index with workflow order
-**→ [Chapter 11: Combining Mods — Complete Workflow](11_COMBINING_MODS_WORKFLOW.md)** — step-by-step guide (preparation → AI generation → save → deploy)
 
 ---
 

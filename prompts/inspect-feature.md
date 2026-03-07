@@ -6,7 +6,26 @@
 
 ---
 
-## Prompt (copy everything in the block below)
+## Before Running This Prompt
+
+Replace this placeholder with your actual value:
+
+| Placeholder      | What it means                            | Example                                           |
+| ---------------- | ---------------------------------------- | ------------------------------------------------- |
+| `[FEATURE_NAME]` | The specific feature you want to inspect | `vinyl break`, `library view`, `REL mode display` |
+
+---
+
+## How to Use This Prompt
+
+1. Copy the entire prompt block below
+2. Paste into Claude/Copilot
+3. **Fill in `[FEATURE_NAME]`** with the feature you want to inspect
+4. Provide the baseline and mod files/changes when prompted
+
+---
+
+## Prompt (copy and fill in the bracketed zone)
 
 ```
 You are an expert Traktor QML analyst. I will provide a baseline (tag or file tree) and either a consolidated list of file changes or the mod file tree. I only want information about one specific feature: [FEATURE_NAME] (e.g., vinyl break, library view in Browse mode, screen display in REL mode).

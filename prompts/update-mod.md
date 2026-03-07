@@ -1,35 +1,70 @@
-# Prompt: Update a Mod
+# Prompt: Update a Mod (Non-Git / ZIP Format)
 
-**When to use**: A mod you've already incorporated releases a new version. Covers both git-tracked and non-git (ZIP/forum) mods.
+**When to use**: A mod from forum/ZIP release needs updating and you have side-by-side version directories.
 
 **Prerequisites**:
-- For non-git mods: both `mods/[ModName-vOLD]/` and `mods/[ModName-vNEW]/` must exist side by side before running this prompt (see [Chapter 11 — Updating Non-Git Mods](../11_COMBINING_MODS_WORKFLOW.md#updating-non-git-mods-zips-forum-posts))
-- For git-tracked mods: the mod repo clone in `/mods/` must have both tags available
+
+- Both `mods/[ModName-vOLD]/` and `mods/[ModName-vNEW]/` directories exist side by side
+- You know which features from this mod are currently integrated into your combined `/qml/`
+- See [Chapter 11 — Updating Non-Git Mods](../11_COMBINING_MODS_WORKFLOW.md#updating-non-git-mods-zips-forum-posts) for setup
+
+**For git-tracked mods**: See [update-mod-git.md](update-mod-git.md)
 
 **Workflow context**: [Chapter 11 — Updating Later](../11_COMBINING_MODS_WORKFLOW.md#updating-later-when-mods-release-new-versions)
 
 ---
 
-## Prompt (copy everything in the block below)
+## Before Running This Prompt
+
+Replace these placeholders with your actual values:
+
+| Placeholder  | What it means      | Example  |
+| ------------ | ------------------ | -------- |
+| `[MOD_NAME]` | Name of the mod    | `D2`     |
+| `[OLD_VER]`  | Old version number | `v1.2.3` |
+| `[NEW_VER]`  | New version number | `v1.2.4` |
+
+---
+
+## How to Use This Prompt
+
+1. Copy the entire prompt block below
+2. Paste into Claude/Copilot
+3. **Only update the "Values to use:" section** with your actual values
+4. Leave all the `[MOD_NAME]`, `[OLD_VER]`, `[NEW_VER]` placeholders as-is throughout the rest of the prompt — the AI will use the values you declared at the top
+
+---
+
+## Prompt (copy and fill in the placeholders above)
 
 ```
-I need to update my combined QML to incorporate changes from [MOD NAME] [OLD VERSION] → [NEW VERSION].
+## Values to use:
+
+- MOD_NAME: [fill in]
+- OLD_VER: [fill in]
+- NEW_VER: [fill in]
+
+---
+
+I need to update my combined QML from [MOD_NAME] [OLD_VER] → [NEW_VER].
 
 ## Current State:
 
-- METADATA.md currently records: [MOD NAME] [OLD VERSION] — paste the relevant METADATA.md entry
-- My /qml/ currently includes these features from this mod: [list features]
-- Old mod files location: mods/[ModName-vOLD]/
-- New mod files location: mods/[ModName-vNEW]/
+- METADATA.md currently records: [paste the METADATA.md line for this mod]
+- My /qml/ includes these features from this mod: [list features]
+- Old mod directory: mods/[MOD_NAME]-[OLD_VER]/
+- New mod directory: mods/[MOD_NAME]-[NEW_VER]/
 
 ## Task:
 
-1. Compare mods/[ModName-vOLD]/ and mods/[ModName-vNEW]/ to identify what changed
-2. Determine which changes affect my combined /qml/ (only the features I'm using — listed above)
+1. Compare the two directories to identify what changed (structure, file additions, deletions, modifications)
+2. Determine which changes affect my combined /qml/ (only the features listed above)
 3. Apply the relevant changes to my /qml/ files
-4. Update METADATA.md: change the version entry from [OLD VERSION] to [NEW VERSION]
+4. Update METADATA.md: change the version entry from [OLD_VER] to [NEW_VER]
 5. List any new conflicts introduced by the new version, with recommended resolutions
 6. Generate a testing checklist specific to the changed behavior
 
-Note: If this is a git-tracked mod, you can also run: git diff [OLD_TAG]..[NEW_TAG] in the mod repo to see changes.
+## Optional: Preview first
+
+Walk me through the key file differences side-by-side before I apply changes.
 ```

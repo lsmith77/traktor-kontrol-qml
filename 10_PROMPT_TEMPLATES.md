@@ -6,14 +6,15 @@
 
 ## Prompt Index
 
-| Prompt | When to use | File |
-|--------|-------------|------|
-| **Combine** | First-time combination of two or more mods | [prompts/combine-mods.md](prompts/combine-mods.md) |
-| **Update** | A mod you've incorporated releases a new version | [prompts/update-mod.md](prompts/update-mod.md) |
-| **Remove / Switch** | Remove a feature or swap one mod's implementation for another's | [prompts/remove-feature.md](prompts/remove-feature.md) |
-| **List Features** | No author feature list exists — generate one for review | [prompts/list-features.md](prompts/list-features.md) |
-| **Inspect Feature** | Need details on one specific feature only | [prompts/inspect-feature.md](prompts/inspect-feature.md) |
-| **Split** | Split a monolithic mod into feature-level modules before merging | [prompts/split-mod.md](prompts/split-mod.md) |
+| Prompt               | When to use                                                      | File                                                     |
+| -------------------- | ---------------------------------------------------------------- | -------------------------------------------------------- |
+| **Combine**          | First-time combination of two or more mods                       | [prompts/combine-mods.md](prompts/combine-mods.md)       |
+| **Update (Non-Git)** | A mod from forum/ZIP releases a new version                      | [prompts/update-mod.md](prompts/update-mod.md)           |
+| **Update (Git)**     | A git-tracked mod with tags releases a new version               | [prompts/update-mod-git.md](prompts/update-mod-git.md)   |
+| **Remove / Switch**  | Remove a feature or swap one mod's implementation for another's  | [prompts/remove-feature.md](prompts/remove-feature.md)   |
+| **List Features**    | No author feature list exists — generate one for review          | [prompts/list-features.md](prompts/list-features.md)     |
+| **Inspect Feature**  | Need details on one specific feature only                        | [prompts/inspect-feature.md](prompts/inspect-feature.md) |
+| **Split**            | Split a monolithic mod into feature-level modules before merging | [prompts/split-mod.md](prompts/split-mod.md)             |
 
 ---
 
@@ -31,7 +32,8 @@
 
 **After initial combination**:
 
-- Mod updates → [update-mod.md](prompts/update-mod.md)
+- Mod updates (non-git) → [update-mod.md](prompts/update-mod.md)
+- Mod updates (git) → [update-mod-git.md](prompts/update-mod-git.md)
 - Remove or swap a feature → [remove-feature.md](prompts/remove-feature.md)
 
 ---

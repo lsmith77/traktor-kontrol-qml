@@ -8,7 +8,21 @@
 
 ---
 
-## Prompt (copy everything in the block below)
+## Before Running This Prompt
+
+This is a straightforward extraction prompt with no required placeholders. Just provide the baseline and mod files/changes.
+
+---
+
+## How to Use This Prompt
+
+1. Copy the entire prompt block below
+2. Paste into Claude/Copilot
+3. Provide the baseline (tag or file tree) and the mod files/changes
+
+---
+
+## Prompt (copy and use as-is)
 
 ```
 You are an expert Traktor QML analyst. I will provide either (A) a consolidated list of file changes (mod vs baseline) or (B) the mod file tree plus the baseline file tree. Your task: produce a concise, reviewable feature list for human verification.

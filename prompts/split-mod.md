@@ -8,7 +8,26 @@
 
 ---
 
-## Prompt (copy everything in the block below)
+## Before Running This Prompt
+
+Replace this placeholder with your actual value:
+
+| Placeholder         | What it means                    | Example          |
+| ------------------- | -------------------------------- | ---------------- |
+| `[TRAKTOR_VERSION]` | Traktor version you're targeting | `4.4.1`, `4.4.2` |
+
+---
+
+## How to Use This Prompt
+
+1. Copy the entire prompt block below
+2. Paste into Claude/Copilot
+3. **Fill in `[TRAKTOR_VERSION]`** with your Traktor version
+4. Provide the baseline tag, reviewed feature list, and mod files/changes when prompted
+
+---
+
+## Prompt (copy and fill in the bracketed zone)
 
 ```
 You are an expert QML refactoring assistant. Inputs:
@@ -23,11 +42,6 @@ Tasks (produce short plan + bulleted outputs):
 - Identify conflicts with baseline (same handler/button/mode) with severity and recommended merge strategy: pick-one, combine-behavior (describe how), toggle, namespace/adapter, or keep-separate-profile.
 - Produce a commit plan: one commit per feature with commit message template and testing checklist entries.
 - Output format: bulleted sections: features, conflicts, commits, tests, notes. Also include a 6-line human summary.
-
-Placeholders:
-
-- [TRAKTOR_VERSION] → e.g., 4.4.1
-- Attach the consolidated change list or a list of changed files when invoking.
 
 Practical notes:
 

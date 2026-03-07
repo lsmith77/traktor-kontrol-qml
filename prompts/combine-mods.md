@@ -12,6 +12,31 @@
 
 ---
 
+## Before Running This Prompt
+
+This prompt uses section headers and inline edit zones (marked with `[...]`).
+
+**Key placeholders** (replace these):
+
+| Placeholder         | What it means             | Example       |
+| ------------------- | ------------------------- | ------------- |
+| `[MOD NAME]`        | Name of the mod           | `D2`, `X1MK3` |
+| `[Traktor Version]` | Your Traktor version      | `4.4.1`       |
+| `[Controllers]`     | Your hardware controllers | `D2 + X1MK3`  |
+
+Other placeholders in the prompt (like `[e.g., v1.2.3...]`, `[...]`) are description zones — replace them with your actual data.
+
+---
+
+## How to Use This Prompt
+
+1. Copy the entire prompt block below
+2. **Fill in every `[...]` zone** with your actual data
+3. Paste into Claude/Copilot
+4. Add your mod files and documentation below the prompt
+
+---
+
 ## Integration Options
 
 Before running the prompt, add a short plain-text block under **My Setup** titled `Integration Options:` that lists your desired inclusions, exclusions, and conflict controls. Use simple phrases — no JSON. Example lines:
@@ -26,7 +51,7 @@ Place this block after `My Setup` and before any pasted documentation or file li
 
 ---
 
-## Prompt (copy everything in the block below)
+## Prompt (copy and fill in all bracketed zones)
 
 ```
 I'm combining multiple Traktor QML mods into a single unified QML directory.

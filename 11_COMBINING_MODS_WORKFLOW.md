@@ -245,7 +245,7 @@ git -C ../mods/D2-v1.2.3 diff v1.2.3..v1.2.4
 
 # 2. Decide: Do I need this update?
 
-# 3. If yes: Update your qml/ using the Mod Update Prompt (prompts/update-mod.md)
+# 3. If yes: Update your qml/ using the Mod Update Prompt for Git (prompts/update-mod-git.md)
 
 # 4. Commit the change
 git commit -m "Update: D2 v1.2.3 -> v1.2.4 (FX routing fix)"
@@ -271,7 +271,7 @@ unzip ModName-v1.2.4.zip -d ~/my-traktor-setup/mods/ModName-v1.2.4/
 #   mods/ModName-v1.2.3/   ← old (keep during transition for comparison)
 #   mods/ModName-v1.2.4/   ← new
 
-# 2. Use the Mod Update Prompt (prompts/update-mod.md) — reference both directories
+# 2. Use the Mod Update Prompt for Non-Git (prompts/update-mod.md) — reference both directories
 #    so the AI can compute what changed and update /qml/ accordingly
 
 # 3. Commit the change
@@ -298,6 +298,7 @@ To remove a single feature from your combined mod, use [prompts/remove-feature.m
 3. Update METADATA.md to reflect the removal
 
 Commit the result with a message like:
+
 ```
 git commit -m "Remove: vinyl-break from D2 v1.2.3 (no longer needed)"
 ```
@@ -309,6 +310,7 @@ This is the more complex case. When you originally added feature X, it may have 
 **How to know if there's a cascade**: Check the `Conflict resolutions applied` section of your METADATA.md. If feature X appears there (or caused an entry there), removing it has cascading effects.
 
 Example METADATA.md entry to look for:
+
 ```
 ## Conflict Resolutions Applied
 - vinyl-break (D2) vs loop-roll (X1MK3): disabled loop-roll long-press on X1MK3 pad 4

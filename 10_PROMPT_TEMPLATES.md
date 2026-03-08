@@ -8,6 +8,7 @@
 
 | Prompt               | When to use                                                      | File                                                     |
 | -------------------- | ---------------------------------------------------------------- | -------------------------------------------------------- |
+| **Create (New)**     | Design and implement a brand-new feature from scratch            | [prompts/create-feature.md](prompts/create-feature.md)   |
 | **Combine**          | First-time combination of two or more mods                       | [prompts/combine-mods.md](prompts/combine-mods.md)       |
 | **Update (Non-Git)** | A mod from forum/ZIP releases a new version                      | [prompts/update-mod.md](prompts/update-mod.md)           |
 | **Update (Git)**     | A git-tracked mod with tags releases a new version               | [prompts/update-mod-git.md](prompts/update-mod-git.md)   |
@@ -19,6 +20,10 @@
 ---
 
 ## Typical Workflow Order
+
+**Creating a brand-new custom feature**:
+
+1. [create-feature.md](prompts/create-feature.md) — describe your idea, get implementation code + docs
 
 **First-time combination (mods with author feature lists)**:
 

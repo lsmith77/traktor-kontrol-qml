@@ -35,6 +35,23 @@ Paste the prompt into Claude, ChatGPT, Copilot, or any AI chat — no tooling be
 
 ---
 
+## I want to create a custom feature
+
+**Describe what you want in plain English. Get production-ready code + test checklist.**
+
+Example: _"Pressing PLAY while the deck is playing should trigger a 700ms vinyl brake ramp, then stop."_
+
+1. **[Prompt Template: Create Feature](prompts/create-feature.md)** — copy the template into Claude, ChatGPT, or Copilot
+2. **Answer a few questions** about your feature (trigger, behavior, configuration)
+3. **Get complete QML code** + documentation + test checklist
+4. **Deploy and test** in Traktor
+
+See [Chapter 10: Prompt Templates](10_PROMPT_TEMPLATES.md) for details, or jump straight to [prompts/create-feature.md](prompts/create-feature.md).
+
+Use the [create-feature.md](prompts/create-feature.md) prompt: describe what you want in natural language (trigger, behavior, config) and get production-ready code + test checklist.
+
+---
+
 ## I'm a new mod author
 
 You want to create something and share it with the community.

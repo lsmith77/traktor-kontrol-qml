@@ -40,6 +40,14 @@ This handbook is for people who want to **create, understand, or maintain Trakto
 - For common questions, check [05_FAQ.md](05_FAQ.md)
 - If anything breaks after a Traktor update, go to [06_COMPATIBILITY_FIXES.md](06_COMPATIBILITY_FIXES.md)
 
+**For creating a brand-new custom feature**:
+
+- Use the AI prompt template in [10_PROMPT_TEMPLATES.md](10_PROMPT_TEMPLATES.md) → [prompts/create-feature.md](prompts/create-feature.md)
+- Describe what you want in natural language (trigger, behavior, configuration)
+- Get production-ready code + test checklist
+- Reference [02_API_REFERENCE.md](02_API_REFERENCE.md) for control paths and patterns
+- Document your feature following [09_MOD_DOCUMENTATION_GUIDE.md](09_MOD_DOCUMENTATION_GUIDE.md)
+
 **For combining multiple community mods**:
 
 - Read [09_MOD_DOCUMENTATION_GUIDE.md](09_MOD_DOCUMENTATION_GUIDE.md) to understand the **metadata lock file** pattern — your key to safe, incremental updates

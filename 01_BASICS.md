@@ -341,6 +341,8 @@ An AI code assistant accelerates development by providing real-time suggestions,
 
 **Why it matters**: An AI assistant helps you **write code faster and understand patterns** by providing immediate, context-aware suggestions. Use it alongside the linter for comprehensive development support.
 
+**Create custom features in plain English**: Beyond real-time suggestions, you can use AI to design entirely new features. See [prompts/create-feature.md](prompts/create-feature.md) — describe what you want (e.g., _"Pressing PLAY while playing triggers a vinyl brake"_), and get production-ready code + documentation + test checklist. See [Chapter 10: Prompt Templates](10_PROMPT_TEMPLATES.md) for the full workflow.
+
 ---
 
 ## Install / backup / restore (the safe workflow)

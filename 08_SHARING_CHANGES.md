@@ -3,6 +3,10 @@
 **Purpose**: Minimal guide for packaging and sharing QML mods as overlays or patches
 **Use when**: You've made a working mod and want to share it with others—perhaps you prefer how you've organized the interface, fixed a layout bug, or created a theme the community loves
 
+---
+
+🧭 **Navigation** — ← [07_GLOSSARY.md](07_GLOSSARY.md) | **You are here** | → [09_MOD_DOCUMENTATION_GUIDE.md](09_MOD_DOCUMENTATION_GUIDE.md) | 📖 [Backup/Restore: 01_BASICS.md](01_BASICS.md)
+
 > **For mod authors**: If you're creating features you want others to adopt and combine, see [Chapter 09: Mod Documentation Guide](09_MOD_DOCUMENTATION_GUIDE.md) for the documentation-driven approach used by community mods.
 
 This chapter covers the minimal "how to share a mod change with someone else" guide.
@@ -23,7 +27,7 @@ Include all of this information so people know if your mod will work for them:
 
 **All mods must have a `qml/` folder at the root**, regardless of scope:
 
-- **Partial/overlay mod** (recommended — only changed files):
+- **Overlay Mod** (recommended — only changed files):
 
   ```
   MyMod-S4MK3/
@@ -36,7 +40,7 @@ Include all of this information so people know if your mod will work for them:
   └── README.md
   ```
 
-- **Full replacement mod** (complete copy with all directories):
+- **Full Replacement Mod** (complete copy with all directories):
   ```
   MyMod-Complete-S4MK3/
   ├── qml/
@@ -64,9 +68,9 @@ The `install-traktor-mod.sh` script is actively maintained and used in productio
 
 ## Two packaging styles: overlays vs. full replacements
 
-### Overlay mods (recommended for most use cases)
+### Overlay Mods (Recommended for Most Use Cases)
 
-Most mods should be shared as a **customization package** using overlay mode. See the **[X1MK3 Performance Mod](https://github.com/lsmith77/X1MK3_PerformanceMod)** for a reference implementation of a well-documented, feature-complete mod.
+Most mods should be shared as **overlay mods**—packaged with only the files you changed, designed to install on top of existing QML. See the **[X1MK3 Performance Mod](https://github.com/lsmith77/X1MK3_PerformanceMod)** for a reference implementation of a well-documented overlay mod.
 
 **How it works:**
 
@@ -75,18 +79,18 @@ Most mods should be shared as a **customization package** using overlay mode. Se
 - Organize them exactly as they appear in Traktor's folder structure
 - Share those files (in a zip) with install instructions using `install-traktor-mod` (default stack mode)
 
-**Why use overlay mode:** If someone has their own customizations, installing your overlay package means their files stay intact. Only the files you changed get updated. Users can combine multiple overlay mods without losing previous customizations.
+**Why use overlay mods:** If someone has their own customizations, installing your overlay mod means their files stay intact. Only the files you changed get updated. Users can combine multiple overlay mods without losing previous customizations.
 
-**Combine multiple overlays:**
+**Combining Multiple Overlay Mods:**
 
 ```bash
-install-traktor-mod  # Apply mod 1 (stack mode)
+install-traktor-mod  # Apply overlay mod 1 (stack mode)
 # Restart and test
-install-traktor-mod  # Apply mod 2 on top (stack mode)
+install-traktor-mod  # Apply overlay mod 2 on top (stack mode)
 # Both mods are now active together — as long as they don't edit the same files
 ```
 
-**Do not use `--fresh` when combining overlays** — it will reset to stock and erase the first mod. Use stack mode (the default) only.
+**Do not use `--fresh` when combining overlay mods** — it will reset to stock and erase the first mod. Use stack mode (the default) only.
 
 **macOS reminder:** When copying folders in Finder, it will ask "Merge" or "Replace." You want **Merge**—this installs your changes without erasing anything else. See the section on [merging folders](01_BASICS.md#install--backup--restore-the-safe-workflow) in [01_BASICS.md](01_BASICS.md) for a visual walkthrough.
 
@@ -480,3 +484,7 @@ This takes 30 seconds but prevents frustration.
 **For users who don't have the script installed:**
 
 If someone doesn't have `install-traktor-mod` installed yet, direct them to [the setup instructions above](#setup-install-script-to-system-path-one-time-setup).
+
+---
+
+**Next:** [09_MOD_DOCUMENTATION_GUIDE.md](09_MOD_DOCUMENTATION_GUIDE.md)

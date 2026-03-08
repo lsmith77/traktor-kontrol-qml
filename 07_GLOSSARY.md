@@ -2,6 +2,10 @@
 
 **Purpose**: Quick reference definitions for QML, Traktor, and modding terms
 **Use when**: You encounter an unfamiliar term and need a one-line definition
+
+---
+
+🧭 **Navigation** — ← [06_COMPATIBILITY_FIXES.md](06_COMPATIBILITY_FIXES.md) | **You are here** | → [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md) | 📖 [Basics: 01_BASICS.md](01_BASICS.md)
 Short definitions for common terms you’ll see when working with Traktor QML mods.
 
 ## Traktor + modding

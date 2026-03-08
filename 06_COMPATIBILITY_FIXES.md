@@ -3,6 +3,10 @@
 **Purpose**: Version compatibility matrix and specific fixes for known issues across Traktor versions
 **Use when**: Something breaks after a Traktor update, or you're updating to a new Traktor version
 
+---
+
+🧭 **Navigation** — ← [05_FAQ.md](05_FAQ.md) | **You are here** | → [07_GLOSSARY.md](07_GLOSSARY.md) | 📖 [API: 02_API_REFERENCE.md](02_API_REFERENCE.md)
+
 This file covers:
 
 - Compatibility notes and known fixes across Traktor versions

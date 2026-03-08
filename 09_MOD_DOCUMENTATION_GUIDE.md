@@ -4,7 +4,9 @@
 
 **Audience**: Mod authors, advanced developers, and documenters creating features for community sharing.
 
-**Connection**: After learning the basics in Chapters 01-05 and applying community mods from Chapter 03, this chapter shows you how to create documentation that helps others do the same.
+---
+
+🧭 **Navigation** — ← [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md) | **You are here** | → [10_PROMPT_TEMPLATES.md](10_PROMPT_TEMPLATES.md) | 📖 [Sharing: 08_SHARING_CHANGES.md](08_SHARING_CHANGES.md)
 
 ---
 
@@ -438,10 +440,10 @@ Musicians use the prompt template when combining mods:
 
 ### Why These Three Parts Work Together
 
-| Part                               | Who         | What                                        | Why                                                      |
-| ---------------------------------- | ----------- | ------------------------------------------- | -------------------------------------------------------- |
-| **Semantic Versioning + Git Tags** | Mod Authors | Release v1.2.3 with clear version numbers   | Musicians understand versions, `git diff` works          |
-| **Metadata Lock File in QML**      | Musicians   | Comment block documenting combined setup    | No external tool, self-documenting, incremental updates  |
+| Part                                                   | Who         | What                                           | Why                                                                |
+| ------------------------------------------------------ | ----------- | ---------------------------------------------- | ------------------------------------------------------------------ |
+| **Semantic Versioning + Git Tags**                     | Mod Authors | Release v1.2.3 with clear version numbers      | Musicians understand versions, `git diff` works                    |
+| **Metadata Lock File in QML**                          | Musicians   | Comment block documenting combined setup       | No external tool, self-documenting, incremental updates            |
 | **Prompt Templates** ([Ch 10](10_PROMPT_TEMPLATES.md)) | Musicians   | AI prompts to combine, update, and remove mods | Automates gathering info, checking compatibility, tracking updates |
 
 ### Real-World Example
@@ -1485,3 +1487,7 @@ This approach follows community best practices from:
 - **Chapter 10** — Prompt templates index (combine, update, remove, extract, split)
 - **Chapter 03** — Learning from community mods (where to find shared features)
 - **Chapter 02** — API reference for property paths you'll document
+
+---
+
+**Next:** [10_PROMPT_TEMPLATES.md](10_PROMPT_TEMPLATES.md)

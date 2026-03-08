@@ -8,13 +8,21 @@ This repo is a **friendly documentation set** for customizing Native Instruments
 
 ---
 
+🧭 **Navigation**
+
+- 👉 **Start here**: [00_HANDBOOK.md](00_HANDBOOK.md) for complete reading guide
+- 📚 **Learn basics**: [01_BASICS.md](01_BASICS.md)
+- 🔑 **All chapters**: [Full list below](#reference-all-chapters)
+
+---
+
 ## I want to install a community mod
 
 Find working mods, understand what they do, and deploy them safely.
 
 1. **[Chapter 03: Community Resources](03_COMMUNITY_RESOURCES.md)** — curated list of GitHub repos and forum mods for S4 MK3, X1 MK3, and other controllers
 2. **[Chapter 01: Basics](01_BASICS.md)** — `qml` folder structure, Traktor architecture
-3. **[Chapter 08: Sharing Changes](08_SHARING_CHANGES.md)** — `install-traktor-mod` script setup (automates backup, install, restore)
+3. **[Chapter 08: Sharing Changes](08_SHARING_CHANGES.md)** — `install-traktor-mod` script setup (automates backup, overlay install, restore)
 4. **[Chapter 05: FAQ](05_FAQ.md)** — safety, Traktor updates overwriting mods, common questions
 5. **[Chapter 04: Troubleshooting](04_TROUBLESHOOTING.md)** — when something breaks
 

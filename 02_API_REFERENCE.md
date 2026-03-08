@@ -3,6 +3,10 @@
 **Purpose**: Complete API reference, file location map, and reusable code templates for Traktor QML
 **Use when**: Looking up a property path, understanding how to set up a wire, or finding copy-paste patterns
 
+---
+
+🧭 **Navigation** — ← [01_BASICS.md](01_BASICS.md) | **You are here** | → [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) | 📖 [Examples: 03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md)
+
 This is the “API/reference” section of the handbook.
 
 - Basics (syntax + folder layout + install/restore): [01_BASICS.md](01_BASICS.md)
@@ -12,6 +16,8 @@ This is the “API/reference” section of the handbook.
 - How to package & share mods: [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md)
 
 For real-world code examples, see [**Chapter 03: Community Resources**](03_COMMUNITY_RESOURCES.md) for links to working mods and their documentation.
+
+**Path format reference**: Before copy-pasting any paths in this chapter, check [00_HANDBOOK.md#path-format-guide](00_HANDBOOK.md#path-format-guide) to understand what `[Placeholder]` means and how property paths work.
 
 ---
 
@@ -509,7 +515,7 @@ AppProperty {
     path: "app.traktor.decks.1.play"
     onValueChanged: {
         if (value) {
-            console.log("Deck started playing")
+            debugRect.color = "green"  // ← Visual feedback: deck is playing
         }
     }
 }
@@ -1588,4 +1594,4 @@ WiresGroup {
 
 ---
 
-**Next**: Start with [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) to see real-world implementations
+**Next:** [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md)

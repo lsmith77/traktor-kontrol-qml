@@ -3,6 +3,8 @@
 **Purpose**: Beginner-friendly intro to QML syntax, Traktor architecture, and safe install/backup/restore workflow
 **Use when**: Setting up changes for the first time or learning how Traktor's QML folder is organized
 
+🧭 **Navigation** — ← [00_HANDBOOK.md](00_HANDBOOK.md) | **You are here** | → [02_API_REFERENCE.md](02_API_REFERENCE.md) | 📖 [Troubleshooting: 04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md)
+
 ## For MIDI Mappers: Why QML?
 
 If you've created MIDI mappings in Traktor Pro, you already understand how controllers work:
@@ -18,6 +20,58 @@ Think of QML as "MIDI mapping on steroids"—you can do everything the mapping p
 - Access Traktor's entire internal state (not just MIDI CCs)
 
 This guide translates MIDI concepts to QML so you can leverage your existing knowledge.
+
+---
+
+## Musician's Glossary: QML in Plain English
+
+Before diving in, here's a quick translation of the core QML concepts you'll see:
+
+| Jargon                        | What Musicians Call It         | What It Does                                                                                              |
+| ----------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| **AppProperty**               | A connection to Traktor's data | Lets you read or write information like "Deck 1's BPM," "is playing," or "track title"                    |
+| **Wire**                      | A "when X, do Y" instruction   | Connects an event (button press) to an action (load track, toggle sync, etc.)                             |
+| **Binding**                   | A "keep these in sync" rule    | Automatically copies a value from one place to another; if the source changes, the copy updates instantly |
+| **Value Converter / Adapter** | A translator                   | Transforms one type of signal into another (e.g., encoder rotation into volume change)                    |
+| **Control Value Path**        | An address for Traktor's data  | A name/reference like `app.traktor.decks.1.tempo` meaning "Deck 1's BPM"                                  |
+| **MappingProperty**           | A controller-specific setting  | Information about your controller setup, like "Shift button is pressed" or "Browse mode is active"        |
+
+**See also**: [Chapter 07: Glossary](07_GLOSSARY.md) for detailed definitions.
+
+---
+
+## What Can I Change? (Concrete Example)
+
+Let's start with something concrete: **Make a button do something different**.
+
+### Example: Change SYNC to NOSYNC
+
+Imagine you want to change what the SYNC button does. Here's the real-world workflow:
+
+**What you're doing:**
+
+1. Find the QML file that controls the SYNC button (it's in `CSI/[ControllerName]/`)
+2. Locate the instruction that says "when SYNC is pressed, do this"
+3. Change "do this" to something else
+
+**Real code looks like:**
+
+```qml
+Wire {
+    from: "%surface%.sync"           // ← When SYNC button is pressed
+    to: someAction                  // ← Do this action
+}
+```
+
+To change what SYNC does, you'd replace `someAction` with a different action (or a `ButtonScriptAdapter` with custom code).
+
+**Why this matters:**
+
+- You're not learning QML in the abstract—you're editing real instructions that control your hardware.
+- Every button, encoder, and screen element follows this same pattern: "when this happens, do that."
+- Once you understand one button, you can understand all of them.
+
+**Next step:** After you understand the architecture below, come back to [Chapter 02: API Reference](02_API_REFERENCE.md#file-locations-quick-map) to find the exact files and property paths for your controller.
 
 ---
 

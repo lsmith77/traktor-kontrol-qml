@@ -4,6 +4,10 @@
 
 **Use this chapter when**: You want to combine multiple mods from different authors into a single unified QML setup.
 
+---
+
+🧭 **Navigation** — ← [10_PROMPT_TEMPLATES.md](10_PROMPT_TEMPLATES.md) | **You are here** | 📖 [Back to: 00_HANDBOOK.md](00_HANDBOOK.md) | 📖 [Sharing: 08_SHARING_CHANGES.md](08_SHARING_CHANGES.md)
+
 **Quick Navigation**:
 
 - [Phase 1: Preparation (Read Only)](#phase-1-preparation-read-only--no-tools-needed)
@@ -153,23 +157,24 @@ git commit -m "Initial: Combined mods (D2 v1.2.3 + X1MK3 v0.12.0 + forum snippet
 
 ### Phase 4: Deploy to Traktor
 
-**10. Backup your existing Traktor QML** (safety first):
+Use the `install-traktor-mod` script to handle backup, installation, and testing safely. See [Chapter 01: Install / Backup / Restore](01_BASICS.md#install--backup--restore-the-safe-workflow) for complete documentation.
 
-- **macOS**: `cp -r ~/Library/Application\ Support/Native\ Instruments/Traktor\ Pro\ 4.4.1/qml ~/Library/Application\ Support/Native\ Instruments/Traktor\ Pro\ 4.4.1/qml.backup`
-- **Windows**: `xcopy "%APPDATA%\Native Instruments\Traktor Pro 4.4.1\qml" "%APPDATA%\Native Instruments\Traktor Pro 4.4.1\qml.backup" /E /I`
+**Quick steps:**
 
-**11. Copy your custom QML to Traktor**:
+**10. Install your custom QML:**
 
-- **macOS**: `cp -r ~/my-traktor-setup/qml/* ~/Library/Application\ Support/Native\ Instruments/Traktor\ Pro\ 4.4.1/qml/`
-- **Windows**: `xcopy "C:\Users\[YourUsername]\my-traktor-setup\qml\*" "%APPDATA%\Native Instruments\Traktor Pro 4.4.1\qml\" /E /Y`
+```bash
+cd ~/my-traktor-setup
+install-traktor-mod              # Merges your qml/ into Traktor's qml/
+```
 
-**12. Test in Traktor Pro**:
+**11. Test in Traktor Pro**:
 
 - Load Traktor
 - Verify controller loads without errors
 - Run the testing checklist from METADATA.md
 
-**13. Commit your deployment**:
+**12. Commit your deployment**:
 
 ```bash
 cd ~/my-traktor-setup
@@ -369,4 +374,113 @@ After deployment, check (in two places):
 
 ---
 
-**Questions?** See [Chapter 09](09_MOD_DOCUMENTATION_GUIDE.md) (Mod Documentation Guide)
+## Conflict Detection Strategy
+
+When combining multiple mods, conflicts occur when:
+
+- **Two mods modify the same file** (exact same QML file like `X1MK3.qml`)
+- **Two mods modify overlapping sections** within a file (same lines or functionally related code)
+- **Two mods define the same component or property** (duplicate IDs, property names)
+
+### Pre-Merge Detection (Before AI Combines)
+
+Before using the [combine-mods.md](prompts/combine-mods.md) prompt, check for conflicts manually:
+
+**Step 1: List all files each mod changes**
+
+For each mod, run:
+
+```bash
+find ModName/qml -type f -name "*.qml" | sort
+```
+
+Compare the file lists. If two mods change the exact same files, a conflict is likely.
+
+**Step 2: Check feature overlap**
+
+Review each mod's feature documentation (see [Chapter 09](09_MOD_DOCUMENTATION_GUIDE.md)):
+
+- Do both mods claim to customize the same button, pad, or screen?
+- Do both mods initialize the same Timer or Handler?
+- Do both mods modify the same Binding or Wire path?
+
+If yes → conflict probable.
+
+**Step 3: Verify with AI**
+
+Before running the full combine prompt, ask the AI:
+
+```
+I want to combine these two mods:
+1. [Mod A]: [list files it changes]
+2. [Mod B]: [list files it changes]
+
+Do these conflict? Which files overlap?
+```
+
+The AI will identify conflicts before merging.
+
+### Resolving Conflicts (In AI or Manually)
+
+Once conflicts are identified:
+
+**Option A: AI Resolution** (fastest)
+
+Provide the AI with both conflicting contributions:
+
+```
+Both mods modify X1MK3.qml.
+
+Mod A changes: [paste relevant section]
+Mod B changes: [paste relevant section]
+
+Merge these changes into one coherent file. If they conflict, choose the one that makes more sense or combine them if possible.
+```
+
+The AI will merge intelligently based on context.
+
+**Option B: Manual Resolution**
+
+If AI output is unclear:
+
+1. Pick one mod's file as the **base**
+2. Manually add the other mod's changes (copy/paste, then adapt)
+3. Test thoroughly using the [3-Pass Testing Approach](04_TROUBLESHOOTING.md#3-pass-testing-approach-normal--edge--reversal)
+4. If your manual merge breaks something, revert and try Option A instead
+
+### Post-Merge Verification
+
+After combining:
+
+1. **Verify syntax**: Use a QML validator or paste your merged file into a QML editor for syntax checking
+2. **Check for duplicate IDs**: Search for `id:` to ensure no component is defined twice
+3. **Review imports**: Ensure all `import` statements are present (most common cause of silent failures)
+4. **Test with 3-Pass Approach**: [04_TROUBLESHOOTING.md#3-pass-testing-approach-normal--edge--reversal](04_TROUBLESHOOTING.md#3-pass-testing-approach-normal--edge--reversal)
+
+### Preventing Conflicts (For Mod Authors)
+
+If you're publishing mods for others to combine:
+
+1. **Document your feature scope clearly** (see [Chapter 09](09_MOD_DOCUMENTATION_GUIDE.md#feature-documentation-template))
+2. **Use unique component IDs** (prefix with your mod name: `MyModButton1`, not just `Button1`)
+3. **Add comments** marking the start/end of your customizations:
+   ```qml
+   // === MyMod START: SYNC button glow ===
+   Rectangle { /* ... */ }
+   // === MyMod END ===
+   ```
+4. **Avoid global changes** (only modify the specific files your feature needs)
+
+This makes it easy for others to identify and resolve conflicts.
+
+---
+
+**Questions?** See:
+
+- [Chapter 04: Troubleshooting](04_TROUBLESHOOTING.md) — Testing & validation
+- [Chapter 09: Mod Documentation Guide](09_MOD_DOCUMENTATION_GUIDE.md) — Feature documentation spec
+- [Chapter 10: Prompt Templates](10_PROMPT_TEMPLATES.md) — AI prompts for combining
+
+---
+
+**Next:** See [00_HANDBOOK.md](00_HANDBOOK.md) for the full handbook index

@@ -3,6 +3,10 @@
 **Purpose**: Directory of real-world QML mods and community discussions
 **Use when**: Looking for working implementations or joining community discussions
 
+---
+
+🧭 **Navigation** — ← [02_API_REFERENCE.md](02_API_REFERENCE.md) | **You are here** | → [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md) | 📖 [API: 02_API_REFERENCE.md](02_API_REFERENCE.md)
+
 > **Note**: This is an index. For detailed feature documentation and learning paths, visit the GitHub repositories directly.
 
 ---
@@ -119,3 +123,7 @@ Premium Traktor QML mods and customization available through subscription servic
 
 - **Native Instruments QML Community**: https://community.native-instruments.com/search?q=tag:qml
 - **Qt QML Documentation**: https://doc.qt.io/qt-5/qmlreference.html
+
+---
+
+**Next:** [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md)

@@ -4,6 +4,12 @@
 **Use when**: A change doesn't work, Traktor won't start, or you need to isolate a problem
 Use this file when something breaks or you’re not sure why a change didn’t work.
 
+---
+
+🧭 **Navigation** — ← [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) | **You are here** | → [05_FAQ.md](05_FAQ.md) | 📖 [Basics: 01_BASICS.md](01_BASICS.md)
+
+**Quick Links:**
+
 - Safety / backup / restore: [01_BASICS.md](01_BASICS.md)
 - Where to edit + Traktor-QML building blocks: [02_API_REFERENCE.md](02_API_REFERENCE.md)
 - Version-specific fixes: [06_COMPATIBILITY_FIXES.md](06_COMPATIBILITY_FIXES.md)
@@ -19,9 +25,30 @@ Use this file when something breaks or you’re not sure why a change didn’t w
 
 ---
 
-## Debugging Workflow
+## Debugging Workflow (Flowchart)
 
-Use this workflow to isolate problems quickly.
+Use this flowchart to isolate problems quickly. For detailed steps, see **Debugging Steps** section below.
+
+```
+┌─────────────────────────────────────────────────────┐
+│  "It doesn't work" — START HERE                     │
+└─────────────────────────────────────────────────────┘
+                        ↓
+          File saved? → Traktor quit? → Restarted?
+                  │
+                NO│
+                  ↓
+          ┌──────────────────────────────────────┐
+          │  Linter showing errors?              │
+          │  (Check Problems panel in VS Code)  │
+          └──────────────────────────────────────┘
+```
+
+**See Debugging Steps section below for detailed instructions.**
+
+---
+
+## Debugging Steps (Detailed)
 
 ### 1) Reduce variables
 
@@ -55,32 +82,30 @@ The most common failures are basic:
 
 Tip: confirm control value paths using the catalog embedded in [02_API_REFERENCE.md](02_API_REFERENCE.md#full-appproperty-path-catalog), and compare against working examples in the [X1MK3 Performance Mod](https://github.com/lsmith77/X1MK3_PerformanceMod) (see [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) for feature-by-feature breakdown).
 
-### 4b) Add debug logging to see what's happening
+### 4b) Use visual debugging to see real-time state
 
-If you need to understand what's going on in your code, add debug logging:
+Add temporary visible indicators to your QML to see what's happening **in real-time** as you test:
 
 ```qml
-Wire {
-    from: "%surface%.button"
-    to: ButtonScriptAdapter {
-        onPress: { console.log("Button pressed! deckId is " + deckId) }
+Rectangle {
+    width: 100
+    height: 20
+    color: myButtonPressed ? "green" : "red"  // ← Shows state on screen
+    Text {
+        text: "Button: " + (myButtonPressed ? "ON" : "OFF")
     }
 }
 ```
 
-After restarting Traktor, open the **Traktor log file** to see the output:
+This gives you **immediate visual feedback** without needing to restart or check log files. When you see the color/text change in real-time, you know your code is executing. When it doesn't change, the wire or condition is the problem.
 
-- **macOS**: `~/Library/Logs/Native Instruments/Traktor.log`
-- **Windows**: `C:\Users\[YourUsername]\AppData\Local\Native Instruments\Traktor\logs\Traktor.log`
-
-Look for your `console.log()` messages to understand what your code is doing.
+**Pro tip**: Add debug rectangles to prove each step of the logic works, then remove them before final testing.
 
 ### 5) When in doubt, restore and re-apply
 
-If Traktor becomes unstable:
+If Traktor becomes unstable, see [Chapter 01: Install / Backup / Restore](01_BASICS.md#install--backup--restore-the-safe-workflow) for detailed steps.
 
-- restore factory defaults: `install-traktor-mod restore` (see [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md#testing-your-overlay-mod))
-- re-apply changes one at a time
+Quick version: Run `install-traktor-mod restore` to reset to stock QML, then re-apply changes one at a time.
 
 ### Quick path when following a community example
 
@@ -90,7 +115,7 @@ If you're working from an example in [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RE
 2. Confirm you edited the correct controller and layer (CSI vs Screens vs Defines).
 3. Check for typos in `AppProperty` paths and `Wire from:` strings.
 4. Use the checklist below.
-5. If Traktor becomes unstable, restore using `install-traktor-mod restore` (see [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md#testing-your-overlay-mod)).
+5. If stuck, follow the systematic approach in [Chapter 01: Install / Backup / Restore](01_BASICS.md#install--backup--restore-the-safe-workflow).
 
 ---
 
@@ -128,7 +153,7 @@ The single best way to avoid debugging is to catch errors before they reach Trak
 **Pro tip**: If your editor shows "0 Problems" but Traktor fails silently, then:
 
 1. Check for Traktor version-specific API changes (see [06_COMPATIBILITY_FIXES.md](06_COMPATIBILITY_FIXES.md))
-2. Search the file for `console.log()` debug statements (see [Debugging Workflow](#debugging-workflow) → step 4b)
+2. Use visual debugging (add temporary colored rectangles—see Debugging Steps step 4b)
 3. Use a clean backup and test with the smallest possible change
 
 ---
@@ -198,16 +223,17 @@ Traktor's QML engine does not always provide visible error messages when a QML f
 1. **Wire 'from' path correct?** Verify `%surface%.button.name` matches your controller
 2. **enabled: condition true?** Check shift state, browse mode, etc.
 3. **Property path exists?** Try similar button/encoder to verify path
-4. **Add debug logging:**
+4. **Use visual debugging** to trace the logic:
 
 ```qml
-Wire {
-    from: "%surface%.button"
-    to: ButtonScriptAdapter {
-        onPress: { console.log("Button pressed!") }
-    }
+Rectangle {
+    width: 50
+    height: 50
+    color: wireCondition ? "green" : "red"  // ← Is wire enabled?
 }
 ```
+
+When you press the button: does the rectangle change color? If yes, the wire works. If no, the condition is the problem.
 
 ---
 
@@ -216,7 +242,7 @@ Wire {
 **Check these:**
 
 1. **AppProperty path correct?** `app.traktor.decks.1` NOT `app.traktor.deck.1` (plural!)
-2. **Binding working?** Add `console.log()` in `onValueChanged`
+2. **Binding working?** Add a visual debug rectangle that shows the binding's value (see Technique 1 in Debugging Techniques)
 3. **Conditional logic reversed?** Check `value === 1` vs `value !== 1`
 4. **Color/font defined?** Verify imports and color names
 
@@ -277,16 +303,23 @@ Example properties that are useful when debugging stem/remix encoder conflicts (
 
 Tip: if `enabled: active && !slotState.value` is too broad, try a more specific blocker like `enabled: active && !deck.focusedSlotstate`.
 
-### Debug Logging
+### Visual Debugging During Development
+
+Add temporary visual indicators while developing to see state changes instantly:
 
 ```qml
-// Add temporary logging
-onValueChanged: {
-    console.log("[DEBUG]", id, "changed to:", value)
+// Add debug rectangle to test a condition
+Rectangle {
+    width: 50
+    height: 50
+    color: (myProperty && myProperty.value > 10) ? "blue" : "gray"
+    Text { text: "Val: " + (myProperty ? myProperty.value : "null") }
 }
 
-// Remove before production - impacts performance
+// Remove this after testing passes
 ```
+
+This is instant feedback—no restart or log file hunting needed.
 
 ### Understanding error messages
 
@@ -327,8 +360,16 @@ Timer {
     repeat: false
     running: false  // ← Should be false, start manually
     onTriggered: {
-        console.log("Timer fired!")  // ← Debug output
+        debugRect.color = "lime"  // ← Visual confirmation timer fired
     }
+}
+
+// Add debug rectangle to the screen
+Rectangle {
+    id: debugRect
+    width: 50
+    height: 50
+    color: "gray"
 }
 
 // Start the timer
@@ -411,44 +452,42 @@ Wire {
 
 ## Debugging Techniques
 
-### Technique 1: Add Console Logging
+### Technique 1: Use Visual Debugging (Real-Time Feedback)
+
+Add visible indicators to see state changes instantly **without restarting**:
 
 ```qml
-// Add to any function or signal handler
-onPress: {
-    console.log("Button pressed!")
-    console.log("Shift state:", shift)
-    console.log("Property value:", myProperty.value)
+// Add temporary debug elements
+Rectangle {
+    width: 100
+    height: 20
+    color: myCondition ? "green" : "red"  // ← See state change in real-time
+    Text {
+        text: "State: " + myProperty.value.toString()  // ← See actual values
+    }
 }
 ```
 
+Remove these debug rectangles before final testing.
+
 ### Technique 2: Simplify to Isolate Problem
 
+Replace complex logic with a simple test:
+
 ```qml
-// Replace complex logic with simple test
 onPress: {
     // Complex original code...
 
     // Simplified test:
-    console.log("Button works!")
+    debugRectangle.color = "blue"  // ← Visual confirmation this runs
 }
 ```
 
-If the simple version works, add back complexity step by step.
+If the simple version triggers visually, add back complexity step by step.
 
-### Technique 3: Use Visual Debugging
+### Technique 3: Verify Against Working Code
 
-```qml
-// Add visible indicators
-Rectangle {
-    width: 100
-    height: 20
-    color: myCondition ? "green" : "red"  // Visual state indicator
-    Text {
-        text: myProperty.value.toString()  // Show actual values
-    }
-}
-```
+Compare your wire/binding against a similar working element (in the stock QML or a community mod). Match the pattern exactly—if they look different, that's your bug.
 
 ---
 
@@ -468,36 +507,36 @@ Rectangle {
 
 ---
 
-## Testing Checklist
+## Testing Framework: 3-Pass Approach + Checklist
 
-After making customizations:
+Follow this structured testing method after making changes. This catches 95% of issues efficiently.
 
-**Visual Tests**:
+### The 3 Passes
 
-- [ ] Deck header displays correctly
-- [ ] Waveforms render properly
-- [ ] Browser displays all columns
-- [ ] Overlays appear and disappear correctly
-- [ ] Colors/fonts applied as expected
-- [ ] No visual glitches or overlapping elements
+1. **Normal Path** – Does the feature work as designed?
+   - Single button press / single encoder movement
+   - Expected behavior occurs
+   - No side effects
+2. **Edge Cases** – What about boundary conditions?
+   - Rapid clicks (debounce issues?)
+   - Hold-down too long (timing issues?)
+   - Shift+feature combinations (conflicts?)
+3. **Reversal Test** – Can you reliably undo?
+   - Disable a toggle, then re-enable?
+   - Load track, then unload?
+   - Verify state resets to before your change
 
-**Functional Tests**:
+**Common issues this catches:** Debounce failures, race conditions, state corruption, shift layer conflicts, timing bugs.
 
-- [ ] All buttons respond
-- [ ] Encoders work correctly
-- [ ] Shift combinations work
-- [ ] Tempo adjustment works
-- [ ] Browser navigation works
-- [ ] Overlays timeout correctly
-- [ ] No unexpected behavior
+### Quick Checklist (After Each Pass)
 
-**Controller Tests**:
+Use these as validation for each pass above:
 
-- [ ] Physical buttons match expected functions
-- [ ] LEDs light up appropriately
-- [ ] Touchstrip/faders work
-- [ ] Pads respond correctly
-- [ ] Screen displays update in real-time
+**Visual**: Display shows correct data, no glitches, overlays appear/disappear  
+**Functional**: Buttons respond, encoders work, shift combinations work, no unexpected behavior  
+**Physical**: LEDs light up, screens update in real-time, visual state matches actual state
+
+**Pro tip:** Document which pass a bug was caught in—it tells you where to look (input handling, timing, or state management).
 
 ---
 

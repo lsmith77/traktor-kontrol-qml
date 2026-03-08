@@ -5,6 +5,10 @@
 
 ---
 
+🧭 **Navigation** — ← [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md) | **You are here** | → [06_COMPATIBILITY_FIXES.md](06_COMPATIBILITY_FIXES.md) | 📖 [Troubleshooting: 04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md)
+
+---
+
 ## General Safety & Capabilities
 
 ### Can I break my controller?
@@ -15,7 +19,7 @@ You generally can't damage the hardware by editing controller files. The typical
 - A controller screen displays incorrectly
 - Traktor becomes unstable until you restore a backup
 
-That's why backup/restore is the core safety net. **Use the `install-traktor-mod` script to restore in one command** — see [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md#testing-your-overlay-mod) for setup and usage.
+That's why backup/restore is the core safety net. **Use the `install-traktor-mod` script to restore in one command** — see [Chapter 01: Install / Backup / Restore](01_BASICS.md#install--backup--restore-the-safe-workflow) for setup and all available modes.
 
 ### Do I need programming experience?
 
@@ -30,19 +34,24 @@ Start with beginner edits and the working examples in the **[X1MK3 Performance M
 
 ## Mods & Installation
 
-### What's the difference between a "mod" and an "overlay"?
+### What's the difference between a "mod" and an "overlay mod"?
 
-- **Mod**: A customization or collection of changes to your controller setup.
-- **Customization Package** (overlay): A mod packaged as _only the files it changes_, designed to be installed on top of your standard controller files without replacing everything. This approach is safer because it doesn't accidentally remove files the customization didn't intend to touch.
+These terms describe the **same thing** viewed from different angles:
 
-Most community customizations are shared as add-on packages. See [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md) for details on how to package and install them.
+- **Mod**: Any QML customization you make—it could be a single file change or many files combined.
+- **Overlay Mod**: How a mod is _packaged_ for sharing—as only the files it changes, designed to install on top of your existing QML without replacing anything else. This approach is safer because you only get the changes the author made, nothing extra.
+- **Overlay Install**: The process of merging an overlay mod into your current QML using the `install-traktor-mod` script (default `stack mode`).
+
+Example: If you make changes to 3 files and package them as an overlay mod, another user can install them (via overlay install) on top of their own setup, and all their other files stay intact.
+
+Most community mods are shared as overlay mods. See [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md) for details on packaging and installation.
 
 ### Can I use community mods from the forums, or only what's in this repo?
 
 You can use community mods from anywhere—this repo is just documentation. However:
 
 - Community customizations may stop working after Traktor updates.
-- **Always back up before installing any mod** (see [01_BASICS.md](01_BASICS.md#install--backup--restore-the-safe-workflow)).
+- **Always back up before installing any mod** (see [Chapter 01: Install / Backup / Restore](01_BASICS.md#install--backup--restore-the-safe-workflow)).
 - If a mod doesn't work, use the troubleshooting guide in [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md) to debug it.
 - This documentation will help you understand how mods work so you can adapt or fix them yourself.
 
@@ -62,7 +71,7 @@ Traktor updates reset your custom changes to factory defaults. But Native Access
 
 ### Can I undo changes?
 
-Yes: **use `install-traktor-mod restore`** to reset to stock QML in one command (see [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md#testing-your-overlay-mod)). Or manually restore your `qml` backup and restart Traktor.
+Yes: **use `install-traktor-mod restore`** to reset to stock QML in one command. See [Chapter 01: Install / Backup / Restore](01_BASICS.md#install--backup--restore-the-safe-workflow) for detailed instructions.
 
 ---
 

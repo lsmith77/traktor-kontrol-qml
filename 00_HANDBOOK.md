@@ -1,11 +1,75 @@
 # Traktor QML Modder’s Handbook
 
-**Handbook Version**: v0.7.0
-**Purpose**: Index and reading guide for the handbook docs
+**Handbook Version**: v0.7.0  
+**Purpose**: Index and reading guide for the handbook docs  
 **Use when**: Starting your QML modding journey or navigating between docs
-This handbook is for people who want to **create, understand, or maintain Traktor QML mods** in a structured way.
 
-> **New & Easy**: Want to combine mods without coding? Check out the **Mod Combination System** section below. It’s designed for musicians, not programmers.
+---
+
+🧭 **Navigation** — Start here, then go → [01_BASICS.md](01_BASICS.md)
+
+> **New & Easy**: Want to combine mods without coding? Check out the **Mod Combination System** section below. It's designed for musicians, not programmers.
+
+---
+
+## Key Concepts (Quick Definition)
+
+These three terms will appear throughout the handbook. Here's what they mean:
+
+- **Mod**: Any customization you make to your Traktor QML—could be a single file change or many files combined.
+- **Overlay Mod**: How a mod is packaged for sharing—as only the files it changes, designed to layer on top of your existing setup safely.
+- **Overlay Install**: The process of merging an overlay mod into your current QML using the `install-traktor-mod` script.
+
+Example: You make changes to 3 files and package them as an overlay mod. Another user can overlay-install them on top of their own setup, and all their other files stay intact.
+
+**See also**: [Chapter 05 FAQ](05_FAQ.md#whats-the-difference-between-a-mod-and-an-overlay-mod) for more detail.
+
+---
+
+## Path Format Guide (Copy-Paste Safe Reference)
+
+Throughout this handbook, you'll see paths to files and Traktor properties. Here's what each format means:
+
+### File System Paths (Folder & File Locations)
+
+Always use `/` (forward slash), never `\` (backslash):
+
+| Format                            | Meaning                                                   | Example                                |
+| --------------------------------- | --------------------------------------------------------- | -------------------------------------- |
+| `qml/`                            | Absolute folder path (from Traktor install root)          | `~/Traktor 4.4.1/Resources/qml/`       |
+| `CSI/[ControllerName]/D2.qml`     | **`[Placeholder]` = replace with your controller**        | `CSI/X1MK3/D2.qml` (not `X1MK3` alone) |
+| `Screens/[ControllerName]/...`    | Folder path with placeholder                              | `Screens/S4MK3/`                       |
+| `~/MyMod/qml/CSI/X1MK3/D2.qml`    | Home directory shortcut (macOS/Linux) = your user folder  | `/Users/yourname/MyMod/qml/...`        |
+| `C:\Users\YourName\MyMod\qml\...` | Windows (still use `/` in code, but `\` in file explorer) | Windows file browser shows `\`         |
+
+**Key Rule**: In documentation and terminal commands, **always write paths with `/`**, never `\`. If you copy a Windows path, convert `\` → `/`.
+
+### Traktor Control / Property Paths (What You Wire To)
+
+These are **data paths** in Traktor (not file paths). Format: dots separate levels.
+
+| Format                                 | Meaning                                       | Example                          |
+| -------------------------------------- | --------------------------------------------- | -------------------------------- |
+| `app.traktor.decks.DECK_ID.PROPERTY`   | **`DECK_ID`** = 1, 2, 3, or 4 (not a literal) | `app.traktor.decks.1.play`       |
+| `app.traktor.browser.BROWSER_ID.state` | **`BROWSER_ID`** = 0 or 1                     | `app.traktor.browser.0.state`    |
+| `app.traktor.settings.SETTING_NAME`    | Global setting path                           | `app.traktor.settings.bpm`       |
+| `mapping.state.SETTING_NAME`           | User-defined mapping state (persistent)       | `mapping.state.my_custom_toggle` |
+| `app.traktor.mix.crossfader`           | Special properties (well-known)               | Direct access (no placeholder)   |
+
+**Key Rule**: Uppercase placeholders like `DECK_ID` = **replace with a number**. Lowercase like `setting_name` = **replace with your chosen name**.
+
+### Variable Naming Conventions
+
+When you create new properties or IDs, follow these:
+
+| Context           | Convention            | Example                                  |
+| ----------------- | --------------------- | ---------------------------------------- |
+| Component `id:`   | camelCase (no dashes) | `id: syncButton` not `sync-button`       |
+| Property names    | camelCase             | `property bool isPlaying`                |
+| AppProperty paths | snake_case + numbers  | `app.traktor.decks.1.play` (established) |
+| File names        | PascalCase or snake   | `D2.qml` or `my_custom_screen.qml`       |
+
+---
 
 ## How this handbook is organized
 

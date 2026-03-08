@@ -4,6 +4,10 @@
 
 ---
 
+🧭 **Navigation** — ← [09_MOD_DOCUMENTATION_GUIDE.md](09_MOD_DOCUMENTATION_GUIDE.md) | **You are here** | → [11_COMBINING_MODS_WORKFLOW.md](11_COMBINING_MODS_WORKFLOW.md) | 📖 [Documentation: 09_MOD_DOCUMENTATION_GUIDE.md](09_MOD_DOCUMENTATION_GUIDE.md)
+
+---
+
 ## Prompt Index
 
 | Prompt               | When to use                                                      | File                                                     |
@@ -83,7 +87,53 @@ If using code snippets from NI forum discussions (e.g., the [MX2 QML Mods thread
 
 ---
 
+## AI Prompts FAQ
+
+### Can I use these prompts with other AI tools (ChatGPT, etc.)?
+
+Yes. Each prompt is designed to work with Claude, ChatGPT, Copilot, or any text-based AI. Simply copy the prompt text into your AI tool's chat window.
+
+**Note**: Results may vary by AI model and version.
+
+### What if the AI output doesn't work?
+
+1. **Copy the full error message** from Traktor's startup output (or use the [Debugging Workflow](04_TROUBLESHOOTING.md#debugging-workflow) to capture it)
+2. **Include the error in a follow-up**: "This code doesn't work: [paste your code]. Error: [paste error]. Fix it."
+3. **Reference working examples**: "Compare against this working example: [paste code from 03_COMMUNITY_RESOURCES.md]"
+
+### Should I use the prompts for combining mods?
+
+**Yes**, but follow the workflow order in [Typical Workflow Order](#typical-workflow-order):
+
+- If mods have **feature documentation** → use [combine-mods.md](prompts/combine-mods.md) directly
+- If mods **lack documentation** → use [list-features.md](prompts/list-features.md) first, then combine
+- For **large monolithic mods** → use [split-mod.md](prompts/split-mod.md) before combining
+
+This prevents conflicts and ensures clear tracking of what came from which mod.
+
+### Can these prompts generate documentation for my mod?
+
+Yes. Use the combination of:
+
+1. [list-features.md](prompts/list-features.md) — to generate a feature list from your code
+2. [Chapter 09: Mod Documentation Guide](09_MOD_DOCUMENTATION_GUIDE.md) — to structure that feature list into proper documentation
+
+Then publish your mod with clear feature documentation so others can combine it safely.
+
+### What's the difference between "Update (Non-Git)" and "Update (Git)" prompts?
+
+- **Non-Git**: For mods distributed as ZIP files or forum uploads. Uses manual version tracking via comments.
+- **Git**: For mods with git tags and releases. Automatically extracts version info from git history.
+
+If unsure, use "Non-Git" (it's more general).
+
+---
+
 ## Related Chapters
 
 - [Chapter 09: Mod Documentation Guide](09_MOD_DOCUMENTATION_GUIDE.md) — versioning, metadata lock files, how to find version info
 - [Chapter 11: Combining Mods — Complete Workflow](11_COMBINING_MODS_WORKFLOW.md) — full step-by-step workflow (preparation, AI generation, save, deploy)
+
+---
+
+**Next:** [11_COMBINING_MODS_WORKFLOW.md](11_COMBINING_MODS_WORKFLOW.md)

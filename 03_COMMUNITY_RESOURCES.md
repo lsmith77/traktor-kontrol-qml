@@ -109,6 +109,34 @@ Community-contributed QML modifications with code snippets and implementation gu
 
 ---
 
+## Success Stories: Combining Mods in Practice
+
+### Traktor QML Multi-Mod Combination (Real-World Example)
+
+**What**: A single repository that combines features from 3 separate performance mods into one coherent setup, with versioning and update tracking.
+
+**Why it matters**: Shows how the [combining workflow](11_COMBINING_MODS_WORKFLOW.md) (with AI prompts and metadata lock files) works in practice—combining multiple community mods, then maintaining them through updates.
+
+**The workflow used**:
+
+1. Started with 3 community mods as sources
+2. Used [Chapter 10 prompt templates](10_PROMPT_TEMPLATES.md) (specifically `combine-mods.md`) with Claude to merge them intelligently
+3. Documented which versions of each mod were combined using metadata lock files
+4. Later, when one of the source mods released an update, used the `update-mod.md` prompt to safely integrate the changes without losing custom tweaks
+
+**Result**: A stable, documented, updateable combination that tracks exactly what came from where.
+
+- **GitHub**: https://github.com/lsmith77/traktor-qml
+- **Key insight**: Shows metadata lock files and version tracking in action—see `METADATA.md` in the repo for how version history is documented
+
+**For trying this yourself**:
+
+- Read [Chapter 11: Combining Mods — Complete Workflow](11_COMBINING_MODS_WORKFLOW.md) for the full process
+- Use the [combine-mods.md](prompts/combine-mods.md) prompt template when you're ready to combine your own
+- Document your versions like this repo does—makes future updates much safer
+
+---
+
 ## Premium/Subscription Resources
 
 Premium Traktor QML mods and customization available through subscription services:

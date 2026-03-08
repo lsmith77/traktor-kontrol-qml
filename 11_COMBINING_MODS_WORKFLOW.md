@@ -17,6 +17,21 @@
 
 ---
 
+## Before You Start: Real-World Example
+
+**Want to see this workflow in action?** Check out the [Traktor QML success story](03_COMMUNITY_RESOURCES.md#traktor-qml-multi-mod-combination-real-world-example):
+
+- Started with 3 separate community mods
+- Combined them using this exact workflow + the `combine-mods.md` prompt template with Claude
+- Documented versions using metadata lock files
+- Later updated when one of the source mods released a new version
+
+**The result**: A stable, maintained combination that tracks exactly what came from where. See the repository at https://github.com/lsmith77/traktor-qml.
+
+This proves the workflow works. You can do the same thing.
+
+---
+
 ## Complete Workflow
 
 ### Phase 1: Preparation (Read Only — No Tools Needed)

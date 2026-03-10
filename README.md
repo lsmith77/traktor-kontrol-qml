@@ -38,6 +38,7 @@ Combining mods by hand is error-prone: the same file appears in both, conflict r
 2. **[Chapter 11: Combining Mods — Complete Workflow](11_COMBINING_MODS_WORKFLOW.md)** — step-by-step guide (preparation → AI generation → save → deploy)
 3. **[Chapter 08: Sharing Changes](08_SHARING_CHANGES.md)** — understand mod structure before combining
 4. **[Chapter 09: Mod Documentation Guide](09_MOD_DOCUMENTATION_GUIDE.md)** — how to read feature documentation in well-documented mods
+5. **[traktor-logger](traktor-logger/README.md)** — verify combined mods load and interact correctly
 
 Paste the prompt into Claude, ChatGPT, Copilot, or any AI chat — no tooling beyond a text editor and git.
 
@@ -52,11 +53,9 @@ Example: _"Pressing PLAY while the deck is playing should trigger a 700ms vinyl 
 1. **[Prompt Template: Create Feature](prompts/create-feature.md)** — copy the template into Claude, ChatGPT, or Copilot
 2. **Answer a few questions** about your feature (trigger, behavior, configuration)
 3. **Get complete QML code** + documentation + test checklist
-4. **Deploy and test** in Traktor
+4. **Deploy and test** in Traktor — use **[traktor-logger](traktor-logger/README.md)** for real-time monitoring
 
 See [Chapter 10: Prompt Templates](10_PROMPT_TEMPLATES.md) for details, or jump straight to [prompts/create-feature.md](prompts/create-feature.md).
-
-Use the [create-feature.md](prompts/create-feature.md) prompt: describe what you want in natural language (trigger, behavior, config) and get production-ready code + test checklist.
 
 ---
 
@@ -68,6 +67,7 @@ You want to create something and share it with the community.
 2. **[Chapter 02: API Reference](02_API_REFERENCE.md)** — control value paths, copy-paste code patterns
 3. **[Chapter 08: Sharing Changes](08_SHARING_CHANGES.md)** — how to package and publish your work
 4. **[Chapter 09: Mod Documentation Guide](09_MOD_DOCUMENTATION_GUIDE.md)** — how to structure your mod so users can apply individual features, and so AI tools can combine your mod with others automatically
+5. **[traktor-logger](traktor-logger/README.md)** — test and debug your code with real-time monitoring
 
 The format in Chapter 09 — one markdown file per feature, semantic version tags in git — means your users can pick just the features they want, and understand exactly what changed in each release.
 

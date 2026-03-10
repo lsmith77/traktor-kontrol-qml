@@ -21,7 +21,9 @@ Use this file when something breaks or you’re not sure why a change didn’t w
 - [Debugging Workflow](#debugging-workflow)
 - [Debugging Checklist](#debugging-checklist)
 - [Troubleshooting Specific Issues](#troubleshooting-specific-issues)
-- [Testing Checklist](#testing-checklist)
+- [Debugging Techniques](#debugging-techniques)
+- [Advanced Debugging: HTTP Logger](#technique-4-advanced-debugging-with-http-logger-structured-logging)
+- [Testing Checklist](#testing-framework-3-pass-approach--checklist)
 
 ---
 
@@ -82,24 +84,22 @@ The most common failures are basic:
 
 Tip: confirm control value paths using the catalog embedded in [02_API_REFERENCE.md](02_API_REFERENCE.md#full-appproperty-path-catalog), and compare against working examples in the [X1MK3 Performance Mod](https://github.com/lsmith77/X1MK3_PerformanceMod) (see [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) for feature-by-feature breakdown).
 
-### 4b) Use visual debugging to see real-time state
+### 4b) Verify runtime state with logger output
 
-Add temporary visible indicators to your QML to see what's happening **in real-time** as you test:
+Use structured logger output to verify conditions, wire execution, and state transitions in real time:
 
 ```qml
-Rectangle {
-    width: 100
-    height: 20
-    color: myButtonPressed ? "green" : "red"  // ← Shows state on screen
-    Text {
-        text: "Button: " + (myButtonPressed ? "ON" : "OFF")
-    }
+Logger { id: logger }
+
+onMyButtonPressedChanged: {
+    logger.debug("Button state changed", {
+        pressed: myButtonPressed,
+        deck: deckId
+    })
 }
 ```
 
-This gives you **immediate visual feedback** without needing to restart or check log files. When you see the color/text change in real-time, you know your code is executing. When it doesn't change, the wire or condition is the problem.
-
-**Pro tip**: Add debug rectangles to prove each step of the logic works, then remove them before final testing.
+This works reliably across all controllers, including those without hardware displays.
 
 ### 5) When in doubt, restore and re-apply
 
@@ -153,7 +153,7 @@ The single best way to avoid debugging is to catch errors before they reach Trak
 **Pro tip**: If your editor shows "0 Problems" but Traktor fails silently, then:
 
 1. Check for Traktor version-specific API changes (see [06_COMPATIBILITY_FIXES.md](06_COMPATIBILITY_FIXES.md))
-2. Use visual debugging (add temporary colored rectangles—see Debugging Steps step 4b)
+2. Use logger probes (add temporary `logger.debug(...)` checkpoints—see Debugging Steps step 4b)
 3. Use a clean backup and test with the smallest possible change
 
 ---
@@ -223,17 +223,21 @@ Traktor's QML engine does not always provide visible error messages when a QML f
 1. **Wire 'from' path correct?** Verify `%surface%.button.name` matches your controller
 2. **enabled: condition true?** Check shift state, browse mode, etc.
 3. **Property path exists?** Try similar button/encoder to verify path
-4. **Use visual debugging** to trace the logic:
+4. **Use logger checkpoints** to trace the logic:
 
 ```qml
-Rectangle {
-    width: 50
-    height: 50
-    color: wireCondition ? "green" : "red"  // ← Is wire enabled?
+Logger { id: logger }
+
+onSomeTrigger: {
+    logger.debug("Wire condition check", {
+        wireCondition: wireCondition,
+        shift: shift,
+        deck: deckId
+    })
 }
 ```
 
-When you press the button: does the rectangle change color? If yes, the wire works. If no, the condition is the problem.
+If the log appears with expected values, the path is active; if not, inspect your conditions and wiring source.
 
 ---
 
@@ -242,7 +246,7 @@ When you press the button: does the rectangle change color? If yes, the wire wor
 **Check these:**
 
 1. **AppProperty path correct?** `app.traktor.decks.1` NOT `app.traktor.deck.1` (plural!)
-2. **Binding working?** Add a visual debug rectangle that shows the binding's value (see Technique 1 in Debugging Techniques)
+2. **Binding working?** Add a temporary `logger.debug` in the binding path to print current input values (see Technique 1 in Debugging Techniques)
 3. **Conditional logic reversed?** Check `value === 1` vs `value !== 1`
 4. **Color/font defined?** Verify imports and color names
 
@@ -303,23 +307,21 @@ Example properties that are useful when debugging stem/remix encoder conflicts (
 
 Tip: if `enabled: active && !slotState.value` is too broad, try a more specific blocker like `enabled: active && !deck.focusedSlotstate`.
 
-### Visual Debugging During Development
+### Runtime Probing During Development
 
-Add temporary visual indicators while developing to see state changes instantly:
+Add temporary logger probes while developing to validate conditions and values:
 
 ```qml
-// Add debug rectangle to test a condition
-Rectangle {
-    width: 50
-    height: 50
-    color: (myProperty && myProperty.value > 10) ? "blue" : "gray"
-    Text { text: "Val: " + (myProperty ? myProperty.value : "null") }
-}
+Logger { id: logger }
 
-// Remove this after testing passes
+onMyPropertyChanged: {
+    logger.debug("Property probe", {
+        value: (myProperty ? myProperty.value : null)
+    })
+}
 ```
 
-This is instant feedback—no restart or log file hunting needed.
+Remove or reduce probe volume once the feature passes testing.
 
 ### Understanding error messages
 
@@ -360,17 +362,11 @@ Timer {
     repeat: false
     running: false  // ← Should be false, start manually
     onTriggered: {
-        debugRect.color = "lime"  // ← Visual confirmation timer fired
+        logger.debug("Timer fired", { timer: "myTimer" })
     }
 }
 
-// Add debug rectangle to the screen
-Rectangle {
-    id: debugRect
-    width: 50
-    height: 50
-    color: "gray"
-}
+Logger { id: logger }
 
 // Start the timer
 myTimer.restart()
@@ -452,23 +448,22 @@ Wire {
 
 ## Debugging Techniques
 
-### Technique 1: Use Visual Debugging (Real-Time Feedback)
+### Technique 1: Use Structured Logger Probes (Real-Time Feedback)
 
-Add visible indicators to see state changes instantly **without restarting**:
+Add temporary logger probes to inspect state transitions in real time:
 
 ```qml
-// Add temporary debug elements
-Rectangle {
-    width: 100
-    height: 20
-    color: myCondition ? "green" : "red"  // ← See state change in real-time
-    Text {
-        text: "State: " + myProperty.value.toString()  // ← See actual values
-    }
+Logger { id: logger }
+
+onMyConditionChanged: {
+    logger.debug("Condition changed", {
+        myCondition: myCondition,
+        value: myProperty ? myProperty.value : null
+    })
 }
 ```
 
-Remove these debug rectangles before final testing.
+Remove or downgrade probe verbosity before final release.
 
 ### Technique 2: Simplify to Isolate Problem
 
@@ -479,15 +474,209 @@ onPress: {
     // Complex original code...
 
     // Simplified test:
-    debugRectangle.color = "blue"  // ← Visual confirmation this runs
+    logger.debug("Simplified press test", { source: "onPress" })
 }
 ```
 
-If the simple version triggers visually, add back complexity step by step.
+If the simple version logs correctly, add back complexity step by step.
 
 ### Technique 3: Verify Against Working Code
 
 Compare your wire/binding against a similar working element (in the stock QML or a community mod). Match the pattern exactly—if they look different, that's your bug.
+
+### Technique 4: Advanced Debugging with HTTP Logger (Structured Logging)
+
+For complex state debugging, use the **traktor-logger** tool—a structured logging system that runs inside Traktor's QML engine with a real-time browser dashboard.
+
+When to use:
+
+- ✅ Complex state tracking across multiple components
+- ✅ Event timing and sequencing (which fires first?)
+- ✅ Structured data inspection (JSON objects from wires)
+- ✅ Post-mortem analysis (review what happened after a crash)
+
+**Installation:**
+
+You have two options depending on your use case:
+
+**Option 1: Logger with a Mod** (recommended if you're installing a mod)
+
+```bash
+install-traktor-mod --with-logger
+```
+
+Adds Logger.qml to your mod's `Defines/` folder. Logger becomes part of your mod installation.
+
+**Option 2: Logger Only** (if you just want debugging without a mod)
+
+```bash
+install-traktor-mod logger install
+```
+
+Installs Logger.qml directly to Traktor's live QML. Use this when you want debugging available everywhere.
+
+Both options use the hybrid fallback to automatically fetch Logger.qml from:
+
+1. Cached (`~/.traktor-mod/logger/Logger.qml`) — offline-friendly after first download
+2. GitHub (https://github.com/lsmith77/traktor-logger) — first-time download (requires internet)
+
+**Usage in your QML:**
+
+```qml
+import Traktor.Defines 1.0
+
+Module {
+    Logger { id: logger }
+
+    // Log state changes with structured data
+    onSomeEventChanged: {
+        logger.info("Event fired", {
+            deckId: deck1.id,
+            trackTitle: track.title,
+            timestamp: new Date().toISOString(),
+            state: someProperty.value
+        })
+    }
+
+    // Different log levels for priority
+    Wire {
+        from: "%surface%.button.back"
+        to: ButtonScriptAdapter {
+            onPress: logger.debug("Back button pressed")
+            onError: logger.error("Back button error", { reason: "hardware" })
+        }
+    }
+}
+```
+
+**View logs in real-time:**
+
+1. Clone the repo and navigate into it:
+
+   ```bash
+   git clone https://github.com/lsmith77/traktor-logger
+   cd traktor-logger
+   ```
+
+2. Start the server:
+   ```bash
+   python3 server.py
+   ```
+3. Open dashboard: http://localhost:8080
+
+4. Interact with Traktor—see logs appear in the dashboard with:
+   - Color-coded severity (error=red, warn=orange, info=blue, debug=cyan)
+   - Timestamps for timing analysis
+   - Structured JSON data viewable inline
+   - Full-text search and level filtering
+
+**API Reference:**
+
+```qml
+Logger {
+    // All methods accept: message (string) + optional data object (JSON)
+    logger.log(message, data)      // Raw log (avoid—use specific levels below)
+    logger.info(message, data)     // Important events
+    logger.debug(message, data)    // Detailed state for investigation
+    logger.warn(message, data)     // Unexpected but recoverable
+    logger.error(message, data)    // Failures that need fixing
+}
+```
+
+**Example: Debugging a complex interaction**
+
+```qml
+Logger { id: logger }
+
+Binding {
+    target: trackDisplay
+    property: "color"
+    value: {
+        logger.debug("Color binding recalculated", {
+            isPlayingDeck1: deck1.isPlaying,
+            focusedDeck: focusedDeck.id,
+            brightness: brightness.value
+        })
+
+        // Now you can see in the dashboard:
+        // - Did this binding execute?
+        // - What were the inputs?
+        // - In what order did related bindings fire?
+
+        return deck1.isPlaying ? "lime" : "gray"
+    }
+}
+```
+
+**Troubleshooting Logger Issues:**
+
+| Problem                  | Solution                                                 |
+| ------------------------ | -------------------------------------------------------- |
+| No logs appearing        | Start server: `python3 server.py` in Logger repo         |
+| "Logs are old"           | Restart: Page reload doesn't clear—restart Traktor       |
+| Can't find Logger.qml    | Run `install-traktor-mod logger update` to refresh cache |
+| No internet (first-time) | Use `logger update` on a machine with internet first     |
+
+**Learn more:**
+
+- [GitHub: traktor-logger](https://github.com/lsmith77/traktor-logger) — Full source, examples, and troubleshooting
+- Logger.qml source: [Logger.qml on GitHub](https://github.com/lsmith77/traktor-logger/blob/main/qml/Logger.qml)
+- HTTP server: [server.py on GitHub](https://github.com/lsmith77/traktor-logger/blob/main/server.py)
+
+**Security Best Practices:**
+
+⚠️ **DO NOT log sensitive data** — All logs are visible in the browser dashboard and terminal output.
+
+**❌ NEVER log:**
+
+- Passwords or API keys
+- Database credentials
+- Authentication tokens
+- User PII (names, email addresses, IDs)
+- File paths (could reveal system structure)
+- Entire response objects if they contain secrets
+
+**✅ Instead, log descriptively:**
+
+```qml
+// GOOD: Descriptive without exposing secrets
+logger.info("Authentication successful", {
+    userId: user.id,
+    method: "oauth",
+    timestamp: now
+})
+
+// GOOD: Log state without dumping entire objects
+logger.debug("API request", {
+    endpoint: "/api/v1/data",
+    status: response.status,
+    duration_ms: elapsed
+})
+
+// BAD: Never log credentials
+logger.error("Login failed", {
+    username: username,
+    password: password,  // ← DON'T DO THIS
+    apiKey: apiKey       // ← DON'T DO THIS
+})
+
+// BAD: Never log entire response bodies
+logger.info("Response received", { body: JSON.stringify(largeObject) })  // ← Could be huge
+```
+
+**Why this matters:**
+
+- When using AI assistants with this logger, they might inadvertently log secrets if you don't set boundaries
+- Logs are stored in memory while the server runs—visible to anyone with browser access to `localhost:8080`
+- If you share a log transcript with teammates, you could leak credentials
+- Rate limiting (100 logs/sec) and payload limits (100KB per entry) protect against abuse but don't hide sensitive data
+
+**If logs contain secrets:**
+
+1. Stop the server immediately (`Ctrl+C`)
+2. Logs are only in memory—they're lost on shutdown
+3. Don't share logs with others if they contained credentials
+4. Restart the server with cleaner logging going forward
 
 ---
 

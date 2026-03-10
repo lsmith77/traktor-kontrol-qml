@@ -133,6 +133,86 @@ When you create new properties or IDs, follow these:
 
 ---
 
+## Debugging & Metadata Collection Tools
+
+The handbook includes integrated debugging and metadata collection tools via `traktor-logger`:
+
+**Quick Start (3 steps)**:
+
+1. **Install Logger** to Traktor's qml:
+
+   ```bash
+   install-traktor-mod logger install
+   ```
+
+2. **Enable metadata collection on at least one connected controller**:
+
+   This step is required if you want data in the **Live Metadata** tab. Without API integration on a connected controller, the logger server runs but receives no deck metadata.
+
+   ```bash
+   install-traktor-mod enable-metadata D2,S8,X1MK3
+   ```
+
+3. **Start the server**:
+
+   ```bash
+   install-traktor-mod server start
+   ```
+
+   `install-traktor-mod` downloads/updates the server package and can launch it directly via `server start`.
+
+   Open dashboard: http://localhost:8080
+
+**Supported Controllers**: D2, S8, S5, S4MK3, S3, S2MK3, X1MK3, Z1MK2, MX2, CDJ3000, XDJ700, XDJ1000MK2
+
+**What's included**:
+
+- **Automatic metadata**: Track loaded, play/pause, tempo, key, sync, BPM, mixer channels (requires metadata/API integration on a connected controller)
+- **Manual logging**: `Logger` QML component for structured debug messages with severity levels
+- **Real-time dashboard**: Browser UI with live metadata view and console log viewer
+- **Color-coded CLI**: Terminal output with visual severity indicators
+
+**Installation options**:
+
+```bash
+# Option 1: Add Logger to a mod
+install-traktor-mod --with-logger
+
+# Option 2: Install Logger standalone (no mod)
+install-traktor-mod logger install
+
+# Option 3: Update Logger + Api modules from GitHub
+install-traktor-mod logger update
+
+# Option 4: Install Logger and start server in one command
+install-traktor-mod logger install && install-traktor-mod server start
+```
+
+**Logger usage in QML**:
+
+```qml
+import Traktor.Defines 1.0
+
+Module {
+    Logger { id: logger }
+
+    onSomeEvent: {
+        logger.info("Event triggered", { deck: 1, state: "playing" })
+        logger.debug("Detailed diagnostics", { value: propValue.value })
+        logger.error("Something failed", { reason: "timeout" })
+    }
+}
+```
+
+**For complete documentation**:
+
+- **Logger usage & examples**: See [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md) → "Technique 4: Advanced Debugging with HTTP Logger"
+- **Server/API documentation (primary)**: https://github.com/lsmith77/traktor-logger
+
+**Security note**: Don't log passwords, API keys, or personal data—all logs are visible in the browser dashboard and terminal.
+
+---
+
 ## Visual Guide: Emoji System
 
 The handbook uses emoji consistently to aid quick scanning:

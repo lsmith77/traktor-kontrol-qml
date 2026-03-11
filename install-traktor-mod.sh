@@ -83,8 +83,17 @@ Standalone Commands:
     1. Cached ~/.traktor-mod/traktor-logger/ (offline after first download)
     2. GitHub download (initial setup, requires internet)
 
+Logger Source Options:
+  install-traktor-mod logger update --branch dev              — update from dev branch
+  install-traktor-mod logger update --local ../traktor-logger — use local repo path
+  install-traktor-mod logger install --branch feature-xyz     — install from specific branch
+  install-traktor-mod logger install --local ./traktor-logger — install from local path
+  
+  Branch: defaults to 'main'. Use any valid GitHub branch name.
+  Local path: can be absolute or relative. Useful for testing development branches locally.
+
 General Options:
-  install-traktor-mod -s /path/to/mod        — use specific directory
+  install-traktor-mod -s /path/to/mod        — use specific mod directory
   install-traktor-mod -h                     — show this help
 
 Notes:
@@ -119,24 +128,51 @@ check_traktor_installed() {
 
 # --- logger utility (hybrid: local → cached → github) ---
 
-LOGGER_CACHE_DIR="$HOME/.traktor-mod/logger"
-LOGGER_GITHUB_URL="https://raw.githubusercontent.com/lsmith77/traktor-logger/main/qml/Logger.qml"
+LOGGER_CACHE_DIR="$HOME/.traktor-mod/traktor-logger"
+LOGGER_BRANCH="main"              # configurable via --branch
+LOGGER_LOCAL_PATH=""              # configurable via --local
+SYMLINK_LOGGER=false               # configurable via --symlink with --local
+
+build_logger_github_url() {
+    # Build GitHub URL with configurable branch
+    echo "https://raw.githubusercontent.com/lsmith77/traktor-logger/${LOGGER_BRANCH}/qml/Logger.qml"
+}
+
+build_server_github_repo() {
+    # Build GitHub repo URL with configurable branch
+    echo "https://raw.githubusercontent.com/lsmith77/traktor-logger/${LOGGER_BRANCH}"
+}
 
 get_logger_qml() {
-    # Returns path to Logger.qml using hybrid fallback chain: cache → GitHub
+    # Returns path to Logger.qml using hybrid fallback chain: 
+    # local → cache → GitHub
     
-    # 1. Check cache (for offline use, one-time download)
+    # 1. Check local path first (if specified)
+    if [ -n "$LOGGER_LOCAL_PATH" ]; then
+        local local_resolved
+        if local_resolved=$(cd "$LOGGER_LOCAL_PATH" 2>/dev/null && pwd 2>/dev/null); then
+            if [ -f "$local_resolved/qml/Logger.qml" ]; then
+                echo "$local_resolved/qml/Logger.qml"
+                return 0
+            fi
+        fi
+        echo "Warning: Local path specified but Logger.qml not found: $LOGGER_LOCAL_PATH/qml/Logger.qml" >&2
+    fi
+    
+    # 2. Check cache (for offline use, one-time download)
     if [ -f "$LOGGER_CACHE_DIR/Logger.qml" ]; then
         echo "$LOGGER_CACHE_DIR/Logger.qml"
         return 0
     fi
     
-    # 2. Download from GitHub (first-time setup, requires internet)
-    echo "Downloading Logger.qml from GitHub..." >&2
+    # 3. Download from GitHub (first-time setup, requires internet)
+    local logger_url
+    logger_url=$(build_logger_github_url)
+    echo "Downloading Logger.qml from GitHub (branch: $LOGGER_BRANCH)..." >&2
     mkdir -p "$LOGGER_CACHE_DIR"
-    if ! curl -sS -o "$LOGGER_CACHE_DIR/Logger.qml" "$LOGGER_GITHUB_URL"; then
+    if ! curl -sS -o "$LOGGER_CACHE_DIR/Logger.qml" "$logger_url"; then
         echo "Error: Failed to download Logger.qml from GitHub" >&2
-        echo "URL: $LOGGER_GITHUB_URL" >&2
+        echo "URL: $logger_url" >&2
         return 1
     fi
     
@@ -145,10 +181,64 @@ get_logger_qml() {
     return 0
 }
 
+
 update_logger_cache() {
-    # Force refresh of traktor-logger package (including Api modules) from GitHub
+    # Force refresh of traktor-logger package (including Api modules) from GitHub or local
     # If Logger/Api are installed, updates them. Otherwise does full install.
-    echo "Updating traktor-logger cache from GitHub..."
+    
+    if [ -n "$LOGGER_LOCAL_PATH" ]; then
+        echo "Using local traktor-logger path: $LOGGER_LOCAL_PATH"
+        local local_resolved
+        if ! local_resolved=$(cd "$LOGGER_LOCAL_PATH" 2>/dev/null && pwd 2>/dev/null); then
+            echo "Error: Cannot access local path: $LOGGER_LOCAL_PATH"
+            return 1
+        fi
+        
+        # Verify local path has necessary files
+        if [ ! -f "$local_resolved/qml/Logger.qml" ] || [ ! -f "$local_resolved/server.py" ]; then
+            echo "Error: Local path missing Logger.qml or server.py"
+            echo "Expected: $local_resolved/qml/Logger.qml and $local_resolved/server.py"
+            return 1
+        fi
+        
+        # If symlink mode, create a symlink to the local path instead of copying
+        if [ "$SYMLINK_LOGGER" = "true" ]; then
+            echo "Setting up cache as symlink to local path..."
+            # Remove existing cache (if present)
+            if [ -e "$LOGGER_CACHE_DIR" ] || [ -L "$LOGGER_CACHE_DIR" ]; then
+                rm -rf "$LOGGER_CACHE_DIR"
+            fi
+            # Ensure parent directory exists
+            mkdir -p "$(dirname "$LOGGER_CACHE_DIR")"
+            # Create symlink from cache to local path
+            if ln -s "$local_resolved" "$LOGGER_CACHE_DIR" 2>/dev/null; then
+                echo "Cache symlinked to local path: $LOGGER_CACHE_DIR -> $local_resolved"
+                return 0
+            else
+                echo "Error: Failed to create symlink. Falling back to copy mode..."
+                SYMLINK_LOGGER=false
+                # Continue to copy mode below
+            fi
+        fi
+        
+        # Copy mode (default when symlink fails or not requested)
+        echo "Updating traktor-logger cache from local path (copy)..."
+        mkdir -p "$LOGGER_CACHE_DIR/qml/CSI/Common/Api"
+        
+        # Copy from local path
+        cp "$local_resolved/server.py" "$LOGGER_CACHE_DIR/server.py"
+        cp "$local_resolved/qml/Logger.qml" "$LOGGER_CACHE_DIR/qml/Logger.qml"
+        [ -f "$local_resolved/qml/qmldir" ] && cp "$local_resolved/qml/qmldir" "$LOGGER_CACHE_DIR/qml/qmldir"
+        cp -r "$local_resolved/qml/CSI/Common/Api"/* "$LOGGER_CACHE_DIR/qml/CSI/Common/Api/" 2>/dev/null || true
+        [ -f "$local_resolved/README.md" ] && cp "$local_resolved/README.md" "$LOGGER_CACHE_DIR/README.md"
+        
+        chmod +x "$LOGGER_CACHE_DIR/server.py"
+        echo "Updated from local path: $local_resolved"
+        return 0
+    fi
+    
+    # GitHub download path (branch-aware)
+    echo "Updating traktor-logger cache from GitHub (branch: $LOGGER_BRANCH)..."
     
     # Download entire traktor-logger package (forces fresh download, bypasses local repo)
     if ! force_update_server_cache; then
@@ -157,8 +247,10 @@ update_logger_cache() {
     fi
     
     # Also update Logger.qml separately for backward compatibility
+    local logger_url
+    logger_url=$(build_logger_github_url)
     mkdir -p "$LOGGER_CACHE_DIR"
-    if ! curl -sS -o "$LOGGER_CACHE_DIR/Logger.qml" "$LOGGER_GITHUB_URL"; then
+    if ! curl -sS -o "$LOGGER_CACHE_DIR/Logger.qml" "$logger_url"; then
         echo "Warning: Failed to update Logger.qml in logger cache"
     else
         echo "Logger.qml cache updated: $LOGGER_CACHE_DIR/Logger.qml"
@@ -216,38 +308,58 @@ SERVER_GITHUB_API_URL="https://api.github.com/repos/lsmith77/traktor-logger/cont
 
 get_server_package() {
     # Returns path to cached traktor-logger or downloads it
-    # Uses hybrid chain: local repo → cache → GitHub
+    # Uses hybrid chain: local path → source dir → cache → GitHub (with branch support)
     
-    # 1. Check if src is specified and contains traktor-logger
+    # 1. Check if local path is specified
+    if [ -n "$LOGGER_LOCAL_PATH" ]; then
+        local local_resolved
+        if ! local_resolved=$(cd "$LOGGER_LOCAL_PATH" 2>/dev/null && pwd 2>/dev/null); then
+            echo "Error: Cannot access local path: $LOGGER_LOCAL_PATH" >&2
+            return 1
+        fi
+        
+        if [ -f "$local_resolved/server.py" ] && [ -f "$local_resolved/qml/Logger.qml" ]; then
+            echo "$local_resolved" >&2
+            echo "$local_resolved"
+            return 0
+        else
+            echo "Error: Local path missing server.py or Logger.qml" >&2
+            return 1
+        fi
+    fi
+    
+    # 2. Check if src is specified and contains traktor-logger
     if [ -d "$SOURCE_DIR/traktor-logger" ]; then
         echo "$SOURCE_DIR/traktor-logger"
         return 0
     fi
     
-    # 2. Check cache
+    # 3. Check cache
     if [ -f "$SERVER_CACHE_DIR/server.py" ] && [ -f "$SERVER_CACHE_DIR/qml/Logger.qml" ]; then
         echo "$SERVER_CACHE_DIR"
         return 0
     fi
     
-    # 3. Download from GitHub
-    echo "Downloading traktor-logger from GitHub..." >&2
+    # 4. Download from GitHub (branch-aware)
+    local repo_url
+    repo_url=$(build_server_github_repo)
+    echo "Downloading traktor-logger from GitHub (branch: $LOGGER_BRANCH)..." >&2
     mkdir -p "$SERVER_CACHE_DIR/qml/CSI/Common/Api"
     
     # Download server.py
-    if ! curl -sS -o "$SERVER_CACHE_DIR/server.py" "$SERVER_GITHUB_REPO/server.py"; then
+    if ! curl -sS -o "$SERVER_CACHE_DIR/server.py" "$repo_url/server.py"; then
         echo "Error: Failed to download server.py" >&2
         return 1
     fi
     
     # Download Logger.qml
-    if ! curl -sS -o "$SERVER_CACHE_DIR/qml/Logger.qml" "$SERVER_GITHUB_REPO/qml/Logger.qml"; then
+    if ! curl -sS -o "$SERVER_CACHE_DIR/qml/Logger.qml" "$repo_url/qml/Logger.qml"; then
         echo "Error: Failed to download Logger.qml" >&2
         return 1
     fi
     
     # Download qmldir
-    if ! curl -sS -o "$SERVER_CACHE_DIR/qml/qmldir" "$SERVER_GITHUB_REPO/qml/qmldir"; then
+    if ! curl -sS -o "$SERVER_CACHE_DIR/qml/qmldir" "$repo_url/qml/qmldir"; then
         echo "Error: Failed to download qmldir" >&2
         return 1
     fi
@@ -255,14 +367,14 @@ get_server_package() {
     # Download Api modules
     local api_files=("ApiClient.js" "ApiDeck.qml" "ApiMasterClock.qml" "ApiChannel.qml" "ApiModule.qml")
     for api_file in "${api_files[@]}"; do
-        if ! curl -sS -o "$SERVER_CACHE_DIR/qml/CSI/Common/Api/$api_file" "$SERVER_GITHUB_REPO/qml/CSI/Common/Api/$api_file"; then
+        if ! curl -sS -o "$SERVER_CACHE_DIR/qml/CSI/Common/Api/$api_file" "$repo_url/qml/CSI/Common/Api/$api_file"; then
             echo "Error: Failed to download $api_file" >&2
             return 1
         fi
     done
     
     # Download README.md (for version information)
-    curl -sS -o "$SERVER_CACHE_DIR/README.md" "$SERVER_GITHUB_REPO/README.md" 2>/dev/null || true
+    curl -sS -o "$SERVER_CACHE_DIR/README.md" "$repo_url/README.md" 2>/dev/null || true
     
     # Make server.py executable
     chmod +x "$SERVER_CACHE_DIR/server.py"
@@ -273,9 +385,45 @@ get_server_package() {
 }
 
 force_update_server_cache() {
-    # Force download of traktor-logger from GitHub, bypassing local repo check
-    # Used by 'logger update' to ensure fresh cache
-    echo "Downloading traktor-logger from GitHub (force update)..."
+    # Force download of traktor-logger from GitHub or local path, bypassing local repo check
+    # Used by 'logger update' to ensure fresh cache. Supports branch and local path options.
+    
+    if [ -n "$LOGGER_LOCAL_PATH" ]; then
+        echo "Downloading (force) traktor-logger from local path: $LOGGER_LOCAL_PATH..."
+        local local_resolved
+        if ! local_resolved=$(cd "$LOGGER_LOCAL_PATH" 2>/dev/null && pwd 2>/dev/null); then
+            echo "Error: Cannot access local path: $LOGGER_LOCAL_PATH" >&2
+            return 1
+        fi
+        
+        if [ ! -f "$local_resolved/server.py" ] || [ ! -f "$local_resolved/qml/Logger.qml" ]; then
+            echo "Error: Local path missing server.py or Logger.qml" >&2
+            return 1
+        fi
+        
+        # Clean existing cache if present
+        if [ -d "$SERVER_CACHE_DIR" ]; then
+            rm -rf "$SERVER_CACHE_DIR"
+        fi
+        
+        mkdir -p "$SERVER_CACHE_DIR/qml/CSI/Common/Api"
+        
+        # Copy from local path
+        cp "$local_resolved/server.py" "$SERVER_CACHE_DIR/server.py"
+        cp "$local_resolved/qml/Logger.qml" "$SERVER_CACHE_DIR/qml/Logger.qml"
+        [ -f "$local_resolved/qml/qmldir" ] && cp "$local_resolved/qml/qmldir" "$SERVER_CACHE_DIR/qml/qmldir"
+        cp -r "$local_resolved/qml/CSI/Common/Api"/* "$SERVER_CACHE_DIR/qml/CSI/Common/Api/" 2>/dev/null || true
+        [ -f "$local_resolved/README.md" ] && cp "$local_resolved/README.md" "$SERVER_CACHE_DIR/README.md"
+        
+        chmod +x "$SERVER_CACHE_DIR/server.py"
+        echo "Force-updated from local path: $local_resolved"
+        return 0
+    fi
+    
+    # GitHub download path (branch-aware)
+    local repo_url
+    repo_url=$(build_server_github_repo)
+    echo "Downloading traktor-logger from GitHub (force update, branch: $LOGGER_BRANCH)..."
     
     # Clean existing cache if present
     if [ -d "$SERVER_CACHE_DIR" ]; then
@@ -285,19 +433,19 @@ force_update_server_cache() {
     mkdir -p "$SERVER_CACHE_DIR/qml/CSI/Common/Api"
     
     # Download server.py
-    if ! curl -sS -o "$SERVER_CACHE_DIR/server.py" "$SERVER_GITHUB_REPO/server.py"; then
+    if ! curl -sS -o "$SERVER_CACHE_DIR/server.py" "$repo_url/server.py"; then
         echo "Error: Failed to download server.py" >&2
         return 1
     fi
     
     # Download Logger.qml
-    if ! curl -sS -o "$SERVER_CACHE_DIR/qml/Logger.qml" "$SERVER_GITHUB_REPO/qml/Logger.qml"; then
+    if ! curl -sS -o "$SERVER_CACHE_DIR/qml/Logger.qml" "$repo_url/qml/Logger.qml"; then
         echo "Error: Failed to download Logger.qml" >&2
         return 1
     fi
     
     # Download qmldir
-    if ! curl -sS -o "$SERVER_CACHE_DIR/qml/qmldir" "$SERVER_GITHUB_REPO/qml/qmldir"; then
+    if ! curl -sS -o "$SERVER_CACHE_DIR/qml/qmldir" "$repo_url/qml/qmldir"; then
         echo "Error: Failed to download qmldir" >&2
         return 1
     fi
@@ -305,14 +453,14 @@ force_update_server_cache() {
     # Download Api modules
     local api_files=("ApiClient.js" "ApiDeck.qml" "ApiMasterClock.qml" "ApiChannel.qml" "ApiModule.qml")
     for api_file in "${api_files[@]}"; do
-        if ! curl -sS -o "$SERVER_CACHE_DIR/qml/CSI/Common/Api/$api_file" "$SERVER_GITHUB_REPO/qml/CSI/Common/Api/$api_file"; then
+        if ! curl -sS -o "$SERVER_CACHE_DIR/qml/CSI/Common/Api/$api_file" "$repo_url/qml/CSI/Common/Api/$api_file"; then
             echo "Error: Failed to download $api_file" >&2
             return 1
         fi
     done
     
     # Download README.md (for version information)
-    curl -sS -o "$SERVER_CACHE_DIR/README.md" "$SERVER_GITHUB_REPO/README.md" 2>/dev/null || true
+    curl -sS -o "$SERVER_CACHE_DIR/README.md" "$repo_url/README.md" 2>/dev/null || true
     
     # Make server.py executable
     chmod +x "$SERVER_CACHE_DIR/server.py"
@@ -569,15 +717,55 @@ QMLDIR
         fi
     fi
     
-    # Copy Logger.qml to Traktor's live QML
-    sudo cp "$logger_src" "$TRAKTOR_QML/Defines/Logger.qml"
-    echo "  ✓ Logger.qml: $TRAKTOR_QML/Defines/Logger.qml"
+    # Copy or symlink Logger.qml to Traktor's live QML
+    if [ "$SYMLINK_LOGGER" = "true" ] && [ -n "$LOGGER_LOCAL_PATH" ]; then
+        # Resolve local path to absolute
+        LOGGER_LOCAL_ABS="$(cd "$LOGGER_LOCAL_PATH" 2>/dev/null && pwd 2>/dev/null)"
+        if [ -z "$LOGGER_LOCAL_ABS" ]; then
+            echo "Error: Cannot resolve local path to absolute: $LOGGER_LOCAL_PATH"
+            return 1
+        fi
+        logger_src_abs="$LOGGER_LOCAL_ABS/qml/Logger.qml"
+        sudo rm -f "$TRAKTOR_QML/Defines/Logger.qml"
+        if sudo ln -s "$logger_src_abs" "$TRAKTOR_QML/Defines/Logger.qml" 2>/dev/null; then
+            echo "  ✓ Logger.qml (symlink): $TRAKTOR_QML/Defines/Logger.qml -> $logger_src_abs"
+        else
+            echo "  ⚠ Logger.qml: symlink creation failed, copying instead..."
+            sudo cp "$logger_src" "$TRAKTOR_QML/Defines/Logger.qml"
+        fi
+    else
+        sudo cp "$logger_src" "$TRAKTOR_QML/Defines/Logger.qml"
+        echo "  ✓ Logger.qml: $TRAKTOR_QML/Defines/Logger.qml"
+    fi
     
-    # Copy Api modules to Traktor's live QML
+    # Copy or symlink Api modules to Traktor's live QML
     local api_src
     if api_src=$(get_api_modules_path 2>/dev/null) && [ -d "$api_src" ] && [ -n "$(ls -A "$api_src" 2>/dev/null)" ]; then
         sudo mkdir -p "$TRAKTOR_QML/CSI/Common/Api"
-        if sudo cp -r "$api_src"/* "$TRAKTOR_QML/CSI/Common/Api/" 2>&1; then
+        
+        if [ "$SYMLINK_LOGGER" = "true" ] && [ -n "$LOGGER_LOCAL_PATH" ]; then
+            # Symlink mode: create symlinks for each Api file
+            LOGGER_LOCAL_ABS="$(cd "$LOGGER_LOCAL_PATH" 2>/dev/null && pwd 2>/dev/null)"
+            api_src_abs="$LOGGER_LOCAL_ABS/qml/CSI/Common/Api"
+            if [ -d "$api_src_abs" ]; then
+                symlink_count=0
+                while IFS= read -r -d '' api_file; do
+                    filename=$(basename "$api_file")
+                    sudo rm -f "$TRAKTOR_QML/CSI/Common/Api/$filename"
+                    if sudo ln -s "$api_file" "$TRAKTOR_QML/CSI/Common/Api/$filename" 2>/dev/null; then
+                        ((symlink_count++))
+                    fi
+                done < <(find "$api_src_abs" -type f -print0)
+                if [ "$symlink_count" -gt 0 ]; then
+                    echo "  ✓ Api modules (symlinks): $TRAKTOR_QML/CSI/Common/Api/ -> $api_src_abs ($symlink_count files)"
+                else
+                    echo "  ⚠ Api modules: symlink creation failed, copying instead..."
+                    sudo cp -r "$api_src"/* "$TRAKTOR_QML/CSI/Common/Api/" 2>&1
+                fi
+            else
+                echo "  ⚠ Api modules: symlink path not found: $api_src_abs"
+            fi
+        elif sudo cp -r "$api_src"/* "$TRAKTOR_QML/CSI/Common/Api/" 2>&1; then
             echo "  ✓ Api modules: $TRAKTOR_QML/CSI/Common/Api/"
         else
             echo "  ⚠ Api modules: could not copy (but Logger.qml is installed)"
@@ -614,6 +802,7 @@ SYMLINK=false
 FULL=false
 WITH_LOGGER=false
 START_SERVER=false
+LOGGER_UPDATE_MODE=false
 MODE="install"
 SOURCE_DIR="."
 
@@ -630,7 +819,7 @@ while [ $# -gt 0 ]; do
             subarg="$1"
             case "$subarg" in
                 install) MODE="install-logger-only" ;;
-                update) update_logger_cache; exit 0 ;;
+                update) LOGGER_UPDATE_MODE=true ;;
                 *) echo "Error: Unknown logger subcommand: $subarg"; exit 1 ;;
             esac
             shift
@@ -658,9 +847,33 @@ while [ $# -gt 0 ]; do
             exit 0
             ;;
         --fresh)   FRESH=true; shift ;;
-        --symlink) SYMLINK=true; shift ;;
+        --symlink) 
+            SYMLINK=true
+            # For logger installs, also set SYMLINK_LOGGER unless already local-only
+            if [ "$MODE" = "install-logger-only" ] || [ "$LOGGER_UPDATE_MODE" = "true" ]; then
+                SYMLINK_LOGGER=true
+            fi
+            shift ;;
         --full)    FULL=true; shift ;;
         --with-logger) WITH_LOGGER=true; shift ;;
+        --branch)
+            shift
+            if [ -z "$1" ] || [[ "$1" =~ ^- ]]; then
+                echo "Error: --branch requires a branch name"
+                exit 1
+            fi
+            LOGGER_BRANCH="$1"
+            shift
+            ;;
+        --local)
+            shift
+            if [ -z "$1" ] || [[ "$1" =~ ^- ]]; then
+                echo "Error: --local requires a path to local traktor-logger directory"
+                exit 1
+            fi
+            LOGGER_LOCAL_PATH="$1"
+            shift
+            ;;
         -h|--help) show_help; exit 0 ;;
         -s|--source)
             shift
@@ -677,6 +890,13 @@ while [ $# -gt 0 ]; do
             ;;
     esac
 done
+
+# --- handle logger update (after all arguments parsed to get --branch and --local) ---
+
+if [ "$LOGGER_UPDATE_MODE" = "true" ]; then
+    update_logger_cache
+    exit 0
+fi
 
 # --- start server only (if 'server start' with no other action flags) ---
 
@@ -739,6 +959,14 @@ fi
 
 if [ "$MODE" = "install-logger-only" ]; then
     echo "Installing Logger.qml and Api modules to Traktor qml..."
+    
+    # First, set up the cache (either as symlink or by downloading/copying)
+    if ! update_logger_cache; then
+        echo "Error: Failed to prepare logger cache"
+        exit 1
+    fi
+    
+    # Then install from cache to Traktor's live qml
     if install_logger_to_traktor; then
         logger_version=$(get_logger_version)
         server_path=$(get_server_path 2>/dev/null || true)

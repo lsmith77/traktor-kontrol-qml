@@ -87,9 +87,12 @@ set "TRAKTOR_QML=!TRAKTOR_RESOURCES!\qml"
 set "TRAKTOR_QML_BACKUP=!TRAKTOR_RESOURCES!\qml.mod-backup"
 set "TRAKTOR_APP=C:\Program Files\Native Instruments\Traktor Pro 4\Traktor Pro 4.exe"
 
-:: Logger cache paths
+:: Logger cache paths and branch/local path support
 set "LOGGER_CACHE_DIR=%USERPROFILE%\.traktor-mod\traktor-logger"
-set "LOGGER_GITHUB_URL=https://raw.githubusercontent.com/lsmith77/traktor-logger/main"
+set "LOGGER_BRANCH=main"
+set "LOGGER_LOCAL_PATH="
+set "SYMLINK_LOGGER=false"
+set "LOGGER_GITHUB_URL=https://raw.githubusercontent.com/lsmith77/traktor-logger/!LOGGER_BRANCH!"
 
 :: --- initialize variables ---
 
@@ -100,6 +103,7 @@ set "SYMLINK=false"
 set "FULL=false"
 set "WITH_LOGGER=false"
 set "START_SERVER=false"
+set "LOGGER_UPDATE_MODE=false"
 set "MODE=install"
 set "NEXT_IS_SOURCE=false"
 set "ENABLE_METADATA="
@@ -140,14 +144,35 @@ if "!NEXT_IS_SOURCE!"=="true" (
     set "FRESH=true"
 ) else if /I "%~1"=="/symlink" (
     set "SYMLINK=true"
+    if /I "!MODE!"=="install-logger-only" (
+        set "SYMLINK_LOGGER=true"
+    )
 ) else if /I "%~1"=="--symlink" (
     set "SYMLINK=true"
+    if /I "!MODE!"=="install-logger-only" (
+        set "SYMLINK_LOGGER=true"
+    )
 ) else if /I "%~1"=="/full" (
     set "FULL=true"
 ) else if /I "%~1"=="--full" (
     set "FULL=true"
 ) else if /I "%~1"=="--with-logger" (
     set "WITH_LOGGER=true"
+) else if /I "%~1"=="--branch" (
+    shift
+    if "%~1"=="" (
+        echo Error: --branch requires a branch name
+        goto :end
+    )
+    set "LOGGER_BRANCH=%~1"
+    set "LOGGER_GITHUB_URL=https://raw.githubusercontent.com/lsmith77/traktor-logger/!LOGGER_BRANCH!"
+) else if /I "%~1"=="--local" (
+    shift
+    if "%~1"=="" (
+        echo Error: --local requires a path to local traktor-logger directory
+        goto :end
+    )
+    set "LOGGER_LOCAL_PATH=%~1"
 ) else if /I "%~1"=="restore" (
     set "MODE=restore"
 ) else if /I "%~1"=="logger" (
@@ -159,8 +184,7 @@ if "!NEXT_IS_SOURCE!"=="true" (
     if /I "%~1"=="install" (
         set "MODE=install-logger-only"
     ) else if /I "%~1"=="update" (
-        call :update_logger_cache
-        goto :end
+        set "LOGGER_UPDATE_MODE=true"
     ) else (
         echo Error: Unknown logger subcommand: %~1
         goto :end
@@ -195,6 +219,13 @@ shift
 goto :parse_args
 
 :end_parse_args
+
+:: --- LOGGER UPDATE MODE (after all arguments parsed to get --branch and --local) ---
+
+if /I "!LOGGER_UPDATE_MODE!"=="true" (
+    call :update_logger_cache
+    goto :end
+)
 
 :: --- RESTORE MODE ---
 
@@ -243,6 +274,15 @@ if /I "!MODE!"=="enable-metadata" (
 
 if /I "!MODE!"=="install-logger-only" (
     echo Installing Logger.qml and Api modules to Traktor qml...
+    
+    REM First, set up the cache (either as symlink or by downloading/copying)
+    call :update_logger_cache
+    if !ERRORLEVEL! NEQ 0 (
+        echo Error: Failed to prepare logger cache
+        goto :end
+    )
+    
+    REM Then install from cache to Traktor's live qml
     call :install_logger_to_traktor
     if !ERRORLEVEL! EQU 0 (
         if "!START_SERVER!"=="true" (
@@ -429,18 +469,31 @@ endlocal
 exit /b %ERRORLEVEL%
 
 :get_logger_from_github
-:: Download Logger.qml from GitHub to cache
+:: Download Logger.qml from GitHub to cache (or use local path)
 setlocal enabledelayedexpansion
 set "CACHE_DIR=%LOGGER_CACHE_DIR%"
 set "CACHE_FILE=!CACHE_DIR!\Logger.qml"
 set "URL=%LOGGER_GITHUB_URL%/qml/Logger.qml"
 
+:: Priority 1: Check local path if specified
+if not "!LOGGER_LOCAL_PATH!"=="" (
+    if exist "!LOGGER_LOCAL_PATH!\qml\Logger.qml" (
+        echo !LOGGER_LOCAL_PATH!\qml\Logger.qml
+        endlocal
+        exit /b 0
+    ) else (
+        echo Warning: Local path specified but Logger.qml not found: !LOGGER_LOCAL_PATH!\qml\Logger.qml
+    )
+)
+
+:: Priority 2: Check cache
 if exist "!CACHE_FILE!" (
     echo !CACHE_FILE!
     endlocal
     exit /b 0
 )
 
+:: Priority 3: Download from GitHub with branch support
 mkdir "!CACHE_DIR!" 2>nul
 call :download_file "!URL!" "!CACHE_FILE!"
 if !ERRORLEVEL! EQU 0 (
@@ -448,20 +501,44 @@ if !ERRORLEVEL! EQU 0 (
     endlocal
     exit /b 0
 ) else (
-    echo Error: Failed to download Logger.qml
+    echo Error: Failed to download Logger.qml from !URL!
     endlocal
     exit /b 1
 )
 
 :get_logger_server_from_github
-:: Download entire traktor-logger package
+:: Download entire traktor-logger package (or use local path)
 setlocal enabledelayedexpansion
 set "CACHE_DIR=%LOGGER_CACHE_DIR%"
 set "BASE_URL=%LOGGER_GITHUB_URL%"
 
+:: Priority 1: Check local path if specified
+if not "!LOGGER_LOCAL_PATH!"=="" (
+    if exist "!LOGGER_LOCAL_PATH!\qml\Logger.qml" (
+        echo Using local traktor-logger from: !LOGGER_LOCAL_PATH!
+        :: Copy from local to cache for consistency
+        mkdir "!CACHE_DIR!\qml\CSI\Common\Api" 2>nul
+        echo Copying from local to cache...
+        setlocal enabledelayedexpansion
+        for /R "!LOGGER_LOCAL_PATH!" %%G in (*.*) do (
+            set "SRC=%%G"
+            set "REL=!SRC:!LOGGER_LOCAL_PATH!=!"
+            set "DST=!CACHE_DIR!!REL!"
+            mkdir "!DST!\.." 2>nul
+            xcopy /Y "!SRC!" "!DST!" >nul 2>&1
+        )
+        endlocal
+        echo Package copied to: !CACHE_DIR!
+        endlocal
+        exit /b 0
+    ) else (
+        echo Warning: Local path specified but not valid: !LOGGER_LOCAL_PATH!
+    )
+)
+
 mkdir "!CACHE_DIR!\qml\CSI\Common\Api" 2>nul
 
-:: List of files to download
+:: Priority 2: Download from GitHub with branch support
 set "FILES[0]=server.py"
 set "FILES[1]=README.md"
 set "FILES[2]=qml/Logger.qml"
@@ -469,11 +546,12 @@ set "FILES[3]=qml/qmldir"
 set "FILES[4]=qml/CSI/Common/Api/ApiClient.js"
 set "FILES[5]=qml/CSI/Common/Api/ApiDeck.qml"
 set "FILES[6]=qml/CSI/Common/Api/ApiMasterClock.qml"
-set "FILES[7]=qml/CSI/Common/Api/ApiModule.qml"
+set "FILES[7]=qml/CSI/Common/Api/ApiChannel.qml"
+set "FILES[8]=qml/CSI/Common/Api/ApiModule.qml"
 
-echo Downloading traktor-logger package from GitHub...
+echo Downloading traktor-logger package from GitHub branch: !LOGGER_BRANCH!...
 
-for /L %%i in (0,1,7) do (
+for /L %%i in (0,1,8) do (
     set "FILE=!FILES[%%i]!"
     set "URL=!BASE_URL!/!FILE!"
     set "DST=!CACHE_DIR!\!FILE!"
@@ -489,11 +567,60 @@ endlocal
 exit /b 0
 
 :update_logger_cache
-echo Updating traktor-logger package from GitHub...
-if exist "%LOGGER_CACHE_DIR%" (
-    rmdir /s /q "%LOGGER_CACHE_DIR%" 2>nul
+setlocal enabledelayedexpansion
+
+:: If symlink mode with local path, symlink the cache instead of copying
+if "!SYMLINK_LOGGER!"=="true" if not "!LOGGER_LOCAL_PATH!"=="" (
+    echo Setting up cache as symlink to local path...
+    
+    REM Resolve local path to absolute
+    for /f "delims=" %%A in ('cd /d "!LOGGER_LOCAL_PATH!" ^&^& cd') do set "LOGGER_LOCAL_ABS=%%A"
+    
+    if not "!LOGGER_LOCAL_ABS!"=="" (
+        REM Remove existing cache
+        if exist "!LOGGER_CACHE_DIR!" (
+            rmdir /s /q "!LOGGER_CACHE_DIR!" 2>nul
+        )
+        
+        REM Ensure parent directory exists
+        for /f "delims=" %%D in ('cd /d "!LOGGER_CACHE_DIR!\.." ^&^& cd') do set "CACHE_PARENT=%%D"
+        if not exist "!CACHE_PARENT!" (
+            mkdir "!CACHE_PARENT!"
+        )
+        
+        REM Create symlink from cache to local path
+        mklink /D "!LOGGER_CACHE_DIR!" "!LOGGER_LOCAL_ABS!" >nul 2>&1
+        if !ERRORLEVEL! EQU 0 (
+            echo Cache symlinked to local path: !LOGGER_CACHE_DIR! -^\"\\- !LOGGER_LOCAL_ABS!
+        ) else (
+            echo Warning: Failed to create symlink. Falling back to copy mode...
+            set "SYMLINK_LOGGER=false"
+        )
+    )
 )
-call :get_logger_server_from_github
+
+if "!SYMLINK_LOGGER!"=="true" if not "!LOGGER_LOCAL_PATH!"=="" (
+    if exist "!LOGGER_CACHE_DIR!" (
+        if not exist "!LOGGER_CACHE_DIR!\qml\Logger.qml" (
+            echo Error: Cache symlink does not contain expected files
+            goto :end
+        )
+        echo Cache is ready: !LOGGER_CACHE_DIR!
+    )
+) else (
+    REM Copy mode (default for non-symlink or no local path)
+    if not "!LOGGER_LOCAL_PATH!"=="" (
+        echo Updating traktor-logger package from local path: !LOGGER_LOCAL_PATH!
+    ) else (
+        echo Updating traktor-logger package from GitHub branch: !LOGGER_BRANCH!
+    )
+    if exist "!LOGGER_CACHE_DIR!" (
+        rmdir /s /q "!LOGGER_CACHE_DIR!" 2>nul
+    )
+    call :get_logger_server_from_github
+)
+
+endlocal
 exit /b 0
 
 :install_logger_to_traktor
@@ -509,13 +636,31 @@ if !ERRORLEVEL! NEQ 0 (
     exit /b 1
 )
 
-:: Copy Logger.qml
-copy "!LOGGER_PATH!" "!TRAKTOR_QML!\Defines\Logger.qml" >nul 2>&1
-if !ERRORLEVEL! EQU 0 (
-    echo   [OK] Logger.qml: !TRAKTOR_QML!\Defines\Logger.qml
+:: Copy or symlink Logger.qml
+if "!SYMLINK_LOGGER!"=="true" if not "!LOGGER_LOCAL_PATH!"=="" (
+    for /f "delims=" %%A in ('cd /d "!LOGGER_LOCAL_PATH!" ^&^& cd') do set "LOGGER_LOCAL_ABS=%%A"
+    if not "!LOGGER_LOCAL_ABS!"=="" (
+        set "LOGGER_SRC_ABS=!LOGGER_LOCAL_ABS!\qml\Logger.qml"
+        del "!TRAKTOR_QML!\Defines\Logger.qml" >nul 2>&1
+        mklink "!TRAKTOR_QML!\Defines\Logger.qml" "!LOGGER_SRC_ABS!" >nul 2>&1
+        if !ERRORLEVEL! EQU 0 (
+            echo   [OK] Logger.qml ^(symlink^): !TRAKTOR_QML!\Defines\Logger.qml
+        ) else (
+            echo   [FAIL] Could not create symlink
+            exit /b 1
+        )
+    ) else (
+        echo   [FAIL] Could not resolve LOGGER_LOCAL_PATH to absolute path
+        exit /b 1
+    )
 ) else (
-    echo   [FAIL] Could not copy Logger.qml
-    exit /b 1
+    copy "!LOGGER_PATH!" "!TRAKTOR_QML!\Defines\Logger.qml" >nul 2>&1
+    if !ERRORLEVEL! EQU 0 (
+        echo   [OK] Logger.qml: !TRAKTOR_QML!\Defines\Logger.qml
+    ) else (
+        echo   [FAIL] Could not copy Logger.qml
+        exit /b 1
+    )
 )
 
 :: Register in qmldir
@@ -535,12 +680,34 @@ if exist "!LOGGER_CACHE_DIR!\qml\CSI\Common\Api" (
     if not exist "!TRAKTOR_QML!\CSI\Common\Api" (
         mkdir "!TRAKTOR_QML!\CSI\Common\Api"
     )
-    xcopy "!LOGGER_CACHE_DIR!\qml\CSI\Common\Api\*" "!TRAKTOR_QML!\CSI\Common\Api\" /E /Y /Q >nul 2>&1
-    echo   [OK] Api modules: !TRAKTOR_QML!\CSI\Common\Api\
+    if "!SYMLINK_LOGGER!"=="true" if not "!LOGGER_LOCAL_PATH!"=="" (
+        for /f "delims=" %%A in ('cd /d "!LOGGER_LOCAL_PATH!" ^&^& cd') do set "LOGGER_LOCAL_ABS=%%A"
+        if exist "!LOGGER_LOCAL_ABS!\qml\CSI\Common\Api" (
+            for /r "!LOGGER_LOCAL_ABS!\qml\CSI\Common\Api" %%F in (*) do (
+                set "FILE=%%F"
+                set "FILENAME=%%~nxF"
+                del "!TRAKTOR_QML!\CSI\Common\Api\!FILENAME!" >nul 2>&1
+                mklink "!TRAKTOR_QML!\CSI\Common\Api\!FILENAME!" "!FILE!" >nul 2>&1
+            )
+            echo   [OK] Api modules ^(symlinks^): !TRAKTOR_QML!\CSI\Common\Api\
+        ) else (
+            echo   [WARN] Api modules: Could not create symlinks
+        )
+    ) else (
+        xcopy "!LOGGER_CACHE_DIR!\qml\CSI\Common\Api\*" "!TRAKTOR_QML!\CSI\Common\Api\" /E /Y /Q >nul 2>&1
+        echo   [OK] Api modules: !TRAKTOR_QML!\CSI\Common\Api\
+    )
 )
 
 echo.
+echo.
 echo [OK] Logger installation complete!
+echo.
+echo For development workflows:
+echo   Install from branch: install-traktor-mod logger install --branch dev
+echo   Install from local: install-traktor-mod logger install --local \path\to\logger
+echo   Install from local with symlinks: install-traktor-mod logger install --local \path\to\logger --symlink
+echo.
 exit /b 0
 
 :install_logger_to_mod
@@ -714,6 +881,12 @@ exit /b 1
     echo   install-traktor-mod.bat logger install  - install Logger.qml and Api modules
     echo   install-traktor-mod.bat logger update   - update/refresh Logger and Api from GitHub
     echo   install-traktor-mod.bat --with-logger   - include Logger with a mod install
+    echo.
+    echo Logger Development Options:
+    echo   install-traktor-mod.bat logger install --branch dev         - install from GitHub dev branch
+    echo   install-traktor-mod.bat logger install --local C:\path     - install from local directory
+    echo   install-traktor-mod.bat logger update --branch feature/xyz - update from GitHub feature branch
+    echo   install-traktor-mod.bat logger update --local C:\dev\logger - update from local directory
     echo.
     echo Server Launch:
     echo   install-traktor-mod.bat server start - launch traktor-logger server on localhost:8080

@@ -32,6 +32,10 @@ setlocal enabledelayedexpansion
 :: Server: Launch the traktor-logger HTTP server for real-time dashboard monitoring.
 :: Metadata: Enable automatic metadata collection from controllers (requires Api modules installed).
 ::
+:: Syntax checking: Before updating this file, validate with blint to catch batch syntax issues:
+::   python3 blint/blint.py install-traktor-mod.bat
+:: See BATCH_FILE_FIXES_REPORT.md for details on blint findings and false positives.
+::
 :: ============================================================
 
 :: Check for admin rights and re-launch elevated if needed, forwarding all args
@@ -148,7 +152,7 @@ if "!NEXT_IS_SOURCE!"=="true" (
     set "MODE=restore"
 ) else if /I "%~1"=="logger" (
     shift
-    if "!%~1:~0,1!"=="" (
+    if "%~1"=="" (
         echo Error: 'logger' requires a subcommand (install or update)
         goto :end
     )
@@ -163,7 +167,7 @@ if "!NEXT_IS_SOURCE!"=="true" (
     )
 ) else if /I "%~1"=="server" (
     shift
-    if "!%~1:~0,1!"=="" (
+    if "%~1"=="" (
         echo Error: 'server' requires a subcommand (start)
         goto :end
     )
@@ -175,7 +179,7 @@ if "!NEXT_IS_SOURCE!"=="true" (
     )
 ) else if /I "%~1"=="enable-metadata" (
     shift
-    if "!%~1:~0,1!"=="" (
+    if "%~1"=="" (
         echo Error: 'enable-metadata' requires controller names
         goto :end
     )
@@ -195,6 +199,7 @@ goto :parse_args
 :: --- RESTORE MODE ---
 
 if /I "!MODE!"=="restore" (
+    REM Verify Traktor paths exist
     if not exist "!TRAKTOR_QML!" (
         echo Error: Traktor Pro 4 not found at expected path.
         echo   Expected: !TRAKTOR_QML!
@@ -206,6 +211,13 @@ if /I "!MODE!"=="restore" (
         goto :end
     )
     echo Restoring stock qml from backup...
+    REM Ask for confirmation before destructive operation
+    echo.
+    set /p CONFIRM="Are you sure you want to restore stock qml? (y/n): "
+    if /I not "%CONFIRM%"=="y" (
+        echo Restore cancelled.
+        goto :end
+    )
     rmdir /s /q "!TRAKTOR_QML!" 2>nul
     if !ERRORLEVEL! NEQ 0 (
         echo Error: Could not delete current qml folder. Is Traktor running?
@@ -404,6 +416,7 @@ set "URL=%~1"
 set "DST=%~2"
 
 if exist "%DST%" (
+    endlocal
     exit /b 0
 )
 
@@ -411,18 +424,20 @@ echo Downloading from: !URL!...
 mkdir "%~dp2" 2>nul
 
 :: Use PowerShell for download (built-in on Windows)
-powershell -NoProfile -Command "try { (New-Object Net.WebClient).DownloadFile('%URL%', '%DST%'); Write-Host 'Downloaded to: %DST%' } catch { Write-Error $_; exit 1 }"
+powershell -NoProfile -Command "try { (New-Object Net.WebClient).DownloadFile('!URL!', '!DST!'); Write-Host 'Downloaded to: !DST!' } catch { Write-Error $_; exit 1 }"
+endlocal
 exit /b %ERRORLEVEL%
 
 :get_logger_from_github
 :: Download Logger.qml from GitHub to cache
-setlocal
+setlocal enabledelayedexpansion
 set "CACHE_DIR=%LOGGER_CACHE_DIR%"
 set "CACHE_FILE=!CACHE_DIR!\Logger.qml"
 set "URL=%LOGGER_GITHUB_URL%/qml/Logger.qml"
 
 if exist "!CACHE_FILE!" (
     echo !CACHE_FILE!
+    endlocal
     exit /b 0
 )
 
@@ -430,15 +445,17 @@ mkdir "!CACHE_DIR!" 2>nul
 call :download_file "!URL!" "!CACHE_FILE!"
 if !ERRORLEVEL! EQU 0 (
     echo !CACHE_FILE!
+    endlocal
     exit /b 0
 ) else (
     echo Error: Failed to download Logger.qml
+    endlocal
     exit /b 1
 )
 
 :get_logger_server_from_github
 :: Download entire traktor-logger package
-setlocal
+setlocal enabledelayedexpansion
 set "CACHE_DIR=%LOGGER_CACHE_DIR%"
 set "BASE_URL=%LOGGER_GITHUB_URL%"
 
@@ -468,6 +485,7 @@ for /L %%i in (0,1,7) do (
 )
 
 echo Package downloaded to: !CACHE_DIR!
+endlocal
 exit /b 0
 
 :update_logger_cache
@@ -566,6 +584,7 @@ if !ERRORLEVEL! EQU 0 (
     endlocal & set "%~1=!CACHE_FILE!"
     exit /b 0
 ) else (
+    endlocal
     exit /b 1
 )
 
@@ -575,12 +594,14 @@ setlocal
 set "CONTROLLERS=%~1"
 
 if "%CONTROLLERS%"=="" (
+    endlocal
     echo Error: No controllers specified for metadata
     exit /b 1
 )
 
 :: Verify Api modules are installed
 if not exist "!TRAKTOR_QML!\CSI\Common\Api" (
+    endlocal
     echo Error: Api modules not found in Traktor qml
     echo.
     echo Install them first with:
@@ -618,6 +639,7 @@ for %%C in (!CONTROLLERS!) do (
     )
 )
 
+endlocal
 exit /b 0
 
 :start_server
@@ -636,6 +658,7 @@ if !ERRORLEVEL! EQU 0 (
         echo Server running on http://localhost:8080
         echo Press Ctrl+C to stop
         echo.
+        endlocal
         python "!LOGGER_CACHE_DIR!\server.py"
         exit /b 0
     ) else (
@@ -645,6 +668,7 @@ if !ERRORLEVEL! EQU 0 (
             echo Server running on http://localhost:8080
             echo Press Ctrl+C to stop
             echo.
+            endlocal
             python "!LOGGER_CACHE_DIR!\server.py"
             exit /b 0
         )
@@ -656,6 +680,7 @@ echo.
 echo To install Python 3:
 echo   Visit: https://www.python.org/downloads/
 echo   Or: winget install Python.Python.3.11
+endlocal
 exit /b 1
 
 :showhelp
@@ -717,4 +742,4 @@ exit /b 1
     echo.
     pause
     endlocal
-    exit /b
+    exit /b 0

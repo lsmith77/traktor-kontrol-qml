@@ -52,13 +52,73 @@ Use this flowchart to isolate problems quickly. For detailed steps, see **Debugg
 
 ## Debugging Steps (Detailed)
 
-### 1) Reduce variables
+### 1) Run Traktor from Terminal and Check Startup Errors
+
+**This is the most direct way to find problems—do this first.**
+
+When you run Traktor from a Terminal (a text-based command interface), all QML errors, warnings, and undefined variables print to the screen. This tells you exactly what's broken and where.
+
+**What is a Terminal?** A Terminal is an app where you type commands instead of clicking. Think of it as a text-based way to launch programs.
+
+**How to open Terminal:**
+
+**macOS:**
+
+- Open Spotlight (Cmd+Space)
+- Type "Terminal" and press Enter
+- (Or navigate to Applications → Utilities → Terminal)
+
+**Windows:**
+
+- Right-click on the Start menu
+- Select "Windows Terminal" or "Command Prompt"
+- (Or search for "cmd" in the Start menu)
+
+---
+
+**macOS: Run Traktor from Terminal:**
+
+Paste this into Terminal and press Enter:
+
+```bash
+/Applications/Native\ Instruments/Traktor\ Pro\ 4/Traktor\ Pro\ 4.app/Contents/MacOS/Traktor\ Pro\ 4
+```
+
+Watch the Terminal window as Traktor loads. Look for error messages like:
+
+- `ReferenceError: someVariable is not defined`
+- `Cannot open: file:///...undefined.png`
+- `Error: Cannot assign [undefined] to QString`
+- `Binding loop detected for property "propertyName"`
+
+Each error tells you the exact file and line number where the problem is.
+
+**Windows:**
+The command path will be different. If you know the installation path to Traktor Pro 4, you can try a similar approach. 
+
+---
+
+**Optional: Save the error output to a file for later review:**
+
+```bash
+/Applications/Native\ Instruments/Traktor\ Pro\ 4/Traktor\ Pro\ 4.app/Contents/MacOS/Traktor\ Pro\ 4 > traktor_debug.log 2>&1
+```
+
+This creates a file called `traktor_debug.log` in your Terminal's current folder with all the errors.
+
+**Next step:** If errors appear, fix them in your QML files and restart Traktor. If no errors appear, continue below.
+
+💡 **Tip:** For analyzing complex error logs, use the `analyze-qml-errors.md` prompt template to categorize all issues at once.
+
+---
+
+### 2) Reduce variables
 
 - Quit Traktor.
 - Reproduce with the smallest possible change.
 - If you changed multiple files, restore all but one and retry.
 
-### 2) Confirm you edited the right file
+### 3) Confirm you edited the right file
 
 Traktor has many controller-specific variants. Make sure you’re editing:
 
@@ -67,7 +127,7 @@ Traktor has many controller-specific variants. Make sure you’re editing:
 
 If you’re not sure where to edit, see the map in [02_API_REFERENCE.md](02_API_REFERENCE.md#file-locations-quick-map).
 
-### 3) Look for obvious QML errors first
+### 4) Look for obvious QML errors first
 
 The most common failures are basic:
 
@@ -76,7 +136,7 @@ The most common failures are basic:
 - wrong import style for your Traktor version
 - typo in a control value path
 
-### 4) Validate your assumptions
+### 5) Validate your assumptions
 
 - Is the control value path available in your Traktor version?
 - Is the deck ID variable what you think it is?
@@ -84,7 +144,7 @@ The most common failures are basic:
 
 Tip: confirm control value paths using the catalog embedded in [02_API_REFERENCE.md](02_API_REFERENCE.md#full-appproperty-path-catalog), and compare against working examples in the [X1MK3 Performance Mod](https://github.com/lsmith77/X1MK3_PerformanceMod) (see [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) for feature-by-feature breakdown).
 
-### 4b) Verify runtime state with logger output
+### 5b) Verify runtime state with logger output
 
 Use structured logger output to verify conditions, wire execution, and state transitions in real time:
 
@@ -101,7 +161,7 @@ onMyButtonPressedChanged: {
 
 This works reliably across all controllers, including those without hardware displays.
 
-### 5) When in doubt, restore and re-apply
+### 6) When in doubt, restore and re-apply
 
 If Traktor becomes unstable, see [Chapter 01: Install / Backup / Restore](01_BASICS.md#install--backup--restore-the-safe-workflow) for detailed steps.
 

@@ -30,6 +30,27 @@ Not for many useful mods.
 
 Start with beginner edits and the working examples in the **[X1MK3 Performance Mod](https://github.com/lsmith77/X1MK3_PerformanceMod)** (see [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md)). Most musicians can make useful customizations without deep programming skills.
 
+### Can I access browser/playlist data (track names, current selection)?
+
+**Short answer**: No, not through the AppProperty API. This is an architectural limitation, not a bug.
+
+**Why**: Browser item selection is managed by Traktor's internal QBrowser model and intentionally not exposed to QML code. You can:
+
+- ✅ Detect when browser is open or fullscreened
+- ✅ Read UI state (sort column, preview activity)
+- ✅ Monitor what users load to decks
+- ❌ Read which item is currently selected in the browser
+- ❌ Build a list of available tracks
+- ❌ Access playlist/crate contents
+
+**What you can do instead**:
+
+1. Monitor **deck properties** — when users load tracks, you get full metadata
+2. Monitor **preview player** — if they're previewing, they're likely selecting it
+3. Use **Wire signals** in a controller mod to track user interactions
+
+**For full details**: See [04_TROUBLESHOOTING.md — Can't Access Browser/Playlist Data](04_TROUBLESHOOTING.md#issue-cant-access-browserplaylist-data-list_selected_item-etc) for architectural explanation and workarounds.
+
 ---
 
 ## Mods & Installation

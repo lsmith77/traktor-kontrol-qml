@@ -487,7 +487,6 @@ Rectangle {
 | Check if in loop                 | `app.traktor.decks.[1-4].loop.active`               | `color: loopActive.value ? colors.orange : colors.white`      |
 | Get loop size                    | `app.traktor.decks.[1-4].loop.size`                 | `text: loopSize.value + " beats"`                             |
 | **Browser & Navigation**         |                                                     |                                                               |
-| Get selected browser item        | `app.traktor.browser.list_selected_item`            | `text: selectedItem.value`                                    |
 | Load track to deck               | `app.traktor.decks.[1-4].load.selected`             | `to: TriggerPropertyAdapter { path: "..." }`                  |
 | Browse up/down                   | `app.traktor.browser.list_navigation`               | `to: RelativePropertyAdapter { path: "..." }`                 |
 | **Effects**                      |                                                     |                                                               |
@@ -613,6 +612,8 @@ app.traktor.[context].[id/index].[category].[property]
 | `app.traktor.browser.preview_player.is_loaded`     | bool [read-only] | Preview loaded         |
 | `app.traktor.browser.preview_player.elapsed_time`  | real [read-only] | Preview playhead       |
 | `app.traktor.browser.preview_content.track_length` | real [read-only] | Preview track duration |
+
+**⚠️ Note**: Browser item selection is not accessible via AppProperties. See [04_TROUBLESHOOTING.md — Can't Access Browser/Playlist Data](04_TROUBLESHOOTING.md#issue-cant-access-browserplaylist-data-list_selected_item-etc) for architectural details and workarounds.
 
 ---
 

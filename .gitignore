@@ -1,4 +1,6 @@
 */
+!.github/
+!.github/**
 !prompts/
 traktor-kontrol-d2
 traktor-kontrol-screens

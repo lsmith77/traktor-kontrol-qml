@@ -1,0 +1,25 @@
+name: Validate Batch File Syntax
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  validate:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test help
+        shell: pwsh
+        run: cmd /c "install-traktor-mod.bat --help"
+
+      - name: Test branch arg
+        shell: pwsh
+        run: cmd /c "install-traktor-mod.bat --branch dev --help"
+
+      - name: Test local arg
+        shell: pwsh
+        run: cmd /c "install-traktor-mod.bat --local C:\\temp --help"
+
+      - name: Test combined args
+        shell: pwsh
+        run: cmd /c "install-traktor-mod.bat --branch feature/xyz --local C:\\dev\\logger --help"

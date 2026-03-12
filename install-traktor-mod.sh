@@ -227,6 +227,16 @@ get_api_modules_path() {
     return 0
 }
 
+get_screen_modules_path() {
+    # Get path to Screens/Common directory (contains ApiBrowser for screen-capable controllers)
+    local server_dir
+    if ! server_dir=$(get_server_package); then
+        return 1
+    fi
+    echo "$server_dir/qml/Screens/Common"
+    return 0
+}
+
 get_logger_version() {
     # Extract version from traktor-logger README (deterministic marker: "Version: X")
     local server_dir readme version
@@ -281,7 +291,23 @@ QMLDIR
     else
         echo "  ⚠ Api modules: not available (Logger.qml is installed)"
     fi
-    
+
+    # Copy Screens modules to mod (ApiBrowser + ApiClient.js for screen-capable controllers)
+    local screens_src
+    if screens_src=$(get_screen_modules_path 2>/dev/null) && [ -d "$screens_src" ] && [ -n "$(ls -A "$screens_src" 2>/dev/null)" ]; then
+        mkdir -p "$MOD_QML/Screens/Common"
+        if cp -r "$screens_src"/* "$MOD_QML/Screens/Common/" 2>&1; then
+            echo "  ✓ Screens modules: $MOD_QML/Screens/Common/"
+        else
+            echo "  ⚠ Screens modules: could not copy"
+        fi
+        # ApiBrowser.qml imports ApiClient.js from the same directory
+        local apiclient_src
+        if apiclient_src=$(get_api_modules_path 2>/dev/null) && [ -f "$apiclient_src/ApiClient.js" ]; then
+            cp "$apiclient_src/ApiClient.js" "$MOD_QML/Screens/Common/ApiClient.js" 2>/dev/null || true
+        fi
+    fi
+
     return 0
 }
 
@@ -310,8 +336,10 @@ enable_metadata_for_traktor() {
         return 1
     fi
     
-    # Now enable metadata on the controllers
+    # Enable CSI metadata collection per-controller
     enable_metadata_for_controllers "$controller_list" "$TRAKTOR_QML"
+    # Enable browser monitoring in all Screen.qml files (shared across controllers)
+    enable_browser_in_all_screens "$TRAKTOR_QML"
 }
 
 enable_metadata_for_controllers() {
@@ -414,7 +442,106 @@ enable_metadata_for_controllers() {
         $use_sudo mv "$temp_file" "$controller_file"
         echo "  ✓ $controller: metadata enabled (validated)"
     done
-    
+
+    return 0
+}
+
+enable_browser_in_all_screens() {
+    # Inject ApiBrowser into every Screen.qml found under the Screens/ directory.
+    # Screen files are shared across controllers (e.g. D2 and S8 both use Screens/S8/Views/Screen.qml),
+    # so we inject into all of them rather than guessing a per-controller path.
+    local target_dir="${1:-$TRAKTOR_QML}"
+    local screens_dir="$target_dir/Screens"
+
+    if [ ! -d "$screens_dir" ]; then
+        echo "  ⚠ No Screens directory found at $screens_dir — browser monitoring skipped"
+        return 0
+    fi
+
+    local use_sudo=""
+    if [[ "$target_dir" == "$TRAKTOR_QML"* ]]; then
+        use_sudo="sudo"
+    fi
+
+    local found=0
+    while IFS= read -r screen_file; do
+        found=1
+
+        # Idempotent check
+        if grep -q "ApiBrowser" "$screen_file"; then
+            echo "  ✓ ${screen_file#$target_dir/}: browser monitoring already enabled"
+            continue
+        fi
+
+        # Compute the import path to Screens/Common relative to this Screen.qml's directory.
+        # e.g. Screens/S4MK3/Screen.qml      → ../Common
+        #      Screens/S8/Views/Screen.qml   → ../../Common
+        local rel_dir
+        rel_dir=$(dirname "${screen_file#$screens_dir/}")
+        local depth
+        depth=$(echo "$rel_dir" | tr -cd '/' | wc -c)
+        local import_path
+        import_path=$(printf '../%.0s' $(seq 1 $((depth + 1))))Common
+
+        # For multi-screen controllers (those with isLeftScreen), only the left
+        # instance should send to avoid duplicate POSTs.
+        local browser_instance='  LoggerScreens.ApiBrowser {}'
+        if grep -q "isLeftScreen" "$screen_file"; then
+            browser_instance='  LoggerScreens.ApiBrowser { active: isLeftScreen }'
+        fi
+
+        # Step 1: Add import for Screens/Common if not already present
+        local import_quoted="\"${import_path}\""
+        if ! grep -q "\"${import_path}\"" "$screen_file" && ! grep -q "'${import_path}'" "$screen_file"; then
+            local temp_file="${screen_file}.tmp1"
+            awk -v imp="import ${import_quoted} as LoggerScreens" '
+                /^import / {
+                    print $0
+                    need_import = 1
+                    next
+                }
+                need_import && !/^import / && !/^$/ {
+                    print imp
+                    print $0
+                    need_import = 0
+                    next
+                }
+                { print }
+            ' "$screen_file" > "$temp_file"
+            $use_sudo mv "$temp_file" "$screen_file"
+        fi
+
+        # Step 2: Inject ApiBrowser after the first { that follows all import lines.
+        # That { is always the root Item's opening brace in a Screen.qml file.
+        # Avoids \s which is not portable across awk implementations (BSD awk on macOS).
+        local temp_file="${screen_file}.tmp2"
+        awk -v component="$browser_instance" '
+            BEGIN { past_imports = 0; done = 0 }
+            /^import /  { past_imports = 1; print; next }
+            past_imports && !done && /\{/ {
+                print
+                print component
+                done = 1
+                next
+            }
+            { print }
+        ' "$screen_file" > "$temp_file"
+
+        # Validate that ApiBrowser was actually inserted
+        if ! grep -q "ApiBrowser" "$temp_file"; then
+            echo "  ✗ ${screen_file#$target_dir/}: injection failed — ApiBrowser not found in output, skipping"
+            rm -f "$temp_file"
+            continue
+        fi
+
+        $use_sudo mv "$temp_file" "$screen_file"
+        echo "  ✓ ${screen_file#$target_dir/}: browser monitoring enabled"
+    done < <(find "$screens_dir" -name "Screen.qml" 2>/dev/null)
+
+    if [ "$found" -eq 0 ]; then
+        echo "  ⚠ No Screen.qml files found under $screens_dir — browser monitoring skipped"
+    fi
+
     return 0
 }
 
@@ -473,7 +600,23 @@ QMLDIR
     else
         echo "  ⚠ Api modules: not available in cache (Logger.qml is installed)"
     fi
-    
+
+    # Copy Screens modules to Traktor's live QML (ApiBrowser + ApiClient.js for screen-capable controllers)
+    local screens_src
+    if screens_src=$(get_screen_modules_path 2>/dev/null) && [ -d "$screens_src" ] && [ -n "$(ls -A "$screens_src" 2>/dev/null)" ]; then
+        sudo mkdir -p "$TRAKTOR_QML/Screens/Common"
+        if sudo cp -r "$screens_src"/* "$TRAKTOR_QML/Screens/Common/" 2>&1; then
+            echo "  ✓ Screens modules: $TRAKTOR_QML/Screens/Common/"
+        else
+            echo "  ⚠ Screens modules: could not copy"
+        fi
+        # ApiBrowser.qml imports ApiClient.js from the same directory
+        local apiclient_src
+        if apiclient_src=$(get_api_modules_path 2>/dev/null) && [ -f "$apiclient_src/ApiClient.js" ]; then
+            sudo cp "$apiclient_src/ApiClient.js" "$TRAKTOR_QML/Screens/Common/ApiClient.js" 2>/dev/null || true
+        fi
+    fi
+
     echo ""
     echo "✓ Logger installation complete!"
     echo ""
@@ -482,7 +625,7 @@ QMLDIR
     echo "  Logger { id: logger }"
     echo "  logger.info('Message', { data: 'value' })"
     echo ""
-    echo "For automatic metadata collection (deck state, channels, tempo):"
+    echo "For automatic metadata collection (deck state, channels, tempo, browser):"
     echo "  Use: install-traktor-mod enable-metadata ControllerName"
     echo "  Example: install-traktor-mod enable-metadata D2,S8,X1MK3"
     echo "  Then open the Logger Web Dashboard at http://localhost:8080"
@@ -490,6 +633,7 @@ QMLDIR
     echo "Components installed:"
     echo "  • Logger.qml: $TRAKTOR_QML/Defines/Logger.qml"
     echo "  • Api modules: $TRAKTOR_QML/CSI/Common/Api/"
+    echo "  • Screens modules: $TRAKTOR_QML/Screens/Common/"
     return 0
 }
 

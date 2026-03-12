@@ -14,8 +14,10 @@ setlocal enabledelayedexpansion
 ::   install-traktor-mod.bat /full /fresh                  — restore stock first, then replace entire qml
 ::   install-traktor-mod.bat /full /fresh /symlink         — restore stock, then symlink complete mod
 ::   install-traktor-mod.bat restore                       — restore stock qml and remove all mods/symlinks
+::   install-traktor-mod.bat logger pull                   — download traktor-logger to local cache from GitHub
+::   install-traktor-mod.bat logger pull /branch dev       — pull from specific branch
+::   install-traktor-mod.bat logger pull /local C:\path   — copy from local directory
 ::   install-traktor-mod.bat logger install                — install Logger.qml and Api modules only
-::   install-traktor-mod.bat logger update                 — update/refresh Logger and Api modules from GitHub
 ::   install-traktor-mod.bat server start                  — launch traktor-logger server on localhost:8080
 ::   install-traktor-mod.bat enable-metadata D2,S8,X1MK3   — inject ApiModule into specified controllers
 ::
@@ -28,7 +30,7 @@ setlocal enabledelayedexpansion
 :: Fresh mode (/fresh): resets qml to stock first, then applies only this mod.
 :: Symlink mode (/symlink): creates symlinks in Traktor's qml pointing back to the files in this mod repo.
 :: Full replacement mode (/full): replaces Traktor's entire qml with this complete mod.
-:: Logger: Install optional Logger.qml and Api modules for debugging and monitoring.
+:: Logger: Download, install Logger.qml and Api modules for debugging and monitoring.
 :: Server: Launch the traktor-logger HTTP server for real-time dashboard monitoring.
 :: Metadata: Enable automatic metadata collection from controllers (requires Api modules installed).
 ::
@@ -103,6 +105,8 @@ set "START_SERVER=false"
 set "MODE=install"
 set "NEXT_IS_SOURCE=false"
 set "ENABLE_METADATA="
+set "BRANCH=main"
+set "LOGGER_LOCAL_PATH="
 
 :: --- parse arguments ---
 
@@ -148,19 +152,46 @@ if "!NEXT_IS_SOURCE!"=="true" (
     set "FULL=true"
 ) else if /I "%~1"=="--with-logger" (
     set "WITH_LOGGER=true"
+) else if /I "%~1"=="/branch" (
+    shift
+    if "%~1"=="" (
+        echo Error: /branch requires a branch name
+        goto :end
+    )
+    set "BRANCH=%~1"
+) else if /I "%~1"=="--branch" (
+    shift
+    if "%~1"=="" (
+        echo Error: --branch requires a branch name
+        goto :end
+    )
+    set "BRANCH=%~1"
+) else if /I "%~1"=="/local" (
+    shift
+    if "%~1"=="" (
+        echo Error: /local requires a path to local traktor-logger directory
+        goto :end
+    )
+    set "LOGGER_LOCAL_PATH=%~1"
+) else if /I "%~1"=="--local" (
+    shift
+    if "%~1"=="" (
+        echo Error: --local requires a path to local traktor-logger directory
+        goto :end
+    )
+    set "LOGGER_LOCAL_PATH=%~1"
 ) else if /I "%~1"=="restore" (
     set "MODE=restore"
 ) else if /I "%~1"=="logger" (
     shift
     if "%~1"=="" (
-        echo Error: 'logger' requires a subcommand (install or update)
+        echo Error: 'logger' requires a subcommand (pull or install)
         goto :end
     )
-    if /I "%~1"=="install" (
+    if /I "%~1"=="pull" (
+        set "MODE=pull-logger"
+    ) else if /I "%~1"=="install" (
         set "MODE=install-logger-only"
-    ) else if /I "%~1"=="update" (
-        call :update_logger_cache
-        goto :end
     ) else (
         echo Error: Unknown logger subcommand: %~1
         goto :end
@@ -211,10 +242,9 @@ if /I "!MODE!"=="restore" (
         goto :end
     )
     echo Restoring stock qml from backup...
-    REM Ask for confirmation before destructive operation
     echo.
     set /p CONFIRM="Are you sure you want to restore stock qml? (y/n): "
-    if /I not "%CONFIRM%"=="y" (
+    if /I not "!CONFIRM!"=="y" (
         echo Restore cancelled.
         goto :end
     )
@@ -232,10 +262,17 @@ if /I "!MODE!"=="restore" (
     goto :end
 )
 
-:: --- LOGGER UPDATE MODE ---
+:: --- ENABLE METADATA MODE ---
 
 if /I "!MODE!"=="enable-metadata" (
     call :enable_metadata_traktor "!ENABLE_METADATA!"
+    goto :end
+)
+
+:: --- PULL LOGGER MODE ---
+
+if /I "!MODE!"=="pull-logger" (
+    call :logger_pull
     goto :end
 )
 
@@ -313,7 +350,7 @@ if "!FULL!"=="true" (
         echo Error: Could not resolve mod source path: !MOD_QML!
         goto :end
     )
-    
+
     if "!SYMLINK!"=="true" (
         echo Installing mod (full replacement - symlinking entire qml)...
         rmdir /s /q "!TRAKTOR_QML!" 2>nul
@@ -353,10 +390,10 @@ if "!FULL!"=="true" (
         goto :end
     )
     echo Installing mod (symlinking overlay files into Traktor qml)...
-    
+
     :: PowerShell symlink helper for overlay mode
     powershell -NoProfile -Command "try { $src = '!MOD_QML_ABS!'; $dst = '!TRAKTOR_QML!'; Get-ChildItem -Path $src -Recurse -File | ForEach-Object { $rel = $_.FullName.Substring($src.Length + 1); $dstFile = Join-Path $dst $rel; $dstDir = Split-Path $dstFile; if (!(Test-Path $dstDir)) { New-Item -ItemType Directory -Path $dstDir -Force | Out-Null }; if (Test-Path $dstFile) { Remove-Item $dstFile -Force }; cmd /c mklink '\"'$dstFile'\"' '\"'$_.FullName'\"' | Out-Null } } catch { Write-Error $_; exit 1 }"
-    
+
     if !ERRORLEVEL! EQU 0 (
         echo Done.
         echo.
@@ -428,84 +465,120 @@ powershell -NoProfile -Command "try { (New-Object Net.WebClient).DownloadFile('!
 endlocal
 exit /b %ERRORLEVEL%
 
-:get_logger_from_github
-:: Download Logger.qml from GitHub to cache
+:download_traktor_logger_from_github
+:: Download entire traktor-logger repo from GitHub as a zip archive
+:: Arguments: %1=branch name
 setlocal enabledelayedexpansion
+set "DL_BRANCH=%~1"
+if "!DL_BRANCH!"=="" set "DL_BRANCH=main"
+set "ZIP_URL=https://github.com/lsmith77/traktor-logger/archive/refs/heads/!DL_BRANCH!.zip"
+set "TMP_ZIP=%TEMP%\traktor-logger-download.zip"
+set "TMP_DIR=%TEMP%\traktor-logger-download"
 set "CACHE_DIR=%LOGGER_CACHE_DIR%"
-set "CACHE_FILE=!CACHE_DIR!\Logger.qml"
-set "URL=%LOGGER_GITHUB_URL%/qml/Logger.qml"
 
-if exist "!CACHE_FILE!" (
-    echo !CACHE_FILE!
-    endlocal
-    exit /b 0
-)
+echo Downloading traktor-logger from GitHub (branch: !DL_BRANCH!)...
+
+:: Remove old cache and temp dirs
+if exist "!CACHE_DIR!" rmdir /s /q "!CACHE_DIR!" 2>nul
+if exist "!TMP_DIR!" rmdir /s /q "!TMP_DIR!" 2>nul
+if exist "!TMP_ZIP!" del /f /q "!TMP_ZIP!" 2>nul
 
 mkdir "!CACHE_DIR!" 2>nul
-call :download_file "!URL!" "!CACHE_FILE!"
-if !ERRORLEVEL! EQU 0 (
-    echo !CACHE_FILE!
-    endlocal
-    exit /b 0
-) else (
-    echo Error: Failed to download Logger.qml
+
+powershell -NoProfile -Command "& { try { Invoke-WebRequest -Uri '!ZIP_URL!' -OutFile '!TMP_ZIP!'; Expand-Archive -Path '!TMP_ZIP!' -DestinationPath '!TMP_DIR!' -Force; $inner = Get-ChildItem '!TMP_DIR!' | Select-Object -First 1; Copy-Item -Path ($inner.FullName + '\*') -Destination '!CACHE_DIR!' -Recurse -Force; Remove-Item '!TMP_ZIP!' -Force -ErrorAction SilentlyContinue; Remove-Item '!TMP_DIR!' -Recurse -Force -ErrorAction SilentlyContinue; Write-Host 'Download complete.' } catch { Write-Error $_; exit 1 } }"
+
+if !ERRORLEVEL! NEQ 0 (
+    echo Error: Failed to download traktor-logger from GitHub
+    if exist "!CACHE_DIR!" rmdir /s /q "!CACHE_DIR!" 2>nul
     endlocal
     exit /b 1
 )
 
-:get_logger_server_from_github
-:: Download entire traktor-logger package
-setlocal enabledelayedexpansion
-set "CACHE_DIR=%LOGGER_CACHE_DIR%"
-set "BASE_URL=%LOGGER_GITHUB_URL%"
-
-mkdir "!CACHE_DIR!\qml\CSI\Common\Api" 2>nul
-
-:: List of files to download
-set "FILES[0]=server.py"
-set "FILES[1]=README.md"
-set "FILES[2]=qml/Logger.qml"
-set "FILES[3]=qml/qmldir"
-set "FILES[4]=qml/CSI/Common/Api/ApiClient.js"
-set "FILES[5]=qml/CSI/Common/Api/ApiDeck.qml"
-set "FILES[6]=qml/CSI/Common/Api/ApiMasterClock.qml"
-set "FILES[7]=qml/CSI/Common/Api/ApiModule.qml"
-
-echo Downloading traktor-logger package from GitHub...
-
-for /L %%i in (0,1,7) do (
-    set "FILE=!FILES[%%i]!"
-    set "URL=!BASE_URL!/!FILE!"
-    set "DST=!CACHE_DIR!\!FILE!"
-    mkdir "!DST!\..\" 2>nul
-    call :download_file "!URL!" "!DST!"
-    if !ERRORLEVEL! NEQ 0 (
-        echo Warning: Failed to download !FILE!
-    )
-)
-
-echo Package downloaded to: !CACHE_DIR!
+echo Downloaded to: !CACHE_DIR!
 endlocal
 exit /b 0
 
-:update_logger_cache
-echo Updating traktor-logger package from GitHub...
-if exist "%LOGGER_CACHE_DIR%" (
-    rmdir /s /q "%LOGGER_CACHE_DIR%" 2>nul
+:logger_pull
+:: Pull traktor-logger into cache from GitHub or local directory
+setlocal enabledelayedexpansion
+
+if not "!LOGGER_LOCAL_PATH!"=="" (
+    echo Copying traktor-logger from local: !LOGGER_LOCAL_PATH! -^> !LOGGER_CACHE_DIR!
+    if exist "!LOGGER_CACHE_DIR!" rmdir /s /q "!LOGGER_CACHE_DIR!" 2>nul
+    if "!SYMLINK!"=="true" (
+        mklink /d "!LOGGER_CACHE_DIR!" "!LOGGER_LOCAL_PATH!" >nul 2>&1
+        if !ERRORLEVEL! EQU 0 (
+            echo Symlinked local traktor-logger directory into cache.
+        ) else (
+            echo Error: Could not create symlink. Make sure you have sufficient permissions.
+            endlocal
+            exit /b 1
+        )
+    ) else (
+        mkdir "!LOGGER_CACHE_DIR!" 2>nul
+        robocopy "!LOGGER_LOCAL_PATH!" "!LOGGER_CACHE_DIR!" /E /NFL /NDL /NJH /NJS >nul
+        if !ERRORLEVEL! LEQ 7 (
+            echo Copied local traktor-logger directory into cache.
+        ) else (
+            echo Error: Could not copy local traktor-logger directory.
+            endlocal
+            exit /b 1
+        )
+    )
+    endlocal
+    exit /b 0
 )
-call :get_logger_server_from_github
-exit /b 0
+
+call :download_traktor_logger_from_github "!BRANCH!"
+endlocal
+exit /b %ERRORLEVEL%
+
+:get_logger_qml_path
+:: Get path to Logger.qml (download if needed)
+:: Returns path via named variable %1
+setlocal enabledelayedexpansion
+set "CACHE_FILE=!LOGGER_CACHE_DIR!\qml\Logger.qml"
+
+if exist "!CACHE_FILE!" (
+    endlocal & set "%~1=!CACHE_FILE!"
+    exit /b 0
+)
+
+:: Not in cache - try downloading the full package
+call :download_traktor_logger_from_github "!BRANCH!"
+if !ERRORLEVEL! NEQ 0 (
+    endlocal
+    exit /b 1
+)
+
+if exist "!CACHE_FILE!" (
+    endlocal & set "%~1=!CACHE_FILE!"
+    exit /b 0
+) else (
+    endlocal
+    exit /b 1
+)
 
 :install_logger_to_traktor
 :: Install Logger.qml and Api modules to Traktor's live QML
+setlocal enabledelayedexpansion
+
+if not exist "!TRAKTOR_QML!" (
+    echo Error: Traktor Pro 4 not found at expected path.
+    echo   Expected: !TRAKTOR_QML!
+    endlocal
+    exit /b 1
+)
+
 if not exist "!TRAKTOR_QML!\Defines" (
     mkdir "!TRAKTOR_QML!\Defines"
 )
 
-:: Download Logger to cache first
+:: Get Logger.qml path (download if needed)
 call :get_logger_qml_path LOGGER_PATH
 if !ERRORLEVEL! NEQ 0 (
     echo Error: Could not obtain Logger.qml
+    endlocal
     exit /b 1
 )
 
@@ -515,6 +588,7 @@ if !ERRORLEVEL! EQU 0 (
     echo   [OK] Logger.qml: !TRAKTOR_QML!\Defines\Logger.qml
 ) else (
     echo   [FAIL] Could not copy Logger.qml
+    endlocal
     exit /b 1
 )
 
@@ -524,27 +598,49 @@ if not exist "!TRAKTOR_QML!\Defines\qmldir" (
         echo module Traktor.Defines
         echo Logger 1.0 Logger.qml
     ) > "!TRAKTOR_QML!\Defines\qmldir"
+) else (
+    findstr /M "^Logger" "!TRAKTOR_QML!\Defines\qmldir" >nul 2>&1
+    if !ERRORLEVEL! NEQ 0 (
+        echo Logger 1.0 Logger.qml >> "!TRAKTOR_QML!\Defines\qmldir"
+    )
 )
 
-:: Download and copy Api modules
+:: Download full package if Api modules not in cache
 if not exist "!LOGGER_CACHE_DIR!\qml\CSI\Common\Api" (
-    call :get_logger_server_from_github
+    call :download_traktor_logger_from_github "!BRANCH!"
 )
 
+:: Copy Api modules
 if exist "!LOGGER_CACHE_DIR!\qml\CSI\Common\Api" (
     if not exist "!TRAKTOR_QML!\CSI\Common\Api" (
         mkdir "!TRAKTOR_QML!\CSI\Common\Api"
     )
     xcopy "!LOGGER_CACHE_DIR!\qml\CSI\Common\Api\*" "!TRAKTOR_QML!\CSI\Common\Api\" /E /Y /Q >nul 2>&1
     echo   [OK] Api modules: !TRAKTOR_QML!\CSI\Common\Api\
+) else (
+    echo   [WARN] Api modules: not available in cache (Logger.qml is installed)
+)
+
+:: Copy Screens modules (ApiBrowser + ApiClient.js for screen-capable controllers)
+if exist "!LOGGER_CACHE_DIR!\qml\Screens\Common" (
+    if not exist "!TRAKTOR_QML!\Screens\Common" mkdir "!TRAKTOR_QML!\Screens\Common"
+    xcopy "!LOGGER_CACHE_DIR!\qml\Screens\Common\*" "!TRAKTOR_QML!\Screens\Common\" /E /Y /Q >nul 2>&1
+    echo   [OK] Screens modules: !TRAKTOR_QML!\Screens\Common\
+    :: ApiBrowser.qml imports ApiClient.js from the same directory
+    if exist "!LOGGER_CACHE_DIR!\qml\CSI\Common\Api\ApiClient.js" (
+        copy /Y "!LOGGER_CACHE_DIR!\qml\CSI\Common\Api\ApiClient.js" "!TRAKTOR_QML!\Screens\Common\ApiClient.js" >nul 2>&1
+    )
 )
 
 echo.
 echo [OK] Logger installation complete!
+endlocal
 exit /b 0
 
 :install_logger_to_mod
 :: Install Logger.qml to mod's folder
+setlocal enabledelayedexpansion
+
 if not exist "!MOD_QML!\Defines" (
     mkdir "!MOD_QML!\Defines"
 )
@@ -552,6 +648,7 @@ if not exist "!MOD_QML!\Defines" (
 call :get_logger_qml_path LOGGER_PATH
 if !ERRORLEVEL! NEQ 0 (
     echo Error: Could not obtain Logger.qml
+    endlocal
     exit /b 1
 )
 
@@ -566,86 +663,92 @@ if exist "!LOGGER_CACHE_DIR!\qml\CSI\Common\Api" (
     echo   [OK] Api modules installed to mod
 )
 
+endlocal
 exit /b 0
-
-:get_logger_qml_path
-:: Get path to Logger.qml (download if needed)
-setlocal
-set "CACHE_FILE=%LOGGER_CACHE_DIR%\Logger.qml"
-
-if exist "!CACHE_FILE!" (
-    endlocal & set "%~1=!CACHE_FILE!"
-    exit /b 0
-)
-
-mkdir "%LOGGER_CACHE_DIR%" 2>nul
-call :download_file "%LOGGER_GITHUB_URL%/qml/Logger.qml" "!CACHE_FILE!"
-if !ERRORLEVEL! EQU 0 (
-    endlocal & set "%~1=!CACHE_FILE!"
-    exit /b 0
-) else (
-    endlocal
-    exit /b 1
-)
 
 :enable_metadata_traktor
 :: Enable metadata for Traktor's installed QML
-setlocal
+setlocal enabledelayedexpansion
 set "CONTROLLERS=%~1"
 
-if "%CONTROLLERS%"=="" (
-    endlocal
+if "!CONTROLLERS!"=="" (
     echo Error: No controllers specified for metadata
+    endlocal
     exit /b 1
 )
 
 :: Verify Api modules are installed
 if not exist "!TRAKTOR_QML!\CSI\Common\Api" (
-    endlocal
     echo Error: Api modules not found in Traktor qml
     echo.
     echo Install them first with:
-    echo   install-traktor-mod logger install
+    echo   install-traktor-mod.bat logger install
+    echo.
+    echo Or pull and install with:
+    echo   install-traktor-mod.bat logger pull
+    echo   install-traktor-mod.bat logger install
+    endlocal
     exit /b 1
 )
 
-echo Enabling metadata for: !CONTROLLERS!
+echo Enabling metadata collection for controllers: !CONTROLLERS!
+echo Target: !TRAKTOR_QML!
 
 :: Parse comma-separated list and enable metadata for each controller
-setlocal enabledelayedexpansion
 for %%C in (!CONTROLLERS!) do (
     set "CONTROLLER=%%C"
     set "CONTROLLER_FILE=!TRAKTOR_QML!\CSI\!CONTROLLER!\!CONTROLLER!.qml"
-    
+
     if exist "!CONTROLLER_FILE!" (
         echo   Enabling: !CONTROLLER!
-        
-        :: Check if ApiModule is already present
+
+        :: Check if ApiModule is already present (idempotent)
         findstr /M "ApiModule" "!CONTROLLER_FILE!" >nul 2>&1
         if !ERRORLEVEL! NEQ 0 (
-            :: Use PowerShell to safely inject ApiModule
-            powershell -NoProfile -Command "try { $content = Get-Content '!CONTROLLER_FILE!'; $content = $content -replace '(\{)(\s*)', '`$1 // Automatic metadata collection`n  ApiModule {}' -replace '(\{)(\s*)(\/\/ Automatic metadata)', '`$1`$2`$3'; Set-Content '!CONTROLLER_FILE!' $content } catch { Write-Error $_; exit 1 }"
-            
+            :: Use PowerShell to safely inject import and ApiModule
+            powershell -NoProfile -Command "& { $file = '!CONTROLLER_FILE!'; $content = Get-Content -Path $file -Raw; $lines = $content -split \"`n\"; $newLines = @(); $importAdded = $false; $inImports = $false; foreach ($line in $lines) { if ($line -match '^import ') { $inImports = $true; $newLines += $line } elseif ($inImports -and -not $importAdded -and $line -notmatch '^import ' -and $line -notmatch '^\s*$') { if ($content -notmatch 'import.*Common/Api') { $newLines += 'import \"../Common/Api\"' }; $newLines += $line; $importAdded = $true; $inImports = $false } else { $newLines += $line } }; $content = $newLines -join \"`n\"; $lines2 = $content -split \"`n\"; $out = @(); $done = $false; $pastImports = $false; foreach ($line in $lines2) { if ($line -match '^import ') { $pastImports = $true; $out += $line; continue }; if ($pastImports -and -not $done -and $line -match 'Mapping\s*\{') { $out += $line; $out += '  // Automatic metadata collection'; $out += '  ApiModule {}'; $done = $true; continue }; $out += $line }; Set-Content -Path $file -Value ($out -join \"`n\") -NoNewline }"
+
             if !ERRORLEVEL! EQU 0 (
-                echo   [OK] !CONTROLLER! metadata enabled
+                echo   [OK] !CONTROLLER!: metadata enabled
             ) else (
                 echo   [FAIL] Could not enable metadata for !CONTROLLER!
             )
         ) else (
-            echo   [OK] !CONTROLLER! metadata already enabled
+            echo   [OK] !CONTROLLER!: metadata already enabled
         )
     ) else (
-        echo   [SKIP] !CONTROLLER! not found
+        echo   [SKIP] !CONTROLLER! not found: !CONTROLLER_FILE!
     )
 )
+
+call :enable_browser_in_all_screens "!TRAKTOR_QML!"
+
+endlocal
+exit /b 0
+
+:enable_browser_in_all_screens
+:: Inject ApiBrowser into every Screen.qml found under the Screens/ directory.
+:: Screen files are shared across controllers, so we inject into all of them.
+:: Arguments: %1=target dir (defaults to TRAKTOR_QML)
+setlocal enabledelayedexpansion
+set "TARGET_DIR=%~1"
+if "!TARGET_DIR!"=="" set "TARGET_DIR=!TRAKTOR_QML!"
+set "SCREENS_DIR=!TARGET_DIR!\Screens"
+
+if not exist "!SCREENS_DIR!" (
+    echo   [SKIP] No Screens directory found - browser monitoring skipped
+    endlocal
+    exit /b 0
+)
+
+powershell -NoProfile -Command "& { $screensDir = '!SCREENS_DIR!'; $traktorQml = '!TARGET_DIR!'; $screenFiles = Get-ChildItem -Path $screensDir -Filter 'Screen.qml' -Recurse -ErrorAction SilentlyContinue; foreach ($file in $screenFiles) { $content = Get-Content -Path $file.FullName -Raw; $relPath = $file.FullName.Substring($traktorQml.Length + 1); if ($content -match 'ApiBrowser') { Write-Host \"  [OK] ${relPath}: browser monitoring already enabled\"; continue }; $fileRelToScreens = $file.DirectoryName.Substring($screensDir.Length).TrimStart('\'); if ($fileRelToScreens -eq '') { $depth = 0 } else { $depth = ($fileRelToScreens -split '\\').Count }; $importPath = ('../' * ($depth + 1)).TrimEnd('/') + 'Common'; if ($content -match 'isLeftScreen') { $browserLine = '  LoggerScreens.ApiBrowser { active: isLeftScreen }' } else { $browserLine = '  LoggerScreens.ApiBrowser {}' }; $importLine = \"import \`\"${importPath}\`\" as LoggerScreens\"; if ($content -notmatch [regex]::Escape($importPath)) { $lines = $content -split \"`n\"; $newLines = @(); $importAdded = $false; $inImports = $false; for ($i = 0; $i -lt $lines.Count; $i++) { $line = $lines[$i]; if ($line -match '^import ') { $inImports = $true; $newLines += $line } elseif ($inImports -and -not $importAdded) { $newLines += $importLine; $newLines += $line; $importAdded = $true; $inImports = $false } else { $newLines += $line } }; $content = $newLines -join \"`n\" }; $lines2 = $content -split \"`n\"; $newLines2 = @(); $pastImports = $false; $done = $false; foreach ($line in $lines2) { if ($line -match '^import ') { $pastImports = $true; $newLines2 += $line; continue }; if ($pastImports -and -not $done -and $line -match '\{') { $newLines2 += $line; $newLines2 += $browserLine; $done = $true; continue }; $newLines2 += $line }; $result = $newLines2 -join \"`n\"; if ($result -notmatch 'ApiBrowser') { Write-Host \"  [FAIL] ${relPath}: injection failed\"; continue }; Set-Content -Path $file.FullName -Value $result -NoNewline; Write-Host \"  [OK] ${relPath}: browser monitoring enabled\" } }"
 
 endlocal
 exit /b 0
 
 :start_server
 :: Start the traktor-logger HTTP server
-setlocal
-set "PYTHON_EXE=python"
+setlocal enabledelayedexpansion
 
 echo Starting traktor-logger server...
 echo.
@@ -653,7 +756,11 @@ echo.
 :: Check if Python is available
 where python >nul 2>&1
 if !ERRORLEVEL! EQU 0 (
-    :: Find server.py
+    :: Find server.py - check cache
+    if not exist "!LOGGER_CACHE_DIR!\server.py" (
+        echo Downloading server from GitHub...
+        call :download_traktor_logger_from_github "!BRANCH!"
+    )
     if exist "!LOGGER_CACHE_DIR!\server.py" (
         echo Server running on http://localhost:8080
         echo Press Ctrl+C to stop
@@ -661,17 +768,6 @@ if !ERRORLEVEL! EQU 0 (
         endlocal
         python "!LOGGER_CACHE_DIR!\server.py"
         exit /b 0
-    ) else (
-        echo Downloading server from GitHub...
-        call :get_logger_server_from_github
-        if exist "!LOGGER_CACHE_DIR!\server.py" (
-            echo Server running on http://localhost:8080
-            echo Press Ctrl+C to stop
-            echo.
-            endlocal
-            python "!LOGGER_CACHE_DIR!\server.py"
-            exit /b 0
-        )
     )
 )
 
@@ -711,9 +807,11 @@ exit /b 1
     echo   install-traktor-mod.bat /full /fresh /symlink - reset, then symlink with replacement
     echo.
     echo Logger (Monitoring) Options:
-    echo   install-traktor-mod.bat logger install  - install Logger.qml and Api modules
-    echo   install-traktor-mod.bat logger update   - update/refresh Logger and Api from GitHub
-    echo   install-traktor-mod.bat --with-logger   - include Logger with a mod install
+    echo   install-traktor-mod.bat logger pull           - download traktor-logger to local cache from GitHub
+    echo   install-traktor-mod.bat logger pull /branch dev - pull from specific branch
+    echo   install-traktor-mod.bat logger pull /local C:\path - copy from local directory
+    echo   install-traktor-mod.bat logger install        - install Logger.qml and Api modules to Traktor qml
+    echo   install-traktor-mod.bat --with-logger         - include Logger with a mod install
     echo.
     echo Server Launch:
     echo   install-traktor-mod.bat server start - launch traktor-logger server on localhost:8080
@@ -724,6 +822,11 @@ exit /b 1
     echo General Options:
     echo   install-traktor-mod.bat restore         - restore stock, remove all mods
     echo   install-traktor-mod.bat -s C:\path\to\mod - use specific directory
+    echo.
+    echo Logger Cache Options (used with 'logger pull'):
+    echo   /branch ^<name^>        - pull from a specific GitHub branch (default: main)
+    echo   /local ^<path^>         - copy from a local traktor-logger directory
+    echo   /symlink (with /local) - symlink local directory into cache instead of copying
     echo.
     echo Help:
     echo   install-traktor-mod.bat -h              - show this help

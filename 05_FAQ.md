@@ -32,24 +32,21 @@ Start with beginner edits and the working examples in the **[X1MK3 Performance M
 
 ### Can I access browser/playlist data (track names, current selection)?
 
-**Short answer**: No, not through the AppProperty API. This is an architectural limitation, not a bug.
+**Short answer**: Yes — but only from the Screens layer, and only on controllers that have displays.
 
-**Why**: Browser item selection is managed by Traktor's internal QBrowser model and intentionally not exposed to QML code. You can:
+The **AppProperty API** does not expose browser item selection (`list_selected_item` etc. return `undefined`). However, `Traktor.Gui 1.0` (available only in the `Screens/` QML folder) provides a native `Traktor.Browser` component that gives full access to:
 
-- ✅ Detect when browser is open or fullscreened
-- ✅ Read UI state (sort column, preview activity)
-- ✅ Monitor what users load to decks
-- ❌ Read which item is currently selected in the browser
-- ❌ Build a list of available tracks
-- ❌ Access playlist/crate contents
+- ✅ Current browser path (`currentPath`)
+- ✅ Selected row index (`currentIndex`)
+- ✅ Full item data (track name, artist, BPM, key, rating, etc.) via `dataSet` model
+- ✅ Whether a content list (tracks) or folder list is showing (`isContentList`)
+- ❌ Not accessible in the CSI layer or from screen-less controllers (X1, Z1, F1, etc.)
 
-**What you can do instead**:
+The `traktor-logger` package's `enable-metadata` command injects an `ApiBrowser` monitor into your controller's Screen.qml that uses this to stream live browser state to the dashboard.
 
-1. Monitor **deck properties** — when users load tracks, you get full metadata
-2. Monitor **preview player** — if they're previewing, they're likely selecting it
-3. Use **Wire signals** in a controller mod to track user interactions
+**Credit**: The Screens-layer reverse engineering that made this possible was pioneered by [DJMirror](https://www.patreon.com/cw/DjMirrorTraktor/home).
 
-**For full details**: See [04_TROUBLESHOOTING.md — Can't Access Browser/Playlist Data](04_TROUBLESHOOTING.md#issue-cant-access-browserplaylist-data-list_selected_item-etc) for architectural explanation and workarounds.
+**For full details**: See [04_TROUBLESHOOTING.md — Accessing Browser/Playlist Data](04_TROUBLESHOOTING.md#issue-accessing-browserplaylist-data).
 
 ---
 

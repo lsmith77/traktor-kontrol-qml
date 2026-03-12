@@ -613,7 +613,7 @@ app.traktor.[context].[id/index].[category].[property]
 | `app.traktor.browser.preview_player.elapsed_time`  | real [read-only] | Preview playhead       |
 | `app.traktor.browser.preview_content.track_length` | real [read-only] | Preview track duration |
 
-**⚠️ Note**: Browser item selection is not accessible via AppProperties. See [04_TROUBLESHOOTING.md — Can't Access Browser/Playlist Data](04_TROUBLESHOOTING.md#issue-cant-access-browserplaylist-data-list_selected_item-etc) for architectural details and workarounds.
+**Note**: Browser item selection (selected track, list contents, current index) is not accessible via AppProperties. It is accessible via `Traktor.Browser` from `Traktor.Gui 1.0` in the Screens layer. See [04_TROUBLESHOOTING.md — Accessing Browser/Playlist Data](04_TROUBLESHOOTING.md#issue-accessing-browserplaylist-data) for details.
 
 ---
 

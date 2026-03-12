@@ -506,134 +506,65 @@ Wire {
 
 ---
 
-### Issue: Can't Access Browser/Playlist Data (list_selected_item, etc.)
+### Issue: Accessing Browser/Playlist Data
 
-**This is NOT a bug** — Traktor intentionally does not expose browser item selection through the AppProperty API.
+Browser item selection is **not accessible via the AppProperty API** — but it IS accessible through `Traktor.Browser` in the Screens layer for controllers that have displays.
 
-**What You May Have Tried:**
+**What does NOT work (AppProperty API):**
 
 - `app.traktor.browser.list_selected_item` → returns `undefined`
 - `app.traktor.browser.list_index` → returns `undefined`
 - `app.traktor.browser.list_focus` → returns `undefined`
 
-**Why It Doesn't Work:**
+These are not exposed. The AppProperty API only gives UI state (`full_screen`, `sort_id`, preview player).
 
-Browser item selection is managed by **Traktor's internal QBrowser model**, which is:
+**What DOES work: `Traktor.Browser` in the Screens layer**
 
-- ✅ **Rendered visually** on displays (D2, S8, controller screens)
-- ✅ **Controlled** via CSI Wires (navigation, gestures)
-- ❌ **NOT exposed** as AppProperties to QML code
-
-```
-┌─────────────────────────────────────────┐
-│  Traktor's Internal QBrowser Model      │
-├─────────────────────────────────────────┤
-│ (contains: list items, current index,   │
-│  folder hierarchy, sorting, etc.)       │
-├─────────────────────────────────────────┤
-│         ↓ Visual Layer            ↑ CSI │
-│    (rendered on screens)    (navigation)│
-│         ↓ via Qt Scene      ↑ Wires    │
-├─────────────────────────────────────────┤
-│    AppProperty API                      │
-│ (what QML modules can read)             │
-│  ❌ No access to item data              │
-│  ✅ Only UI state: fullscreen, sort_id  │
-└─────────────────────────────────────────┘
-```
-
-**What Traktor DOES expose:**
-
-| Available                           | Type      | Use Case                  |
-| ----------------------------------- | --------- | ------------------------- |
-| `app.traktor.browser.full_screen`   | bool      | Is browser fullscreened?  |
-| `app.traktor.browser.sort_id`       | int       | Which column sorted?      |
-| `app.traktor.browser.preview_*`     | bool/real | Is preview player active? |
-| `app.traktor.decks.X.load.selected` | trigger   | Load selected to deck     |
-
-**What You CANNOT Access:**
-
-- ❌ Current selected item name/path
-- ❌ Browser list contents
-- ❌ Current highlight position
-- ❌ Folder structure
-- ❌ Track data from browser (use deck data instead)
-
-**Architectural Reason:**
-
-The browser model is kept internal by design:
-
-1. **Performance** — Browser can contain 50,000+ tracks; exposing it as properties would require expensive synchronization
-2. **Consistency** — Single source of truth (internal Qt model) prevents sync issues
-3. **Encapsulation** — UI behavior is controlled exclusively through CSI Wires, not external state binding
-4. **Security** — Browser models sometimes contain filesystem-level data best not exposed to QML
-
-**What You CAN Do Instead:**
-
-**Option 1: Monitor Deck Loads** (recommended)
+Controllers with displays (S4MK3, S8, D2) load QML from a `Screens/` folder that has access to `Traktor.Gui 1.0`. This module provides a native `Traktor.Browser` component with full access to browser state:
 
 ```qml
-// When user loads selected item to deck, you get full metadata
-AppProperty { id: deckTitle; path: "app.traktor.decks.1.track.content.title" }
-AppProperty { id: deckArtist; path: "app.traktor.decks.1.track.content.artist" }
+import Traktor.Gui 1.0 as Traktor
 
-onPress: {
-    // Load selected from browser
-    loadSelectedToPool.value = true
-
-    // After load completes, deck properties update
-    logger.info("User loaded track", {
-        title: deckTitle.value,
-        artist: deckArtist.value
-    })
+Traktor.Browser {
+    id: browser
+    isActive: true  // subscribe to browser model updates
+    // Exposes:
+    //   browser.currentPath    — e.g. "Browser | Track Collection | Releases"
+    //   browser.currentIndex   — currently selected row index
+    //   browser.isContentList  — true when viewing tracks (vs folder list)
+    //   browser.dataSet        — list model of visible items
 }
-```
 
-**Option 2: Monitor Preview Player**
-
-```qml
-// User previewing an item is a strong signal of what they selected
-AppProperty { id: previewLoaded; path: "app.traktor.browser.preview_player.is_loaded" }
-AppProperty { id: previewTime; path: "app.traktor.browser.preview_player.elapsed_time" }
-
-onPreviewLoadedChanged: {
-    if (previewLoaded.value) {
-        logger.info("User is previewing track")
+ListView {
+    model: browser.dataSet
+    delegate: Item {
+        property var trackName: model.trackName
+        property var artistName: model.artistName
+        property var bpm: model.bpm
+        property var key: model.key
+        // also: nodeName, dataType, keyIndex, rating, prepared, loadedInDeck
     }
 }
 ```
 
-**Option 3: Use Wire Signals** (if you're building a controller mod)
+**Constraint: Screens layer only**
 
-```qml
-// Monitor browser navigation/selection changes via Wires
-Browser {
-    name: "myBrowser"
-    onJumpToIndex: {
-        logger.info("Browser jumped", { index: index })
-    }
-}
+`Traktor.Gui 1.0` is only available in QML loaded from the `Screens/` folder. It is **not** available in the CSI layer (`CSI/`) — any attempt to use it there will fail silently or crash. Screen-less controllers (X1, Z1, F1, etc.) cannot use this approach.
+
+**traktor-logger integration**
+
+The `traktor-logger` package includes `ApiBrowser.qml` (a `Screens/Common/` component) that uses `Traktor.Browser` to monitor browser state and send it to the dashboard in real time. Enable it with:
+
+```bash
+install-traktor-mod enable-metadata D2
 ```
 
-**Tested:** This limitation applies universally:
-
-- ✅ Traktor Pro 4 (all versions)
-- ✅ All controller types (S4MK3, S8, D2, etc.)
-- ✅ All screen displays (no exception)
-- ✅ CSI Modules (the constrained environment)
-
-**If You Need Playlist Metadata:**
-
-- ✅ Use Traktor's **Library API** instead (if available in your version)
-- ✅ Query metadata from deck properties (tracks already loaded)
-- ✅ Build your own browser cache by monitoring deck loads over time
-- ✅ Export setlist data through Traktor's library export feature
+This injects `ApiBrowser` into the Screen.qml of the target controller and sends current path, selected item metadata, and a window of surrounding items (up to 10 above, 20 below) to the **🎵 Browser** tab of the dashboard.
 
 **References:**
 
-- See [02_API_REFERENCE.md — Browser & Preview](02_API_REFERENCE.md#browser--preview) for complete list of available browser properties
-- Deck metadata: [02_API_REFERENCE.md — Track Metadata](02_API_REFERENCE.md#track-metadata)
-- Why Traktor's API is limited: Traktor's CSI framework prioritizes controller usability over data exposure; the philosophy is to expose **controls** and **observable UI state**, not internal data models
+- See [02_API_REFERENCE.md — Browser & Preview](02_API_REFERENCE.md#browser--preview) for AppProperty browser properties
+- Deck metadata (for loaded tracks): [02_API_REFERENCE.md — Track Metadata](02_API_REFERENCE.md#track-metadata)
 
 ---
 

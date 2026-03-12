@@ -6,6 +6,8 @@ This repo is a **friendly documentation set** for customizing Native Instruments
 
 **If you've created MIDI mappings in Traktor Pro**, you understand the concept of wiring hardware controls to actions. QML works the same way — it's just more powerful: you can change what buttons do, what screens show, and how the UI behaves.
 
+# NOTE: The install-traktor-mod scripts referenced in this documentation are vibe coded via AI with minimal code review. Use with caution and review scripts before production use.
+
 ---
 
 🧭 **Navigation**

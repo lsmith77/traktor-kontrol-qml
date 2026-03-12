@@ -401,6 +401,8 @@ An AI code assistant accelerates development by providing real-time suggestions,
 
 ## Install / backup / restore (the safe workflow)
 
+> **Disclaimer:** The install-traktor-mod scripts referenced here are vibe coded via AI with minimal code review. Use with caution and review scripts before production use.
+
 **The script automates backup, installation, and restoration.** It works on macOS and Windows and prevents the most common mistakes (incomplete installs, missing files).
 
 **Setup** (one-time): See [08_SHARING_CHANGES.md — Setup](08_SHARING_CHANGES.md#setup-install-script-to-system-path-one-time-setup) to add the script to your PATH.

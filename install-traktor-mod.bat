@@ -1,4 +1,5 @@
 @echo off
+:: NOTE: This script is vibe coded via AI with minimal code review. Use with caution and review before production use.
 setlocal enabledelayedexpansion
 
 :: ============================================================

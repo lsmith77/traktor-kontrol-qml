@@ -52,6 +52,7 @@
 # See 08_SHARING_CHANGES.md for setup instructions.
 
 set -e
+set -o pipefail
 
 show_help() {
     cat << 'EOF'
@@ -163,7 +164,6 @@ get_logger_qml() {
 # --- traktor-logger server caching (metadata + manual logging system) ---
 
 SERVER_CACHE_DIR="$HOME/.traktor-mod/traktor-logger"
-SERVER_GITHUB_REPO="https://raw.githubusercontent.com/lsmith77/traktor-logger/main"
 
 _download_traktor_logger_from_github() {
     # Download entire traktor-logger repo from GitHub as a tarball
@@ -256,17 +256,41 @@ get_logger_version() {
 }
 
 install_logger_qml() {
-    # Install Logger.qml and Api modules into mod's qml/
+    # Install Logger.qml and Api modules into mod's qml/ (symlink or copy)
+    local server_dir
+    if ! server_dir=$(get_server_package); then
+        echo "Error: Could not obtain traktor-logger package"
+        return 1
+    fi
+
+    if [ "$SYMLINK" = "true" ]; then
+        local logger_qml_abs
+        logger_qml_abs="$(cd "$server_dir/qml" && pwd)"
+        # Symlink individual top-level entries so the mod qml remains a real directory
+        # (preserving other mod files alongside the logger symlinks)
+        mkdir -p "$MOD_QML"
+        for entry in Defines CSI Screens; do
+            local src="$logger_qml_abs/$entry"
+            local dst="$MOD_QML/$entry"
+            [ -d "$src" ] || continue
+            rm -rf "$dst"
+            ln -s "$src" "$dst"
+            echo "  ✓ $entry: $dst -> $src"
+        done
+        return 0
+    fi
+
+    # Copy mode
     if [ ! -d "$MOD_QML/Defines" ]; then
         mkdir -p "$MOD_QML/Defines"
     fi
-    
+
     local logger_src
     if ! logger_src=$(get_logger_qml); then
         echo "Error: Could not obtain Logger.qml"
         return 1
     fi
-    
+
     # Create qmldir if it doesn't exist
     if [ ! -f "$MOD_QML/Defines/qmldir" ]; then
         cat > "$MOD_QML/Defines/qmldir" << 'QMLDIR'
@@ -274,12 +298,10 @@ module Traktor.Defines
 Logger 1.0 Logger.qml
 QMLDIR
     fi
-    
-    # Copy Logger.qml to mod
+
     cp "$logger_src" "$MOD_QML/Defines/Logger.qml"
     echo "  ✓ Logger.qml: $MOD_QML/Defines/Logger.qml"
-    
-    # Copy Api modules to mod
+
     local api_src
     if api_src=$(get_api_modules_path 2>/dev/null) && [ -d "$api_src" ] && [ -n "$(ls -A "$api_src" 2>/dev/null)" ]; then
         mkdir -p "$MOD_QML/CSI/Common/Api"
@@ -292,7 +314,6 @@ QMLDIR
         echo "  ⚠ Api modules: not available (Logger.qml is installed)"
     fi
 
-    # Copy Screens modules to mod (ApiBrowser + ApiClient.js for screen-capable controllers)
     local screens_src
     if screens_src=$(get_screen_modules_path 2>/dev/null) && [ -d "$screens_src" ] && [ -n "$(ls -A "$screens_src" 2>/dev/null)" ]; then
         mkdir -p "$MOD_QML/Screens/Common"
@@ -301,7 +322,6 @@ QMLDIR
         else
             echo "  ⚠ Screens modules: could not copy"
         fi
-        # ApiBrowser.qml imports ApiClient.js from the same directory
         local apiclient_src
         if apiclient_src=$(get_api_modules_path 2>/dev/null) && [ -f "$apiclient_src/ApiClient.js" ]; then
             cp "$apiclient_src/ApiClient.js" "$MOD_QML/Screens/Common/ApiClient.js" 2>/dev/null || true
@@ -428,12 +448,9 @@ enable_metadata_for_controllers() {
             { print }
         ' "$controller_file" > "$temp_file"
         
-        # Validate the temp file has balanced braces (basic check)
-        local open_braces=$(grep -o '{' "$temp_file" | wc -l)
-        local close_braces=$(grep -o '}' "$temp_file" | wc -l)
-        
-        if [ "$open_braces" -ne "$close_braces" ]; then
-            echo "  ✗ $controller: validation failed - brace mismatch"
+        # Validate the injection was actually inserted
+        if ! grep -q "ApiModule" "$temp_file"; then
+            echo "  ✗ $controller: injection failed — ApiModule not found in output"
             rm -f "$temp_file"
             continue
         fi
@@ -548,7 +565,7 @@ enable_browser_in_all_screens() {
 install_logger_to_traktor() {
     # Install Logger.qml and Api modules directly to Traktor's live QML (not to a mod)
     check_traktor_installed
-    
+
     # Create backup on first install
     if [ ! -d "$TRAKTOR_QML_BACKUP" ]; then
         echo "Creating backup of stock qml..."
@@ -557,7 +574,39 @@ install_logger_to_traktor() {
     else
         echo "Backup exists: $TRAKTOR_QML_BACKUP"
     fi
-    
+
+    # Symlink mode: copy logger files into local mod's qml, then symlink Traktor's qml to it
+    if [ "$SYMLINK" = "true" ]; then
+        if [ ! -d "$MOD_QML" ]; then
+            echo "Error: No local mod qml found at $MOD_QML"
+            echo "  Run from a mod directory containing a qml/ folder, or use without --symlink"
+            return 1
+        fi
+        # Copy logger files into the local mod's qml (no symlinks inside the mod)
+        local saved_symlink="$SYMLINK"
+        SYMLINK=false
+        install_logger_qml
+        SYMLINK="$saved_symlink"
+        # Symlink Traktor's qml to the local mod's qml
+        local mod_qml_abs
+        mod_qml_abs="$(cd "$MOD_QML" && pwd)"
+        sudo rm -rf "$TRAKTOR_QML"
+        sudo ln -s "$mod_qml_abs" "$TRAKTOR_QML"
+        echo "  ✓ qml: $TRAKTOR_QML -> $mod_qml_abs"
+        echo ""
+        echo "✓ Logger installation complete!"
+        echo ""
+        echo "For simple debug logging in your controller:"
+        echo "  import Traktor.Defines 1.0"
+        echo "  Logger { id: logger }"
+        echo "  logger.info('Message', { data: 'value' })"
+        echo ""
+        echo "Edit files in $mod_qml_abs and restart Traktor — no reinstall needed."
+        return 0
+    fi
+
+    # Copy mode: install individual files into Traktor's live QML
+
     # Get Logger.qml using hybrid fallback
     local logger_src
     if ! logger_src=$(get_logger_qml); then
@@ -572,23 +621,20 @@ install_logger_to_traktor() {
 
     # Register Logger in qmldir
     if [ ! -f "$TRAKTOR_QML/Defines/qmldir" ]; then
-        # Create new qmldir if missing
         sudo tee "$TRAKTOR_QML/Defines/qmldir" > /dev/null << 'QMLDIR'
 module Traktor.Defines
 Logger 1.0 Logger.qml
 QMLDIR
     else
-        # Append Logger to existing qmldir if not already there
         if ! grep -q "^Logger" "$TRAKTOR_QML/Defines/qmldir"; then
             echo "Logger 1.0 Logger.qml" | sudo tee -a "$TRAKTOR_QML/Defines/qmldir" > /dev/null
         fi
     fi
 
-    # Copy Logger.qml to Traktor's live QML
     sudo cp "$logger_src" "$TRAKTOR_QML/Defines/Logger.qml"
     echo "  ✓ Logger.qml: $TRAKTOR_QML/Defines/Logger.qml"
-    
-    # Copy Api modules to Traktor's live QML
+
+    # Copy Api modules
     local api_src
     if api_src=$(get_api_modules_path 2>/dev/null) && [ -d "$api_src" ] && [ -n "$(ls -A "$api_src" 2>/dev/null)" ]; then
         sudo mkdir -p "$TRAKTOR_QML/CSI/Common/Api"
@@ -601,7 +647,7 @@ QMLDIR
         echo "  ⚠ Api modules: not available in cache (Logger.qml is installed)"
     fi
 
-    # Copy Screens modules to Traktor's live QML (ApiBrowser + ApiClient.js for screen-capable controllers)
+    # Copy Screens modules
     local screens_src
     if screens_src=$(get_screen_modules_path 2>/dev/null) && [ -d "$screens_src" ] && [ -n "$(ls -A "$screens_src" 2>/dev/null)" ]; then
         sudo mkdir -p "$TRAKTOR_QML/Screens/Common"
@@ -610,7 +656,6 @@ QMLDIR
         else
             echo "  ⚠ Screens modules: could not copy"
         fi
-        # ApiBrowser.qml imports ApiClient.js from the same directory
         local apiclient_src
         if apiclient_src=$(get_api_modules_path 2>/dev/null) && [ -f "$apiclient_src/ApiClient.js" ]; then
             sudo cp "$apiclient_src/ApiClient.js" "$TRAKTOR_QML/Screens/Common/ApiClient.js" 2>/dev/null || true
@@ -652,6 +697,7 @@ SOURCE_DIR="."
 
 # --- argument parsing with --branch and --local ---
 BRANCH="main"
+SERVER_GITHUB_REPO="https://raw.githubusercontent.com/lsmith77/traktor-logger/${BRANCH}"
 LOGGER_LOCAL_PATH=""
 while [ $# -gt 0 ]; do
     arg="$1"
@@ -784,8 +830,7 @@ if [ "$START_SERVER" = "true" ] && [ "$MODE" = "install" ] && [ "$FRESH" = "fals
         exit 1
     fi
     
-    server_path=$(get_server_path)
-    if [ $? -eq 0 ]; then
+    if server_path=$(get_server_path); then
         echo "Server running on http://localhost:8080"
         echo "Press Ctrl+C to stop the server"
         echo ""
@@ -817,6 +862,12 @@ if [ "$MODE" = "restore" ]; then
         echo "Cannot restore — was the mod installed with this script?"
         exit 1
     fi
+    echo "This will restore stock qml, removing ALL mods and symlinks."
+    read -rp "Are you sure? [y/N] " confirm
+    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+        echo "Restore cancelled."
+        exit 0
+    fi
     echo "Restoring stock qml from backup..."
     sudo rm -rf "$TRAKTOR_QML"
     sudo mv "$TRAKTOR_QML_BACKUP" "$TRAKTOR_QML"
@@ -842,7 +893,7 @@ if [ "$MODE" = "install-logger-only" ]; then
         if [ -n "$server_path" ]; then
             echo "Server path: $server_path"
         fi
-        # If 'server start' was specified, start the server; otherwise prompt to launch Traktor
+        # If 'server start' was specified, start the server
         if [ "$START_SERVER" = "true" ]; then
             echo ""
             echo "Starting traktor-logger server..."
@@ -859,10 +910,7 @@ if [ "$MODE" = "install-logger-only" ]; then
             fi
         fi
         echo ""
-        read -rp "Launch Traktor now? [y/N] " answer
-        if [[ "$answer" =~ ^[Yy]$ ]]; then
-            open "$TRAKTOR_APP"
-        fi
+        echo "Restart Traktor to apply changes."
     else
         echo "Error: Installation failed"
         exit 1
@@ -962,6 +1010,7 @@ if [ "$WITH_LOGGER" = "true" ]; then
         echo "Components installed:"
         echo "  • Logger.qml: $MOD_QML/Defines/"
         echo "  • Api modules: $MOD_QML/CSI/Common/Api/"
+        echo "  • Screens modules: $MOD_QML/Screens/Common/"
     else
         echo "Warning: Installation failed"
     fi
@@ -984,8 +1033,7 @@ if [ "$START_SERVER" = "true" ]; then
         exit 1
     fi
     
-    server_path=$(get_server_path)
-    if [ $? -eq 0 ]; then
+    if server_path=$(get_server_path); then
         echo "Server running on http://localhost:8080"
         echo "Press Ctrl+C to stop the server"
         echo ""
@@ -1000,9 +1048,5 @@ fi
 
 echo ""
 echo "To undo all mods:  install-traktor-mod restore"
-
-read -rp "Launch Traktor now? [y/N] " answer
-if [[ "$answer" =~ ^[Yy]$ ]]; then
-    open "$TRAKTOR_APP"
-fi
+echo "Restart Traktor to apply changes."
 

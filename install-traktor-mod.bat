@@ -50,24 +50,13 @@ if %errorLevel% == 0 (
 )
 
 :uac_prompt
-    set "ELEV_ARGS=%*"
-    setlocal disabledelayedexpansion
-    set "ELEV_ARGS=!ELEV_ARGS:"=""!"
-    setlocal enabledelayedexpansion
     echo Set UAC = CreateObject("Shell.Application") > "%temp%\getadmin.vbs"
-    echo UAC.ShellExecute "%~f0", "!ELEV_ARGS!", "%%CD%%", "runas", 1 >> "%temp%\getadmin.vbs"
+    echo UAC.ShellExecute "%~f0", "%*", "%CD%", "runas", 1 >> "%temp%\getadmin.vbs"
     "%temp%\getadmin.vbs"
     exit /B
 
 :admin_ok
     if exist "%temp%\getadmin.vbs" ( del "%temp%\getadmin.vbs" )
-
-echo.
-echo ╔════════════════════════════════════════════════════════════════╗
-echo ║ Traktor Mod Installer (Windows) - Full Featured Edition        ║
-echo ║ Supports: overlay/full modes, symlinks, logger, metadata       ║
-echo ╚════════════════════════════════════════════════════════════════╝
-echo.
 
 :: Check for help flag first
 for %%A in (%*) do (
@@ -116,20 +105,20 @@ if "%~1"=="" goto :end_parse_args
 if "!NEXT_IS_SOURCE!"=="true" (
     if "%~1"=="" (
         echo Error: -s/--source requires a directory path to follow
-        goto :end
+        goto :end_error
     )
     set "NEXT_ARG=%~1"
     if "!NEXT_ARG:~0,1!"=="/" (
         echo Error: -s/--source requires a directory path, not a flag: %~1
-        goto :end
+        goto :end_error
     )
     if "!NEXT_ARG:~0,1!"=="-" (
         echo Error: -s/--source requires a directory path, not a flag: %~1
-        goto :end
+        goto :end_error
     )
     if not exist "%~1" (
         echo Error: Source directory not found: %~1
-        goto :end
+        goto :end_error
     )
     for /f "delims=" %%D in ('cd /d "%~1" 2^>nul ^&^& cd') do set "SOURCE_DIR=%%D"
     set "MOD_QML=!SOURCE_DIR!\qml"
@@ -152,32 +141,34 @@ if "!NEXT_IS_SOURCE!"=="true" (
     set "FULL=true"
 ) else if /I "%~1"=="--with-logger" (
     set "WITH_LOGGER=true"
+) else if /I "%~1"=="/with-logger" (
+    set "WITH_LOGGER=true"
 ) else if /I "%~1"=="/branch" (
     shift
     if "%~1"=="" (
         echo Error: /branch requires a branch name
-        goto :end
+        goto :end_error
     )
     set "BRANCH=%~1"
 ) else if /I "%~1"=="--branch" (
     shift
     if "%~1"=="" (
         echo Error: --branch requires a branch name
-        goto :end
+        goto :end_error
     )
     set "BRANCH=%~1"
 ) else if /I "%~1"=="/local" (
     shift
     if "%~1"=="" (
         echo Error: /local requires a path to local traktor-logger directory
-        goto :end
+        goto :end_error
     )
     set "LOGGER_LOCAL_PATH=%~1"
 ) else if /I "%~1"=="--local" (
     shift
     if "%~1"=="" (
         echo Error: --local requires a path to local traktor-logger directory
-        goto :end
+        goto :end_error
     )
     set "LOGGER_LOCAL_PATH=%~1"
 ) else if /I "%~1"=="restore" (
@@ -186,7 +177,7 @@ if "!NEXT_IS_SOURCE!"=="true" (
     shift
     if "%~1"=="" (
         echo Error: 'logger' requires a subcommand (pull or install)
-        goto :end
+        goto :end_error
     )
     if /I "%~1"=="pull" (
         set "MODE=pull-logger"
@@ -194,32 +185,32 @@ if "!NEXT_IS_SOURCE!"=="true" (
         set "MODE=install-logger-only"
     ) else (
         echo Error: Unknown logger subcommand: %~1
-        goto :end
+        goto :end_error
     )
 ) else if /I "%~1"=="server" (
     shift
     if "%~1"=="" (
         echo Error: 'server' requires a subcommand (start)
-        goto :end
+        goto :end_error
     )
     if /I "%~1"=="start" (
         set "START_SERVER=true"
     ) else (
         echo Error: Unknown server subcommand: %~1
-        goto :end
+        goto :end_error
     )
 ) else if /I "%~1"=="enable-metadata" (
     shift
     if "%~1"=="" (
         echo Error: 'enable-metadata' requires controller names
-        goto :end
+        goto :end_error
     )
     set "ENABLE_METADATA=%~1"
     set "MODE=enable-metadata"
     shift
 ) else (
     echo Error: Unknown argument: %~1
-    goto :end
+    goto :end_error
 )
 
 shift
@@ -234,12 +225,12 @@ if /I "!MODE!"=="restore" (
     if not exist "!TRAKTOR_QML!" (
         echo Error: Traktor Pro 4 not found at expected path.
         echo   Expected: !TRAKTOR_QML!
-        goto :end
+        goto :end_error
     )
     if not exist "!TRAKTOR_QML_BACKUP!" (
         echo Error: No backup found at: !TRAKTOR_QML_BACKUP!
         echo   Cannot restore — was the mod installed with this script?
-        goto :end
+        goto :end_error
     )
     echo Restoring stock qml from backup...
     echo.
@@ -251,12 +242,12 @@ if /I "!MODE!"=="restore" (
     rmdir /s /q "!TRAKTOR_QML!" 2>nul
     if !ERRORLEVEL! NEQ 0 (
         echo Error: Could not delete current qml folder. Is Traktor running?
-        goto :end
+        goto :end_error
     )
     move "!TRAKTOR_QML_BACKUP!" "!TRAKTOR_QML!" >nul 2>&1
     if !ERRORLEVEL! NEQ 0 (
         echo Error: Could not restore backup. Aborting.
-        goto :end
+        goto :end_error
     )
     echo Done. Restart Traktor to apply.
     goto :end
@@ -285,10 +276,11 @@ if /I "!MODE!"=="install-logger-only" (
         if "!START_SERVER!"=="true" (
             call :start_server
         )
+        goto :end
     ) else (
         echo Error: Installation failed
+        goto :end_error
     )
-    goto :end
 )
 
 :: --- START SERVER ONLY (if 'server start' with no other action flags) ---
@@ -300,10 +292,17 @@ if "!START_SERVER!"=="true" if "!MODE!"=="install" if "!FRESH!"=="false" if "!SY
 
 :: --- STANDARD INSTALL MODE ---
 
+echo.
+echo ╔════════════════════════════════════════════════════════════════╗
+echo ║ Traktor Mod Installer (Windows) - Full Featured Edition        ║
+echo ║ Supports: overlay/full modes, symlinks, logger, metadata       ║
+echo ╚════════════════════════════════════════════════════════════════╝
+echo.
+
 if not exist "!TRAKTOR_QML!" (
     echo Error: Traktor Pro 4 not found at expected path.
     echo   Expected: !TRAKTOR_QML!
-    goto :end
+    goto :end_error
 )
 
 if not exist "!MOD_QML!" (
@@ -315,7 +314,7 @@ if not exist "!MOD_QML!" (
         echo Error: Source directory not found.
         echo   Source: !SOURCE_DIR!
     )
-    goto :end
+    goto :end_error
 )
 
 :: Create backup on first install
@@ -326,7 +325,7 @@ if not exist "!TRAKTOR_QML_BACKUP!" (
         echo   Backup saved: !TRAKTOR_QML_BACKUP!
     ) else (
         echo Error: Could not create backup. Aborting.
-        goto :end
+        goto :end_error
     )
 ) else (
     echo Backup exists: !TRAKTOR_QML_BACKUP!
@@ -338,7 +337,7 @@ if "!FRESH!"=="true" (
     robocopy "!TRAKTOR_QML_BACKUP!" "!TRAKTOR_QML!" /MIR /NFL /NDL /NJH /NJS >nul
     if !ERRORLEVEL! GTR 7 (
         echo Error: Could not reset to stock. Aborting.
-        goto :end
+        goto :end_error
     )
 )
 
@@ -348,7 +347,7 @@ if "!FULL!"=="true" (
     for /f "delims=" %%P in ('cd /d "!MOD_QML!" 2^>nul ^&^& cd') do set "MOD_QML_ABS=%%P"
     if not defined MOD_QML_ABS (
         echo Error: Could not resolve mod source path: !MOD_QML!
-        goto :end
+        goto :end_error
     )
 
     if "!SYMLINK!"=="true" (
@@ -356,12 +355,12 @@ if "!FULL!"=="true" (
         rmdir /s /q "!TRAKTOR_QML!" 2>nul
         if !ERRORLEVEL! NEQ 0 (
             echo Error: Could not delete current qml folder. Is Traktor running?
-            goto :end
+            goto :end_error
         )
         mklink /d "!TRAKTOR_QML!" "!MOD_QML_ABS!" >nul 2>&1
         if !ERRORLEVEL! NEQ 0 (
             echo Error: Could not create symlink. Make sure you have sufficient permissions.
-            goto :end
+            goto :end_error
         )
         echo Done.
         echo.
@@ -372,14 +371,14 @@ if "!FULL!"=="true" (
         rmdir /s /q "!TRAKTOR_QML!" 2>nul
         if !ERRORLEVEL! NEQ 0 (
             echo Error: Could not delete current qml folder. Is Traktor running?
-            goto :end
+            goto :end_error
         )
         robocopy "!MOD_QML!" "!TRAKTOR_QML!" /E /COPYALL /NFL /NDL /NJH /NJS >nul
         if !ERRORLEVEL! LEQ 7 (
             echo Done.
         ) else (
             echo Error: Could not copy mod files. Aborting.
-            goto :end
+            goto :end_error
         )
     )
 ) else if "!SYMLINK!"=="true" (
@@ -387,12 +386,23 @@ if "!FULL!"=="true" (
     for /f "delims=" %%P in ('cd /d "!MOD_QML!" 2^>nul ^&^& cd') do set "MOD_QML_ABS=%%P"
     if not defined MOD_QML_ABS (
         echo Error: Could not resolve mod source path: !MOD_QML!
-        goto :end
+        goto :end_error
     )
     echo Installing mod (symlinking overlay files into Traktor qml)...
 
     :: PowerShell symlink helper for overlay mode
-    powershell -NoProfile -Command "try { $src = '!MOD_QML_ABS!'; $dst = '!TRAKTOR_QML!'; Get-ChildItem -Path $src -Recurse -File | ForEach-Object { $rel = $_.FullName.Substring($src.Length + 1); $dstFile = Join-Path $dst $rel; $dstDir = Split-Path $dstFile; if (!(Test-Path $dstDir)) { New-Item -ItemType Directory -Path $dstDir -Force | Out-Null }; if (Test-Path $dstFile) { Remove-Item $dstFile -Force }; cmd /c mklink '\"'$dstFile'\"' '\"'$_.FullName'\"' | Out-Null } } catch { Write-Error $_; exit 1 }"
+    powershell -NoProfile -Command ^
+      "try {" ^
+      "$src = '!MOD_QML_ABS!'; $dst = '!TRAKTOR_QML!';" ^
+      "Get-ChildItem -Path $src -Recurse -File | ForEach-Object {" ^
+      "  $rel = $_.FullName.Substring($src.Length + 1);" ^
+      "  $dstFile = Join-Path $dst $rel;" ^
+      "  $dstDir = Split-Path $dstFile;" ^
+      "  if (!(Test-Path $dstDir)) { New-Item -ItemType Directory -Path $dstDir -Force | Out-Null };" ^
+      "  if (Test-Path $dstFile) { Remove-Item $dstFile -Force };" ^
+      "  cmd /c mklink '\"'$dstFile'\"' '\"'$_.FullName'\"' | Out-Null" ^
+      "}" ^
+      "} catch { Write-Error $_; exit 1 }"
 
     if !ERRORLEVEL! EQU 0 (
         echo Done.
@@ -410,7 +420,7 @@ if "!FULL!"=="true" (
     ) else (
         echo Error: An error occurred while copying mod files.
         echo   Error code: !ERRORLEVEL!
-        goto :end
+        goto :end_error
     )
 )
 
@@ -429,41 +439,13 @@ if "!START_SERVER!"=="true" (
 
 echo.
 echo To undo all mods:  install-traktor-mod restore
-
-set /p LAUNCH="Launch Traktor now? [y/N] "
-if /I "!LAUNCH!"=="y" (
-    if exist "!TRAKTOR_APP!" (
-        start "" "!TRAKTOR_APP!"
-    ) else (
-        echo Traktor executable not found at: !TRAKTOR_APP!
-    )
-)
+echo Restart Traktor to apply changes.
 
 goto :end
 
 :: ============================================================
 :: FUNCTIONS
 :: ============================================================
-
-:download_file
-:: Download file from URL to destination
-:: Arguments: %1=URL, %2=destination file
-setlocal
-set "URL=%~1"
-set "DST=%~2"
-
-if exist "%DST%" (
-    endlocal
-    exit /b 0
-)
-
-echo Downloading from: !URL!...
-mkdir "%~dp2" 2>nul
-
-:: Use PowerShell for download (built-in on Windows)
-powershell -NoProfile -Command "try { (New-Object Net.WebClient).DownloadFile('!URL!', '!DST!'); Write-Host 'Downloaded to: !DST!' } catch { Write-Error $_; exit 1 }"
-endlocal
-exit /b %ERRORLEVEL%
 
 :download_traktor_logger_from_github
 :: Download entire traktor-logger repo from GitHub as a zip archive
@@ -570,6 +552,64 @@ if not exist "!TRAKTOR_QML!" (
     exit /b 1
 )
 
+:: Symlink mode: copy logger files into local mod qml, then symlink Traktor's qml to it
+if "!SYMLINK!"=="true" (
+    if not exist "!MOD_QML!" (
+        echo Error: No local mod qml found at !MOD_QML!
+        echo   Run from a mod directory containing a qml\ folder, or use without /symlink
+        endlocal
+        exit /b 1
+    )
+    :: Resolve MOD_QML to absolute path
+    for /f "delims=" %%P in ('cd /d "!MOD_QML!" 2^>nul ^&^& cd') do set "MOD_QML_ABS=%%P"
+    if not defined MOD_QML_ABS (
+        echo Error: Could not resolve mod qml path: !MOD_QML!
+        endlocal
+        exit /b 1
+    )
+    :: Copy logger files into local mod's qml
+    if not exist "!LOGGER_CACHE_DIR!\qml" (
+        call :download_traktor_logger_from_github "!BRANCH!"
+        if !ERRORLEVEL! NEQ 0 (
+            echo Error: Could not obtain traktor-logger package
+            endlocal
+            exit /b 1
+        )
+    )
+    if not exist "!MOD_QML_ABS!\Defines" mkdir "!MOD_QML_ABS!\Defines"
+    call :get_logger_qml_path LOGGER_PATH
+    copy "!LOGGER_PATH!" "!MOD_QML_ABS!\Defines\Logger.qml" >nul 2>&1
+    echo   [OK] Logger.qml: !MOD_QML_ABS!\Defines\Logger.qml
+    if exist "!LOGGER_CACHE_DIR!\qml\CSI\Common\Api" (
+        if not exist "!MOD_QML_ABS!\CSI\Common\Api" mkdir "!MOD_QML_ABS!\CSI\Common\Api"
+        xcopy "!LOGGER_CACHE_DIR!\qml\CSI\Common\Api\*" "!MOD_QML_ABS!\CSI\Common\Api\" /E /Y /Q >nul 2>&1
+        echo   [OK] Api modules: !MOD_QML_ABS!\CSI\Common\Api\
+    )
+    if exist "!LOGGER_CACHE_DIR!\qml\Screens\Common" (
+        if not exist "!MOD_QML_ABS!\Screens\Common" mkdir "!MOD_QML_ABS!\Screens\Common"
+        xcopy "!LOGGER_CACHE_DIR!\qml\Screens\Common\*" "!MOD_QML_ABS!\Screens\Common\" /E /Y /Q >nul 2>&1
+        echo   [OK] Screens modules: !MOD_QML_ABS!\Screens\Common\
+    )
+    :: Symlink Traktor's qml to the local mod's qml
+    rmdir /s /q "!TRAKTOR_QML!" 2>nul
+    mklink /d "!TRAKTOR_QML!" "!MOD_QML_ABS!" >nul 2>&1
+    if !ERRORLEVEL! EQU 0 (
+        echo   [OK] qml: !TRAKTOR_QML! -^> !MOD_QML_ABS!
+    ) else (
+        echo   [FAIL] Could not create symlink for qml directory
+        endlocal
+        exit /b 1
+    )
+    echo.
+    echo [OK] Logger installation complete!
+    echo.
+    echo Edit files in !MOD_QML_ABS! and restart Traktor - no reinstall needed.
+    endlocal
+    exit /b 0
+)
+
+:: Copy mode: install individual files into Traktor's live QML
+
 if not exist "!TRAKTOR_QML!\Defines" (
     mkdir "!TRAKTOR_QML!\Defines"
 )
@@ -582,7 +622,6 @@ if !ERRORLEVEL! NEQ 0 (
     exit /b 1
 )
 
-:: Copy Logger.qml
 copy "!LOGGER_PATH!" "!TRAKTOR_QML!\Defines\Logger.qml" >nul 2>&1
 if !ERRORLEVEL! EQU 0 (
     echo   [OK] Logger.qml: !TRAKTOR_QML!\Defines\Logger.qml
@@ -621,7 +660,7 @@ if exist "!LOGGER_CACHE_DIR!\qml\CSI\Common\Api" (
     echo   [WARN] Api modules: not available in cache (Logger.qml is installed)
 )
 
-:: Copy Screens modules (ApiBrowser + ApiClient.js for screen-capable controllers)
+:: Copy Screens modules
 if exist "!LOGGER_CACHE_DIR!\qml\Screens\Common" (
     if not exist "!TRAKTOR_QML!\Screens\Common" mkdir "!TRAKTOR_QML!\Screens\Common"
     xcopy "!LOGGER_CACHE_DIR!\qml\Screens\Common\*" "!TRAKTOR_QML!\Screens\Common\" /E /Y /Q >nul 2>&1
@@ -634,6 +673,21 @@ if exist "!LOGGER_CACHE_DIR!\qml\Screens\Common" (
 
 echo.
 echo [OK] Logger installation complete!
+echo.
+echo For simple debug logging in your controller:
+echo   import Traktor.Defines 1.0
+echo   Logger { id: logger }
+echo   logger.info('Message', { data: 'value' })
+echo.
+echo For automatic metadata collection (deck state, channels, tempo, browser):
+echo   Use: install-traktor-mod.bat enable-metadata ControllerName
+echo   Example: install-traktor-mod.bat enable-metadata D2,S8,X1MK3
+echo   Then open the Logger Web Dashboard at http://localhost:8080
+echo.
+echo Components installed:
+echo   - Logger.qml: !TRAKTOR_QML!\Defines\Logger.qml
+echo   - Api modules: !TRAKTOR_QML!\CSI\Common\Api\
+echo   - Screens modules: !TRAKTOR_QML!\Screens\Common\
 endlocal
 exit /b 0
 
@@ -661,6 +715,15 @@ if exist "!LOGGER_CACHE_DIR!\qml\CSI\Common\Api" (
     )
     xcopy "!LOGGER_CACHE_DIR!\qml\CSI\Common\Api\*" "!MOD_QML!\CSI\Common\Api\" /E /Y /Q >nul 2>&1
     echo   [OK] Api modules installed to mod
+)
+
+if exist "!LOGGER_CACHE_DIR!\qml\Screens\Common" (
+    if not exist "!MOD_QML!\Screens\Common" mkdir "!MOD_QML!\Screens\Common"
+    xcopy "!LOGGER_CACHE_DIR!\qml\Screens\Common\*" "!MOD_QML!\Screens\Common\" /E /Y /Q >nul 2>&1
+    echo   [OK] Screens modules: !MOD_QML!\Screens\Common\
+    if exist "!LOGGER_CACHE_DIR!\qml\CSI\Common\Api\ApiClient.js" (
+        copy /Y "!LOGGER_CACHE_DIR!\qml\CSI\Common\Api\ApiClient.js" "!MOD_QML!\Screens\Common\ApiClient.js" >nul 2>&1
+    )
 )
 
 endlocal
@@ -706,7 +769,31 @@ for %%C in (!CONTROLLERS!) do (
         findstr /M "ApiModule" "!CONTROLLER_FILE!" >nul 2>&1
         if !ERRORLEVEL! NEQ 0 (
             :: Use PowerShell to safely inject import and ApiModule
-            powershell -NoProfile -Command "& { $file = '!CONTROLLER_FILE!'; $content = Get-Content -Path $file -Raw; $lines = $content -split \"`n\"; $newLines = @(); $importAdded = $false; $inImports = $false; foreach ($line in $lines) { if ($line -match '^import ') { $inImports = $true; $newLines += $line } elseif ($inImports -and -not $importAdded -and $line -notmatch '^import ' -and $line -notmatch '^\s*$') { if ($content -notmatch 'import.*Common/Api') { $newLines += 'import \"../Common/Api\"' }; $newLines += $line; $importAdded = $true; $inImports = $false } else { $newLines += $line } }; $content = $newLines -join \"`n\"; $lines2 = $content -split \"`n\"; $out = @(); $done = $false; $pastImports = $false; foreach ($line in $lines2) { if ($line -match '^import ') { $pastImports = $true; $out += $line; continue }; if ($pastImports -and -not $done -and $line -match 'Mapping\s*\{') { $out += $line; $out += '  // Automatic metadata collection'; $out += '  ApiModule {}'; $done = $true; continue }; $out += $line }; Set-Content -Path $file -Value ($out -join \"`n\") -NoNewline }"
+            powershell -NoProfile -Command ^
+                "& {" ^
+                "$file = '!CONTROLLER_FILE!';" ^
+                "$content = Get-Content -Path $file -Raw;" ^
+                "$lines = $content -split \"`n\";" ^
+                "$newLines = @(); $importAdded = $false; $inImports = $false;" ^
+                "foreach ($line in $lines) {" ^
+                "  if ($line -match '^import ') { $inImports = $true; $newLines += $line }" ^
+                "  elseif ($inImports -and -not $importAdded -and $line -notmatch '^import ' -and $line -notmatch '^\s*$') {" ^
+                "    if ($content -notmatch 'import.*Common/Api') { $newLines += 'import \"../Common/Api\"' };" ^
+                "    $newLines += $line; $importAdded = $true; $inImports = $false" ^
+                "  } else { $newLines += $line }" ^
+                "};" ^
+                "$content = $newLines -join \"`n\";" ^
+                "$lines2 = $content -split \"`n\";" ^
+                "$out = @(); $done = $false; $pastImports = $false;" ^
+                "foreach ($line in $lines2) {" ^
+                "  if ($line -match '^import ') { $pastImports = $true; $out += $line; continue };" ^
+                "  if ($pastImports -and -not $done -and $line -match 'Mapping\s*\{') {" ^
+                "    $out += $line; $out += '  // Automatic metadata collection';" ^
+                "    $out += '  ApiModule {}'; $done = $true; continue" ^
+                "  };" ^
+                "  $out += $line" ^
+                "};" ^
+                "Set-Content -Path $file -Value ($out -join \"`n\") -NoNewline }"
 
             if !ERRORLEVEL! EQU 0 (
                 echo   [OK] !CONTROLLER!: metadata enabled
@@ -741,7 +828,40 @@ if not exist "!SCREENS_DIR!" (
     exit /b 0
 )
 
-powershell -NoProfile -Command "& { $screensDir = '!SCREENS_DIR!'; $traktorQml = '!TARGET_DIR!'; $screenFiles = Get-ChildItem -Path $screensDir -Filter 'Screen.qml' -Recurse -ErrorAction SilentlyContinue; foreach ($file in $screenFiles) { $content = Get-Content -Path $file.FullName -Raw; $relPath = $file.FullName.Substring($traktorQml.Length + 1); if ($content -match 'ApiBrowser') { Write-Host \"  [OK] ${relPath}: browser monitoring already enabled\"; continue }; $fileRelToScreens = $file.DirectoryName.Substring($screensDir.Length).TrimStart('\'); if ($fileRelToScreens -eq '') { $depth = 0 } else { $depth = ($fileRelToScreens -split '\\').Count }; $importPath = ('../' * ($depth + 1)).TrimEnd('/') + 'Common'; if ($content -match 'isLeftScreen') { $browserLine = '  LoggerScreens.ApiBrowser { active: isLeftScreen }' } else { $browserLine = '  LoggerScreens.ApiBrowser {}' }; $importLine = \"import \`\"${importPath}\`\" as LoggerScreens\"; if ($content -notmatch [regex]::Escape($importPath)) { $lines = $content -split \"`n\"; $newLines = @(); $importAdded = $false; $inImports = $false; for ($i = 0; $i -lt $lines.Count; $i++) { $line = $lines[$i]; if ($line -match '^import ') { $inImports = $true; $newLines += $line } elseif ($inImports -and -not $importAdded) { $newLines += $importLine; $newLines += $line; $importAdded = $true; $inImports = $false } else { $newLines += $line } }; $content = $newLines -join \"`n\" }; $lines2 = $content -split \"`n\"; $newLines2 = @(); $pastImports = $false; $done = $false; foreach ($line in $lines2) { if ($line -match '^import ') { $pastImports = $true; $newLines2 += $line; continue }; if ($pastImports -and -not $done -and $line -match '\{') { $newLines2 += $line; $newLines2 += $browserLine; $done = $true; continue }; $newLines2 += $line }; $result = $newLines2 -join \"`n\"; if ($result -notmatch 'ApiBrowser') { Write-Host \"  [FAIL] ${relPath}: injection failed\"; continue }; Set-Content -Path $file.FullName -Value $result -NoNewline; Write-Host \"  [OK] ${relPath}: browser monitoring enabled\" } }"
+powershell -NoProfile -Command ^
+    "& {" ^
+    "$screensDir = '!SCREENS_DIR!'; $traktorQml = '!TARGET_DIR!';" ^
+    "$screenFiles = Get-ChildItem -Path $screensDir -Filter 'Screen.qml' -Recurse -ErrorAction SilentlyContinue;" ^
+    "foreach ($file in $screenFiles) {" ^
+    "  $content = Get-Content -Path $file.FullName -Raw;" ^
+    "  $relPath = $file.FullName.Substring($traktorQml.Length + 1);" ^
+    "  if ($content -match 'ApiBrowser') { Write-Host \"  [OK] ${relPath}: browser monitoring already enabled\"; continue };" ^
+    "  $fileRelToScreens = $file.DirectoryName.Substring($screensDir.Length).TrimStart('\');" ^
+    "  if ($fileRelToScreens -eq '') { $depth = 0 } else { $depth = ($fileRelToScreens -split '\\').Count };" ^
+    "  $importPath = ('../' * ($depth + 1)).TrimEnd('/') + 'Common';" ^
+    "  if ($content -match 'isLeftScreen') { $browserLine = '  LoggerScreens.ApiBrowser { active: isLeftScreen }' }" ^
+    "  else { $browserLine = '  LoggerScreens.ApiBrowser {}' };" ^
+    "  $importLine = \"import \`\"${importPath}\`\" as LoggerScreens\";" ^
+    "  if ($content -notmatch [regex]::Escape($importPath)) {" ^
+    "    $lines = $content -split \"`n\";" ^
+    "    $newLines = @(); $importAdded = $false; $inImports = $false;" ^
+    "    for ($i = 0; $i -lt $lines.Count; $i++) { $line = $lines[$i];" ^
+    "      if ($line -match '^import ') { $inImports = $true; $newLines += $line }" ^
+    "      elseif ($inImports -and -not $importAdded) { $newLines += $importLine; $newLines += $line; $importAdded = $true; $inImports = $false }" ^
+    "      else { $newLines += $line }" ^
+    "    }; $content = $newLines -join \"`n\"" ^
+    "  };" ^
+    "  $lines2 = $content -split \"`n\";" ^
+    "  $newLines2 = @(); $pastImports = $false; $done = $false;" ^
+    "  foreach ($line in $lines2) {" ^
+    "    if ($line -match '^import ') { $pastImports = $true; $newLines2 += $line; continue };" ^
+    "    if ($pastImports -and -not $done -and $line -match '\{') { $newLines2 += $line; $newLines2 += $browserLine; $done = $true; continue };" ^
+    "    $newLines2 += $line" ^
+    "  }; $result = $newLines2 -join \"`n\";" ^
+    "  if ($result -notmatch 'ApiBrowser') { Write-Host \"  [FAIL] ${relPath}: injection failed\"; continue };" ^
+    "  Set-Content -Path $file.FullName -Value $result -NoNewline;" ^
+    "  Write-Host \"  [OK] ${relPath}: browser monitoring enabled\"" ^
+    "} }"
 
 endlocal
 exit /b 0
@@ -840,6 +960,13 @@ exit /b 1
     echo   - Supports both 32-bit and 64-bit Traktor installations
     echo   - Logger requires Python 3 for server (get from python.org)
     echo.
+    goto :end
+
+:end_error
+    echo.
+    pause
+    endlocal
+    exit /b 1
 
 :end
     echo.

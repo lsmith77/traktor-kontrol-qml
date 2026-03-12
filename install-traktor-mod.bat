@@ -15,6 +15,7 @@ setlocal enabledelayedexpansion
 ::   install-traktor-mod.bat /full /fresh                  — restore stock first, then replace entire qml
 ::   install-traktor-mod.bat /full /fresh /symlink         — restore stock, then symlink complete mod
 ::   install-traktor-mod.bat restore                       — restore stock qml and remove all mods/symlinks
+::   install-traktor-mod.bat restore /pull                — fetch stock qml from GitHub (when backup is missing or to force a refresh)
 ::   install-traktor-mod.bat logger pull                   — download traktor-logger to local cache from GitHub
 ::   install-traktor-mod.bat logger pull /branch dev       — pull from specific branch
 ::   install-traktor-mod.bat logger pull /local C:\path   — copy from local directory
@@ -92,6 +93,7 @@ set "SYMLINK=false"
 set "FULL=false"
 set "WITH_LOGGER=false"
 set "START_SERVER=false"
+set "PULL_RESTORE=false"
 set "MODE=install"
 set "NEXT_IS_SOURCE=false"
 set "ENABLE_METADATA="
@@ -128,6 +130,10 @@ if "!NEXT_IS_SOURCE!"=="true" (
     set "NEXT_IS_SOURCE=true"
 ) else if /I "%~1"=="--source" (
     set "NEXT_IS_SOURCE=true"
+) else if /I "%~1"=="/pull" (
+    set "PULL_RESTORE=true"
+) else if /I "%~1"=="--pull" (
+    set "PULL_RESTORE=true"
 ) else if /I "%~1"=="/fresh" (
     set "FRESH=true"
 ) else if /I "%~1"=="--fresh" (
@@ -228,9 +234,24 @@ if /I "!MODE!"=="restore" (
         echo   Expected: !TRAKTOR_QML!
         goto :end_error
     )
+    if "!PULL_RESTORE!"=="true" (
+        echo Fetching stock QML files from GitHub ^(--pull^)...
+        echo This will replace the live qml, removing ALL mods and symlinks.
+        set /p CONFIRM="Are you sure? (y/n): "
+        if /I not "!CONFIRM!"=="y" (
+            echo Restore cancelled.
+            goto :end
+        )
+        call :restore_from_github
+        if !ERRORLEVEL! NEQ 0 goto :end_error
+        goto :end
+    )
     if not exist "!TRAKTOR_QML_BACKUP!" (
         echo Error: No backup found at: !TRAKTOR_QML_BACKUP!
         echo   Cannot restore — was the mod installed with this script?
+        echo.
+        echo To fetch stock QML from GitHub instead, run:
+        echo   install-traktor-mod.bat restore /pull
         goto :end_error
     )
     echo Restoring stock qml from backup...
@@ -459,7 +480,7 @@ set "TMP_ZIP=%TEMP%\traktor-logger-download.zip"
 set "TMP_DIR=%TEMP%\traktor-logger-download"
 set "CACHE_DIR=%LOGGER_CACHE_DIR%"
 
-echo Downloading traktor-logger from GitHub (branch: !DL_BRANCH!)...
+echo Downloading traktor-logger from: !ZIP_URL!
 
 :: Remove old cache and temp dirs
 if exist "!CACHE_DIR!" rmdir /s /q "!CACHE_DIR!" 2>nul
@@ -941,7 +962,8 @@ exit /b 1
     echo   install-traktor-mod.bat enable-metadata D2,S8,X1MK3 - inject ApiModule into controllers
     echo.
     echo General Options:
-    echo   install-traktor-mod.bat restore         - restore stock, remove all mods
+    echo   install-traktor-mod.bat restore         - restore stock qml from backup, remove all mods
+    echo   install-traktor-mod.bat restore /pull  - fetch stock qml from GitHub (ignores backup)
     echo   install-traktor-mod.bat -s C:\path\to\mod - use specific directory
     echo.
     echo Logger Cache Options (used with 'logger pull'):
@@ -962,6 +984,102 @@ exit /b 1
     echo   - Logger requires Python 3 for server (get from python.org)
     echo.
     goto :end
+
+:restore_from_github
+:: Fetch stock QML from GitHub traktor-kontrol-qml-files repo, letting the user pick a tag
+setlocal enabledelayedexpansion
+
+set "TAGS_FILE=%TEMP%\traktor-qml-tags.txt"
+set "SELECTED_TAG_FILE=%TEMP%\traktor-qml-selected-tag.txt"
+set "TMP_ZIP=%TEMP%\traktor-qml-restore.zip"
+set "TMP_DIR=%TEMP%\traktor-qml-restore"
+
+if exist "!TAGS_FILE!" del /f /q "!TAGS_FILE!" 2>nul
+if exist "!SELECTED_TAG_FILE!" del /f /q "!SELECTED_TAG_FILE!" 2>nul
+
+:: Fetch tags and prompt for selection via PowerShell (handles display + Read-Host interactively)
+echo Fetching available QML versions from: https://api.github.com/repos/lsmith77/traktor-kontrol-qml-files/tags?per_page=100
+powershell -NoProfile -Command ^
+    "& { try {" ^
+    "  $r = Invoke-RestMethod -Uri 'https://api.github.com/repos/lsmith77/traktor-kontrol-qml-files/tags?per_page=100';" ^
+    "  $tags = @($r | ForEach-Object { $_.name });" ^
+    "  if ($tags.Count -eq 0) { Write-Error 'No versions found in GitHub repository'; exit 1 };" ^
+    "  $detected = '';" ^
+    "  try { $detected = (Get-Item '!TRAKTOR_APP!').VersionInfo.ProductVersion } catch {};" ^
+    "  Write-Host '';" ^
+    "  Write-Host 'Available QML versions:';" ^
+    "  $defaultIdx = 0;" ^
+    "  for ($i = 0; $i -lt $tags.Count; $i++) {" ^
+    "    $marker = '';" ^
+    "    $detectedShort = ($detected -split ' ')[0];" ^
+    "    if ($detectedShort -and $tags[$i] -like \"*$detectedShort*\") { $marker = ' <- your version'; $defaultIdx = $i + 1 };" ^
+    "    Write-Host (\"  {0,2}) {1}{2}\" -f ($i+1), $tags[$i], $marker)" ^
+    "  };" ^
+    "  Write-Host '';" ^
+    "  if ($detected) { Write-Host \"Detected Traktor version: $detected\" };" ^
+    "  $prompt = if ($defaultIdx -gt 0) { \"Enter number (default: $defaultIdx) or tag name\" } else { 'Enter number or tag name' };" ^
+    "  $sel = Read-Host $prompt;" ^
+    "  if ([string]::IsNullOrEmpty($sel) -and $defaultIdx -gt 0) { $sel = $defaultIdx };" ^
+    "  $selectedTag = '';" ^
+    "  if ($sel -match '^\d+$') {" ^
+    "    $idx = [int]$sel - 1;" ^
+    "    if ($idx -ge 0 -and $idx -lt $tags.Count) { $selectedTag = $tags[$idx] }" ^
+    "    else { Write-Error \"Invalid selection: $sel\"; exit 1 }" ^
+    "  } else { $selectedTag = $sel };" ^
+    "  if (-not $selectedTag) { Write-Error 'No version selected'; exit 1 };" ^
+    "  $selectedTag | Set-Content -Path '!SELECTED_TAG_FILE!'" ^
+    "} catch { Write-Error $_; exit 1 } }"
+
+if !ERRORLEVEL! NEQ 0 (
+    echo Error: Could not fetch or select a version from GitHub.
+    endlocal
+    exit /b 1
+)
+
+if not exist "!SELECTED_TAG_FILE!" (
+    echo Error: No version was selected.
+    endlocal
+    exit /b 1
+)
+
+set /p SELECTED_TAG=<"!SELECTED_TAG_FILE!"
+set "SELECTED_TAG=!SELECTED_TAG: =!"
+if "!SELECTED_TAG!"=="" (
+    echo Error: No version was selected.
+    endlocal
+    exit /b 1
+)
+
+echo.
+echo Downloading QML files from: https://github.com/lsmith77/traktor-kontrol-qml-files/archive/refs/tags/!SELECTED_TAG!.zip
+
+if exist "!TMP_DIR!" rmdir /s /q "!TMP_DIR!" 2>nul
+if exist "!TMP_ZIP!" del /f /q "!TMP_ZIP!" 2>nul
+
+powershell -NoProfile -Command ^
+    "& { try {" ^
+    "  $url = 'https://github.com/lsmith77/traktor-kontrol-qml-files/archive/refs/tags/!SELECTED_TAG!.zip';" ^
+    "  Invoke-WebRequest -Uri $url -OutFile '!TMP_ZIP!';" ^
+    "  Expand-Archive -Path '!TMP_ZIP!' -DestinationPath '!TMP_DIR!' -Force;" ^
+    "  $inner = Get-ChildItem '!TMP_DIR!' | Select-Object -First 1;" ^
+    "  $qmlSrc = Join-Path $inner.FullName 'qml';" ^
+    "  if (-not (Test-Path $qmlSrc)) { Write-Error 'No qml folder found in downloaded archive'; exit 1 };" ^
+    "  if (Test-Path '!TRAKTOR_QML!') { Remove-Item -Path '!TRAKTOR_QML!' -Recurse -Force };" ^
+    "  if (Test-Path '!TRAKTOR_QML_BACKUP!') { Remove-Item -Path '!TRAKTOR_QML_BACKUP!' -Recurse -Force };" ^
+    "  Copy-Item -Path $qmlSrc -Destination '!TRAKTOR_QML!' -Recurse;" ^
+    "  Remove-Item '!TMP_ZIP!', '!TMP_DIR!' -Recurse -Force -ErrorAction SilentlyContinue;" ^
+    "  Write-Host 'Done.'" ^
+    "} catch { Write-Error $_; exit 1 } }"
+
+if !ERRORLEVEL! NEQ 0 (
+    echo Error: Failed to download or extract QML files for tag: !SELECTED_TAG!
+    endlocal
+    exit /b 1
+)
+
+echo Restart Traktor to apply.
+endlocal
+exit /b 0
 
 :end_error
     echo.

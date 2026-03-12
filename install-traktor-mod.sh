@@ -15,6 +15,7 @@
 #   install-traktor-mod --full                               — replace entire qml with mod's qml
 #   install-traktor-mod --full --symlink                     — symlink entire mod qml into Traktor (dev mode)
 #   install-traktor-mod restore                              — restore stock qml and remove all mods/symlinks
+#   install-traktor-mod restore --pull                       — fetch stock qml from GitHub (when backup is missing or to force a refresh)
 #
 # Specifying source directory (optional; defaults to current directory):
 #   install-traktor-mod --source /path/to/mod                - use specific directory
@@ -90,7 +91,8 @@ Standalone Commands:
   install-traktor-mod logger install         — install Logger.qml and Api modules to Traktor qml
   install-traktor-mod server start           — launch traktor-logger server on localhost:8080
   install-traktor-mod enable-metadata D2,S8,X1MK3  — inject ApiModule into controller files
-  install-traktor-mod restore                — restore stock qml, remove all mods
+  install-traktor-mod restore                — restore stock qml from backup, remove all mods
+  install-traktor-mod restore --pull         — fetch stock qml from GitHub (ignores backup)
 
   Logger cache options (used with 'logger pull'):
     --branch <name>                          — pull from a specific GitHub branch (default: main)
@@ -170,7 +172,7 @@ _download_traktor_logger_from_github() {
     # Download entire traktor-logger repo from GitHub as a tarball
     local branch="$1"
     local archive_url="https://github.com/lsmith77/traktor-logger/archive/refs/heads/${branch}.tar.gz"
-    echo "Downloading traktor-logger from GitHub (branch: ${branch})..." >&2
+    echo "Downloading traktor-logger from: $archive_url" >&2
     rm -rf "$SERVER_CACHE_DIR"
     mkdir -p "$SERVER_CACHE_DIR"
     if ! curl -sS -L "$archive_url" | tar xz --strip-components=1 -C "$SERVER_CACHE_DIR"; then
@@ -685,6 +687,126 @@ QMLDIR
 
 
 
+# --- restore from GitHub helpers ---
+
+detect_traktor_version() {
+    # Try to read the installed Traktor version from the app bundle Info.plist
+    if [ -f "$TRAKTOR_APP/Contents/Info.plist" ]; then
+        defaults read "$TRAKTOR_APP/Contents/Info.plist" CFBundleShortVersionString 2>/dev/null || true
+    fi
+}
+
+fetch_qml_tags_from_github() {
+    # Return available tags (one per line) from traktor-kontrol-qml-files repo
+    local api_url="https://api.github.com/repos/lsmith77/traktor-kontrol-qml-files/tags?per_page=100"
+    local tags_json
+    if ! tags_json=$(curl -sS --fail "$api_url" 2>/dev/null); then
+        return 1
+    fi
+    # Extract tag names without jq
+    echo "$tags_json" | grep '"name"' | sed -E 's/.*"name": *"([^"]*)".*/\1/'
+}
+
+restore_from_github() {
+    local api_url="https://api.github.com/repos/lsmith77/traktor-kontrol-qml-files/tags?per_page=100"
+    echo "Fetching available QML versions from: $api_url"
+    local tags_raw
+    if ! tags_raw=$(fetch_qml_tags_from_github); then
+        echo "Error: Could not fetch available versions from GitHub."
+        echo "  Check your internet connection and try again."
+        return 1
+    fi
+    if [ -z "$tags_raw" ]; then
+        echo "Error: No versions found in the GitHub repository."
+        return 1
+    fi
+
+    # Build tag array
+    local tag_array=()
+    while IFS= read -r tag; do
+        [ -n "$tag" ] && tag_array+=("$tag")
+    done <<< "$tags_raw"
+
+    # Try to auto-detect installed Traktor version
+    local detected_version
+    detected_version=$(detect_traktor_version)
+
+    echo ""
+    echo "Available QML versions:"
+    local i=1
+    local default_idx=0
+    for tag in "${tag_array[@]}"; do
+        local marker=""
+        local version_short="${detected_version%% *}"  # strip build number (e.g. "4.4.2 158" → "4.4.2")
+        if [ -n "$version_short" ] && [[ "$tag" == *"$version_short"* ]]; then
+            marker=" ← your version"
+            default_idx=$i
+        fi
+        printf "  %2d) %s%s\n" "$i" "$tag" "$marker"
+        ((i++))
+    done
+
+    echo ""
+    if [ -n "$detected_version" ]; then
+        echo "Detected Traktor version: $detected_version"
+    fi
+    if [ "$default_idx" -gt 0 ]; then
+        read -rp "Enter a number (default: $default_idx) or type a tag name: " selection
+    else
+        read -rp "Enter a number or type a tag name: " selection
+    fi
+
+    # Use detected default if user pressed Enter
+    if [ -z "$selection" ] && [ "$default_idx" -gt 0 ]; then
+        selection="$default_idx"
+    fi
+
+    local selected_tag=""
+    if [[ "$selection" =~ ^[0-9]+$ ]]; then
+        local idx=$((selection - 1))
+        if [ "$idx" -ge 0 ] && [ "$idx" -lt "${#tag_array[@]}" ]; then
+            selected_tag="${tag_array[$idx]}"
+        else
+            echo "Error: Invalid selection: $selection"
+            return 1
+        fi
+    else
+        selected_tag="$selection"
+    fi
+
+    if [ -z "$selected_tag" ]; then
+        echo "Error: No version selected."
+        return 1
+    fi
+
+    local archive_url="https://github.com/lsmith77/traktor-kontrol-qml-files/archive/refs/tags/${selected_tag}.tar.gz"
+    echo ""
+    echo "Downloading QML files from: $archive_url"
+    local tmp_dir
+    tmp_dir=$(mktemp -d)
+
+    if ! curl -sS -L --fail "$archive_url" | tar xz --strip-components=1 -C "$tmp_dir"; then
+        echo "Error: Failed to download QML files for tag: $selected_tag"
+        rm -rf "$tmp_dir"
+        return 1
+    fi
+
+    if [ ! -d "$tmp_dir/qml" ]; then
+        echo "Error: Downloaded archive does not contain a 'qml' folder."
+        echo "  Verify that tag '$selected_tag' exists and is valid."
+        rm -rf "$tmp_dir"
+        return 1
+    fi
+
+    echo "Restoring stock qml from GitHub (tag: $selected_tag)..."
+    sudo rm -rf "$TRAKTOR_QML"
+    sudo rm -rf "$TRAKTOR_QML_BACKUP"
+    sudo cp -r "$tmp_dir/qml" "$TRAKTOR_QML"
+    rm -rf "$tmp_dir"
+    echo "Done. Restart Traktor to apply."
+    return 0
+}
+
 # --- parse args ---
 
 FRESH=false
@@ -692,6 +814,7 @@ SYMLINK=false
 FULL=false
 WITH_LOGGER=false
 START_SERVER=false
+PULL_RESTORE=false
 MODE="install"
 SOURCE_DIR="."
 
@@ -743,6 +866,7 @@ while [ $# -gt 0 ]; do
         --fresh)   FRESH=true; shift ;;
         --symlink) SYMLINK=true; shift ;;
         --full)    FULL=true; shift ;;
+        --pull)    PULL_RESTORE=true; shift ;;
         --with-logger) WITH_LOGGER=true; shift ;;
         --branch)
             shift
@@ -858,9 +982,22 @@ MOD_QML="$RESOLVED_SOURCE/qml"
 
 if [ "$MODE" = "restore" ]; then
     check_traktor_installed
+    if [ "$PULL_RESTORE" = "true" ]; then
+        echo "This will replace the live qml, removing ALL mods and symlinks."
+        read -rp "Are you sure? [y/N] " confirm
+        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+            echo "Restore cancelled."
+            exit 0
+        fi
+        restore_from_github
+        exit $?
+    fi
     if [ ! -d "$TRAKTOR_QML_BACKUP" ]; then
         echo "No backup found at: $TRAKTOR_QML_BACKUP"
         echo "Cannot restore — was the mod installed with this script?"
+        echo ""
+        echo "To fetch stock QML from GitHub instead, run:"
+        echo "  install-traktor-mod restore --pull"
         exit 1
     fi
     echo "This will restore stock qml, removing ALL mods and symlinks."

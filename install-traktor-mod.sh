@@ -3,7 +3,7 @@
 #
 # Synopsis:
 #   Merges QML overlay mods into Traktor's live qml folder with backup and restore support.
-#   Supports three modes: stack (merge), fresh (reset), and symlink (dev mode).
+#   Supports overlay modes (stack, fresh, symlink) and full replacement mode (--full).
 #   No reinstall needed when using symlink mode — just restart Traktor after edits.
 #
 # Usage:
@@ -11,12 +11,23 @@
 #   install-traktor-mod --fresh                              — restore stock first, then merge mod (clean mode)
 #   install-traktor-mod --symlink                            — symlink mod files into live qml (dev mode)
 #   install-traktor-mod --fresh --symlink                    — restore stock first, then symlink mod files
+#   install-traktor-mod --full                               — replace entire qml with mod's qml
+#   install-traktor-mod --full --symlink                     — symlink entire mod qml into Traktor (dev mode)
 #   install-traktor-mod restore                              — restore stock qml and remove all mods/symlinks
 #
 # Specifying source directory (optional; defaults to current directory):
 #   install-traktor-mod --source /path/to/mod                - use specific directory
 #   install-traktor-mod -s ../traktor-kontrol-d2 --fresh     — use subdirectory, fresh mode
 #   install-traktor-mod -s ~/my-mod --symlink                — use home directory, symlink mode
+#
+# Logger and server commands:
+#   install-traktor-mod logger pull                          — download traktor-logger to local cache
+#   install-traktor-mod logger pull --branch dev             — pull from a specific branch
+#   install-traktor-mod logger pull --local /path/to/logger  — copy from local directory
+#   install-traktor-mod logger pull --symlink --local /path  — symlink local logger directory into cache
+#   install-traktor-mod logger install                       — install Logger.qml and Api modules to Traktor qml
+#   install-traktor-mod server start                         — launch traktor-logger server on localhost:8080
+#   install-traktor-mod enable-metadata D2,S8,X1MK3         — inject ApiModule into controller files
 #
 # Help:
 #   install-traktor-mod -h                                   — show this help text
@@ -73,12 +84,17 @@ Installation Modifiers:
   install-traktor-mod --with-logger          — include Logger.qml and Api modules with a mod
 
 Standalone Commands:
+  install-traktor-mod logger pull            — download traktor-logger to local cache from GitHub
   install-traktor-mod logger install         — install Logger.qml and Api modules to Traktor qml
-  install-traktor-mod logger update          — update Logger.qml and Api modules (refreshes from GitHub)
   install-traktor-mod server start           — launch traktor-logger server on localhost:8080
   install-traktor-mod enable-metadata D2,S8,X1MK3  — inject ApiModule into controller files
   install-traktor-mod restore                — restore stock qml, remove all mods
-  
+
+  Logger cache options (used with 'logger pull'):
+    --branch <name>                          — pull from a specific GitHub branch (default: main)
+    --local /path/to/logger                  — copy from a local traktor-logger directory
+    --symlink (with --local)                 — symlink local directory into cache instead of copying
+
   Logger and Api modules use hybrid fallback chain:
     1. Cached ~/.traktor-mod/traktor-logger/ (offline after first download)
     2. GitHub download (initial setup, requires internet)
@@ -119,207 +135,77 @@ check_traktor_installed() {
 
 # --- logger utility (hybrid: local → cached → github) ---
 
-LOGGER_CACHE_DIR="$HOME/.traktor-mod/logger"
-LOGGER_GITHUB_URL="https://raw.githubusercontent.com/lsmith77/traktor-logger/main/qml/Logger.qml"
+
 
 get_logger_qml() {
     # Returns path to Logger.qml using hybrid fallback chain: cache → GitHub
-    
+    local logger_path="$SERVER_CACHE_DIR/qml/Logger.qml"
+    local logger_url="$SERVER_GITHUB_REPO/qml/Logger.qml"
     # 1. Check cache (for offline use, one-time download)
-    if [ -f "$LOGGER_CACHE_DIR/Logger.qml" ]; then
-        echo "$LOGGER_CACHE_DIR/Logger.qml"
+    if [ -f "$logger_path" ]; then
+        echo "$logger_path"
         return 0
     fi
-    
     # 2. Download from GitHub (first-time setup, requires internet)
     echo "Downloading Logger.qml from GitHub..." >&2
-    mkdir -p "$LOGGER_CACHE_DIR"
-    if ! curl -sS -o "$LOGGER_CACHE_DIR/Logger.qml" "$LOGGER_GITHUB_URL"; then
+    mkdir -p "$(dirname "$logger_path")"
+    if ! curl -sS -o "$logger_path" "$logger_url"; then
         echo "Error: Failed to download Logger.qml from GitHub" >&2
-        echo "URL: $LOGGER_GITHUB_URL" >&2
+        echo "URL: $logger_url" >&2
         return 1
     fi
-    
-    echo "Downloaded to: $LOGGER_CACHE_DIR/Logger.qml" >&2
-    echo "$LOGGER_CACHE_DIR/Logger.qml"
+    echo "Downloaded to: $logger_path" >&2
+    echo "$logger_path"
     return 0
 }
 
-update_logger_cache() {
-    # Force refresh of traktor-logger package (including Api modules) from GitHub
-    # If Logger/Api are installed, updates them. Otherwise does full install.
-    echo "Updating traktor-logger cache from GitHub..."
-    
-    # Download entire traktor-logger package (forces fresh download, bypasses local repo)
-    if ! force_update_server_cache; then
-        echo "Error: Failed to update traktor-logger package"
-        return 1
-    fi
-    
-    # Also update Logger.qml separately for backward compatibility
-    mkdir -p "$LOGGER_CACHE_DIR"
-    if ! curl -sS -o "$LOGGER_CACHE_DIR/Logger.qml" "$LOGGER_GITHUB_URL"; then
-        echo "Warning: Failed to update Logger.qml in logger cache"
-    else
-        echo "Logger.qml cache updated: $LOGGER_CACHE_DIR/Logger.qml"
-    fi
-    
-    local logger_version server_path
-    logger_version=$(get_logger_version)
-    server_path=$(get_server_path 2>/dev/null || true)
-    echo "traktor-logger version: $logger_version"
-    if [ -n "$server_path" ]; then
-        echo "Server updated: $server_path"
-    fi
-
-    # Check if Logger/Api are already installed in Traktor's live qml
-    local logger_exists=false
-    local api_exists=false
-    [ -f "$TRAKTOR_QML/Defines/Logger.qml" ] && logger_exists=true
-    [ -d "$TRAKTOR_QML/CSI/Common/Api" ] && [ -n "$(ls -A "$TRAKTOR_QML/CSI/Common/Api" 2>/dev/null)" ] && api_exists=true
-    
-    # If either component is missing, do a full install
-    if [ "$logger_exists" = false ] || [ "$api_exists" = false ]; then
-        echo "Logger and/or Api modules not found in Traktor qml. Installing..."
-        if install_logger_to_traktor; then
-            echo "Installation complete."
-        else
-            echo "Warning: Installation had issues, but cache is updated."
-        fi
-        return 0
-    fi
-    
-
-    # Both exist - update them
-    echo "Updating Logger.qml in Traktor's live qml..."
-    sudo cp "$LOGGER_CACHE_DIR/Logger.qml" "$TRAKTOR_QML/Defines/Logger.qml"
-    echo "  ✓ Logger.qml updated: $TRAKTOR_QML/Defines/Logger.qml"
-    
-    # Update Api modules
-    local api_src
-    if api_src=$(get_api_modules_path 2>/dev/null) && [ -d "$api_src" ] && [ -n "$(ls -A "$api_src" 2>/dev/null)" ]; then
-        if sudo cp -r "$api_src"/* "$TRAKTOR_QML/CSI/Common/Api/" 2>&1 > /dev/null; then
-            echo "  ✓ Api modules updated: $TRAKTOR_QML/CSI/Common/Api/"
-        else
-            echo "  ⚠ Api modules: could not update"
-        fi
-    fi
-    
-    return 0
-}
 
 # --- traktor-logger server caching (metadata + manual logging system) ---
 
 SERVER_CACHE_DIR="$HOME/.traktor-mod/traktor-logger"
 SERVER_GITHUB_REPO="https://raw.githubusercontent.com/lsmith77/traktor-logger/main"
-SERVER_GITHUB_API_URL="https://api.github.com/repos/lsmith77/traktor-logger/contents"
+
+_download_traktor_logger_from_github() {
+    # Download entire traktor-logger repo from GitHub as a tarball
+    local branch="$1"
+    local archive_url="https://github.com/lsmith77/traktor-logger/archive/refs/heads/${branch}.tar.gz"
+    echo "Downloading traktor-logger from GitHub (branch: ${branch})..." >&2
+    rm -rf "$SERVER_CACHE_DIR"
+    mkdir -p "$SERVER_CACHE_DIR"
+    if ! curl -sS -L "$archive_url" | tar xz --strip-components=1 -C "$SERVER_CACHE_DIR"; then
+        echo "Error: Failed to download traktor-logger from GitHub" >&2
+        rm -rf "$SERVER_CACHE_DIR"
+        return 1
+    fi
+    chmod +x "$SERVER_CACHE_DIR/server.py" 2>/dev/null || true
+    return 0
+}
 
 get_server_package() {
     # Returns path to cached traktor-logger or downloads it
     # Uses hybrid chain: local repo → cache → GitHub
-    
+
     # 1. Check if src is specified and contains traktor-logger
     if [ -d "$SOURCE_DIR/traktor-logger" ]; then
         echo "$SOURCE_DIR/traktor-logger"
         return 0
     fi
-    
+
     # 2. Check cache
     if [ -f "$SERVER_CACHE_DIR/server.py" ] && [ -f "$SERVER_CACHE_DIR/qml/Logger.qml" ]; then
         echo "$SERVER_CACHE_DIR"
         return 0
     fi
-    
+
     # 3. Download from GitHub
-    echo "Downloading traktor-logger from GitHub..." >&2
-    mkdir -p "$SERVER_CACHE_DIR/qml/CSI/Common/Api"
-    
-    # Download server.py
-    if ! curl -sS -o "$SERVER_CACHE_DIR/server.py" "$SERVER_GITHUB_REPO/server.py"; then
-        echo "Error: Failed to download server.py" >&2
+    if ! _download_traktor_logger_from_github "$BRANCH" >&2; then
         return 1
     fi
-    
-    # Download Logger.qml
-    if ! curl -sS -o "$SERVER_CACHE_DIR/qml/Logger.qml" "$SERVER_GITHUB_REPO/qml/Logger.qml"; then
-        echo "Error: Failed to download Logger.qml" >&2
-        return 1
-    fi
-    
-    # Download qmldir
-    if ! curl -sS -o "$SERVER_CACHE_DIR/qml/qmldir" "$SERVER_GITHUB_REPO/qml/qmldir"; then
-        echo "Error: Failed to download qmldir" >&2
-        return 1
-    fi
-    
-    # Download Api modules
-    local api_files=("ApiClient.js" "ApiDeck.qml" "ApiMasterClock.qml" "ApiChannel.qml" "ApiModule.qml")
-    for api_file in "${api_files[@]}"; do
-        if ! curl -sS -o "$SERVER_CACHE_DIR/qml/CSI/Common/Api/$api_file" "$SERVER_GITHUB_REPO/qml/CSI/Common/Api/$api_file"; then
-            echo "Error: Failed to download $api_file" >&2
-            return 1
-        fi
-    done
-    
-    # Download README.md (for version information)
-    curl -sS -o "$SERVER_CACHE_DIR/README.md" "$SERVER_GITHUB_REPO/README.md" 2>/dev/null || true
-    
-    # Make server.py executable
-    chmod +x "$SERVER_CACHE_DIR/server.py"
-    
     echo "Downloaded to: $SERVER_CACHE_DIR" >&2
     echo "$SERVER_CACHE_DIR"
     return 0
 }
 
-force_update_server_cache() {
-    # Force download of traktor-logger from GitHub, bypassing local repo check
-    # Used by 'logger update' to ensure fresh cache
-    echo "Downloading traktor-logger from GitHub (force update)..."
-    
-    # Clean existing cache if present
-    if [ -d "$SERVER_CACHE_DIR" ]; then
-        rm -rf "$SERVER_CACHE_DIR"
-    fi
-    
-    mkdir -p "$SERVER_CACHE_DIR/qml/CSI/Common/Api"
-    
-    # Download server.py
-    if ! curl -sS -o "$SERVER_CACHE_DIR/server.py" "$SERVER_GITHUB_REPO/server.py"; then
-        echo "Error: Failed to download server.py" >&2
-        return 1
-    fi
-    
-    # Download Logger.qml
-    if ! curl -sS -o "$SERVER_CACHE_DIR/qml/Logger.qml" "$SERVER_GITHUB_REPO/qml/Logger.qml"; then
-        echo "Error: Failed to download Logger.qml" >&2
-        return 1
-    fi
-    
-    # Download qmldir
-    if ! curl -sS -o "$SERVER_CACHE_DIR/qml/qmldir" "$SERVER_GITHUB_REPO/qml/qmldir"; then
-        echo "Error: Failed to download qmldir" >&2
-        return 1
-    fi
-    
-    # Download Api modules
-    local api_files=("ApiClient.js" "ApiDeck.qml" "ApiMasterClock.qml" "ApiChannel.qml" "ApiModule.qml")
-    for api_file in "${api_files[@]}"; do
-        if ! curl -sS -o "$SERVER_CACHE_DIR/qml/CSI/Common/Api/$api_file" "$SERVER_GITHUB_REPO/qml/CSI/Common/Api/$api_file"; then
-            echo "Error: Failed to download $api_file" >&2
-            return 1
-        fi
-    done
-    
-    # Download README.md (for version information)
-    curl -sS -o "$SERVER_CACHE_DIR/README.md" "$SERVER_GITHUB_REPO/README.md" 2>/dev/null || true
-    
-    # Make server.py executable
-    chmod +x "$SERVER_CACHE_DIR/server.py"
-    
-    echo "Downloaded to: $SERVER_CACHE_DIR"
-    return 0
-}
 
 get_server_path() {
     # Get path to server.py (local, cached, or download)
@@ -402,7 +288,7 @@ QMLDIR
 enable_metadata_for_traktor() {
     # Enable metadata for Traktor's installed qml (standalone operation)
     # Injects ApiModule into controller files
-    # Note: Api modules must be installed first via 'logger install' or 'logger update'
+    # Note: Api modules must be installed first via 'logger pull' + 'logger install'
     local controller_list="$1"
     
     if [ -z "$controller_list" ]; then
@@ -419,8 +305,8 @@ enable_metadata_for_traktor() {
         echo "Install them first with:"
         echo "  install-traktor-mod logger install"
         echo ""
-        echo "Or update them with:"
-        echo "  install-traktor-mod logger update"
+        echo "Or pull and install with:"
+        echo "  install-traktor-mod logger pull && install-traktor-mod logger install"
         return 1
     fi
     
@@ -541,6 +427,8 @@ install_logger_to_traktor() {
         echo "Creating backup of stock qml..."
         sudo cp -r "$TRAKTOR_QML" "$TRAKTOR_QML_BACKUP"
         echo "  Backup saved: $TRAKTOR_QML_BACKUP"
+    else
+        echo "Backup exists: $TRAKTOR_QML_BACKUP"
     fi
     
     # Get Logger.qml using hybrid fallback
@@ -549,12 +437,12 @@ install_logger_to_traktor() {
         echo "Error: Could not obtain Logger.qml"
         return 1
     fi
-    
+
     # Create Defines folder in Traktor's live QML if it doesn't exist
     if [ ! -d "$TRAKTOR_QML/Defines" ]; then
         sudo mkdir -p "$TRAKTOR_QML/Defines"
     fi
-    
+
     # Register Logger in qmldir
     if [ ! -f "$TRAKTOR_QML/Defines/qmldir" ]; then
         # Create new qmldir if missing
@@ -568,7 +456,7 @@ QMLDIR
             echo "Logger 1.0 Logger.qml" | sudo tee -a "$TRAKTOR_QML/Defines/qmldir" > /dev/null
         fi
     fi
-    
+
     # Copy Logger.qml to Traktor's live QML
     sudo cp "$logger_src" "$TRAKTOR_QML/Defines/Logger.qml"
     echo "  ✓ Logger.qml: $TRAKTOR_QML/Defines/Logger.qml"
@@ -617,6 +505,10 @@ START_SERVER=false
 MODE="install"
 SOURCE_DIR="."
 
+
+# --- argument parsing with --branch and --local ---
+BRANCH="main"
+LOGGER_LOCAL_PATH=""
 while [ $# -gt 0 ]; do
     arg="$1"
     case "$arg" in
@@ -624,13 +516,13 @@ while [ $# -gt 0 ]; do
         logger)
             shift
             if [ -z "$1" ]; then
-                echo "Error: 'logger' requires a subcommand (install or update)"
+                echo "Error: 'logger' requires a subcommand (pull or install)"
                 exit 1
             fi
             subarg="$1"
             case "$subarg" in
+                pull) MODE="pull-logger" ;;
                 install) MODE="install-logger-only" ;;
-                update) update_logger_cache; exit 0 ;;
                 *) echo "Error: Unknown logger subcommand: $subarg"; exit 1 ;;
             esac
             shift
@@ -661,6 +553,24 @@ while [ $# -gt 0 ]; do
         --symlink) SYMLINK=true; shift ;;
         --full)    FULL=true; shift ;;
         --with-logger) WITH_LOGGER=true; shift ;;
+        --branch)
+            shift
+            if [ -z "$1" ] || [[ "$1" =~ ^- ]]; then
+                echo "Error: --branch requires a branch name"
+                exit 1
+            fi
+            BRANCH="$1"
+            shift
+            ;;
+        --local)
+            shift
+            if [ -z "$1" ] || [[ "$1" =~ ^- ]]; then
+                echo "Error: --local requires a path to local traktor-logger directory"
+                exit 1
+            fi
+            LOGGER_LOCAL_PATH="$1"
+            shift
+            ;;
         -h|--help) show_help; exit 0 ;;
         -s|--source)
             shift
@@ -677,6 +587,41 @@ while [ $# -gt 0 ]; do
             ;;
     esac
 done
+
+
+# --- logger pull logic ---
+SERVER_GITHUB_REPO="https://raw.githubusercontent.com/lsmith77/traktor-logger/${BRANCH}"
+
+logger_pull() {
+    # Pull traktor-logger into ~/.traktor-mod/traktor-logger from GitHub or local
+    if [ -n "$LOGGER_LOCAL_PATH" ]; then
+        local local_resolved
+        if local_resolved=$(cd "$LOGGER_LOCAL_PATH" 2>/dev/null && pwd 2>/dev/null); then
+            echo "Copying traktor-logger from local: $local_resolved -> $SERVER_CACHE_DIR"
+            mkdir -p "$(dirname "$SERVER_CACHE_DIR")"
+            rm -rf "$SERVER_CACHE_DIR"
+            if [ "$SYMLINK" = true ]; then
+                ln -s "$local_resolved" "$SERVER_CACHE_DIR"
+                echo "Symlinked entire traktor-logger directory from local path."
+            else
+                mkdir -p "$SERVER_CACHE_DIR"
+                cp -R "$local_resolved/". "$SERVER_CACHE_DIR/"
+                echo "Copied entire traktor-logger directory from local path."
+            fi
+            return 0
+        else
+            echo "Error: Could not resolve local logger path: $LOGGER_LOCAL_PATH"
+            return 1
+        fi
+    fi
+    # Otherwise, pull from GitHub
+    if ! _download_traktor_logger_from_github "$BRANCH"; then
+        return 1
+    fi
+    echo "Downloaded to: $SERVER_CACHE_DIR"
+    return 0
+}
+
 
 # --- start server only (if 'server start' with no other action flags) ---
 
@@ -737,8 +682,14 @@ fi
 
 # --- install logger only ---
 
+
+if [ "$MODE" = "pull-logger" ]; then
+    logger_pull
+    exit $?
+fi
+
 if [ "$MODE" = "install-logger-only" ]; then
-    echo "Installing Logger.qml and Api modules to Traktor qml..."
+    echo "Installing Logger.qml and Api modules to Traktor qml from cache..."
     if install_logger_to_traktor; then
         logger_version=$(get_logger_version)
         server_path=$(get_server_path 2>/dev/null || true)
@@ -747,7 +698,6 @@ if [ "$MODE" = "install-logger-only" ]; then
         if [ -n "$server_path" ]; then
             echo "Server path: $server_path"
         fi
-        
         # If 'server start' was specified, start the server; otherwise prompt to launch Traktor
         if [ "$START_SERVER" = "true" ]; then
             echo ""
@@ -764,7 +714,6 @@ if [ "$MODE" = "install-logger-only" ]; then
                 exit 1
             fi
         fi
-        
         echo ""
         read -rp "Launch Traktor now? [y/N] " answer
         if [[ "$answer" =~ ^[Yy]$ ]]; then

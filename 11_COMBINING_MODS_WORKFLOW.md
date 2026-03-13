@@ -172,7 +172,7 @@ git commit -m "Initial: Combined mods (D2 v1.2.3 + X1MK3 v0.12.0 + forum snippet
 
 ### Phase 4: Deploy to Traktor
 
-Use the `install-traktor-mod` script to handle backup, installation, and testing safely. See [Chapter 01: Install / Backup / Restore](01_BASICS.md#install--backup--restore-the-safe-workflow) for complete documentation.
+Use the `traktor-mod` script to handle backup, installation, and testing safely. See [Chapter 01: Install / Backup / Restore](01_BASICS.md#install--backup--restore-the-safe-workflow) for complete documentation.
 
 **Quick steps:**
 
@@ -180,7 +180,7 @@ Use the `install-traktor-mod` script to handle backup, installation, and testing
 
 ```bash
 cd ~/my-traktor-setup
-install-traktor-mod              # Merges your qml/ into Traktor's qml/
+traktor-mod              # Merges your qml/ into Traktor's qml/
 ```
 
 **11. Test in Traktor Pro**:

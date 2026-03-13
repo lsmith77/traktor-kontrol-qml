@@ -1,6 +1,6 @@
 #!/bin/bash
 # NOTE: This script is vibe coded via AI with minimal code review. Use with caution and review before production use.
-# install-traktor-mod.sh — Install a QML overlay mod into Traktor Pro 4 (macOS)
+# traktor-mod.sh — Install a QML overlay mod into Traktor Pro 4 (macOS)
 #
 # Synopsis:
 #   Merges QML overlay mods into Traktor's live qml folder with backup and restore support.
@@ -8,32 +8,32 @@
 #   No reinstall needed when using symlink mode — just restart Traktor after edits.
 #
 # Usage:
-#   install-traktor-mod                                      — merge mod on top of current live qml (stack mode)
-#   install-traktor-mod --fresh                              — restore stock first, then merge mod (clean mode)
-#   install-traktor-mod --symlink                            — symlink mod files into live qml (dev mode)
-#   install-traktor-mod --fresh --symlink                    — restore stock first, then symlink mod files
-#   install-traktor-mod --full                               — replace entire qml with mod's qml
-#   install-traktor-mod --full --symlink                     — symlink entire mod qml into Traktor (dev mode)
-#   install-traktor-mod restore                              — restore stock qml and remove all mods/symlinks
-#   install-traktor-mod restore --pull                       — fetch stock qml from GitHub (when backup is missing or to force a refresh)
+#   traktor-mod                                      — merge mod on top of current live qml (stack mode)
+#   traktor-mod --fresh                              — restore stock first, then merge mod (clean mode)
+#   traktor-mod --symlink                            — symlink mod files into live qml (dev mode)
+#   traktor-mod --fresh --symlink                    — restore stock first, then symlink mod files
+#   traktor-mod --full                               — replace entire qml with mod's qml
+#   traktor-mod --full --symlink                     — symlink entire mod qml into Traktor (dev mode)
+#   traktor-mod restore                              — restore stock qml and remove all mods/symlinks
+#   traktor-mod restore --pull                       — fetch stock qml from GitHub (when backup is missing or to force a refresh)
 #
 # Specifying source directory (optional; defaults to current directory):
-#   install-traktor-mod --source /path/to/mod                - use specific directory
-#   install-traktor-mod -s ../traktor-kontrol-d2 --fresh     — use subdirectory, fresh mode
-#   install-traktor-mod -s ~/my-mod --symlink                — use home directory, symlink mode
+#   traktor-mod --source /path/to/mod                - use specific directory
+#   traktor-mod -s ../traktor-kontrol-d2 --fresh     — use subdirectory, fresh mode
+#   traktor-mod -s ~/my-mod --symlink                — use home directory, symlink mode
 #
 # Logger and server commands:
-#   install-traktor-mod logger pull                          — download traktor-logger to local cache
-#   install-traktor-mod logger pull --branch dev             — pull from a specific branch
-#   install-traktor-mod logger pull --local /path/to/logger  — copy from local directory
-#   install-traktor-mod logger pull --symlink --local /path  — symlink local logger directory into cache
-#   install-traktor-mod logger install                       — install Logger.qml and Api modules to Traktor qml
-#   install-traktor-mod server start                         — launch traktor-logger server on localhost:8080
-#   install-traktor-mod enable-metadata D2,S8,X1MK3         — inject ApiModule into controller files
+#   traktor-mod logger pull                          — download traktor-logger to local cache
+#   traktor-mod logger pull --branch dev             — pull from a specific branch
+#   traktor-mod logger pull --local /path/to/logger  — copy from local directory
+#   traktor-mod logger pull --symlink --local /path  — symlink local logger directory into cache
+#   traktor-mod logger install                       — install Logger.qml and Api modules to Traktor qml
+#   traktor-mod server start                         — launch traktor-logger server on localhost:8080
+#   traktor-mod enable-metadata D2,S8,X1MK3         — inject ApiModule into controller files
 #
 # Help:
-#   install-traktor-mod -h                                   — show this help text
-#   install-traktor-mod --help                               — show this help text
+#   traktor-mod -h                                   — show this help text
+#   traktor-mod --help                               — show this help text
 #
 # Stack mode (default): copies mod files into Traktor's live qml. Other installed mods remain.
 #
@@ -58,7 +58,7 @@ set -o pipefail
 
 show_help() {
     cat << 'EOF'
-install-traktor-mod — Install QML mods into Traktor Pro 4 (macOS)
+traktor-mod — Install QML mods into Traktor Pro 4 (macOS)
 
 Two installation modes available:
 
@@ -72,27 +72,27 @@ FULL REPLACEMENT MODE (--full):
   Supports copy and symlink sub-modes.
 
 Overlay Mode Usage:
-  install-traktor-mod                        — merge mod (default)
-  install-traktor-mod --fresh                — reset to stock first, then merge
-  install-traktor-mod --symlink              — symlink mode (dev)
-  install-traktor-mod --fresh --symlink      — reset stock, then symlink
+  traktor-mod                        — merge mod (default)
+  traktor-mod --fresh                — reset to stock first, then merge
+  traktor-mod --symlink              — symlink mode (dev)
+  traktor-mod --fresh --symlink      — reset stock, then symlink
 
 Full Replacement Mode Usage:
-  install-traktor-mod --full                 — replace entire qml
-  install-traktor-mod --full --symlink       — replace with symlinks (dev mode)
-  install-traktor-mod --full --fresh         — reset stock first, then replace
-  install-traktor-mod --full --fresh --symlink — reset stock, then symlink with replacement
+  traktor-mod --full                 — replace entire qml
+  traktor-mod --full --symlink       — replace with symlinks (dev mode)
+  traktor-mod --full --fresh         — reset stock first, then replace
+  traktor-mod --full --fresh --symlink — reset stock, then symlink with replacement
 
 Installation Modifiers:
-  install-traktor-mod --with-logger          — include Logger.qml and Api modules with a mod
+  traktor-mod --with-logger          — include Logger.qml and Api modules with a mod
 
 Standalone Commands:
-  install-traktor-mod logger pull            — download traktor-logger to local cache from GitHub
-  install-traktor-mod logger install         — install Logger.qml and Api modules to Traktor qml
-  install-traktor-mod server start           — launch traktor-logger server on localhost:8080
-  install-traktor-mod enable-metadata D2,S8,X1MK3  — inject ApiModule into controller files
-  install-traktor-mod restore                — restore stock qml from backup, remove all mods
-  install-traktor-mod restore --pull         — fetch stock qml from GitHub (ignores backup)
+  traktor-mod logger pull            — download traktor-logger to local cache from GitHub
+  traktor-mod logger install         — install Logger.qml and Api modules to Traktor qml
+  traktor-mod server start           — launch traktor-logger server on localhost:8080
+  traktor-mod enable-metadata D2,S8,X1MK3  — inject ApiModule into controller files
+  traktor-mod restore                — restore stock qml from backup, remove all mods
+  traktor-mod restore --pull         — fetch stock qml from GitHub (ignores backup)
 
   Logger cache options (used with 'logger pull'):
     --branch <name>                          — pull from a specific GitHub branch (default: main)
@@ -104,8 +104,8 @@ Standalone Commands:
     2. GitHub download (initial setup, requires internet)
 
 General Options:
-  install-traktor-mod -s /path/to/mod        — use specific directory
-  install-traktor-mod -h                     — show this help
+  traktor-mod -s /path/to/mod        — use specific directory
+  traktor-mod -h                     — show this help
 
 Notes:
   - Backup created on first install (never overwritten)
@@ -352,10 +352,10 @@ enable_metadata_for_traktor() {
         echo "Error: Api modules not found in Traktor qml"
         echo ""
         echo "Install them first with:"
-        echo "  install-traktor-mod logger install"
+        echo "  traktor-mod logger install"
         echo ""
         echo "Or pull and install with:"
-        echo "  install-traktor-mod logger pull && install-traktor-mod logger install"
+        echo "  traktor-mod logger pull && traktor-mod logger install"
         return 1
     fi
     
@@ -674,8 +674,8 @@ QMLDIR
     echo "  logger.info('Message', { data: 'value' })"
     echo ""
     echo "For automatic metadata collection (deck state, channels, tempo, browser):"
-    echo "  Use: install-traktor-mod enable-metadata ControllerName"
-    echo "  Example: install-traktor-mod enable-metadata D2,S8,X1MK3"
+    echo "  Use: traktor-mod enable-metadata ControllerName"
+    echo "  Example: traktor-mod enable-metadata D2,S8,X1MK3"
     echo "  Then open the Logger Web Dashboard at http://localhost:8080"
     echo ""
     echo "Components installed:"
@@ -997,7 +997,7 @@ if [ "$MODE" = "restore" ]; then
         echo "Cannot restore — was the mod installed with this script?"
         echo ""
         echo "To fetch stock QML from GitHub instead, run:"
-        echo "  install-traktor-mod restore --pull"
+        echo "  traktor-mod restore --pull"
         exit 1
     fi
     echo "This will restore stock qml, removing ALL mods and symlinks."
@@ -1185,6 +1185,6 @@ if [ "$START_SERVER" = "true" ]; then
 fi
 
 echo ""
-echo "To undo all mods:  install-traktor-mod restore"
+echo "To undo all mods:  traktor-mod restore"
 echo "Restart Traktor to apply changes."
 

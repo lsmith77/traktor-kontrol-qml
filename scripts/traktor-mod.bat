@@ -3,30 +3,30 @@
 setlocal enabledelayedexpansion
 
 :: ============================================================
-:: install-traktor-mod.bat — Install a QML overlay mod into Traktor Pro 4 (Windows)
+:: traktor-mod.bat — Install a QML overlay mod into Traktor Pro 4 (Windows)
 ::
 :: Usage (double-click or run from Command Prompt):
-::   install-traktor-mod.bat                                — merge mod on top of current live qml (stack mode)
-::   install-traktor-mod.bat /fresh                        — restore stock first, then merge mod (clean mode)
-::   install-traktor-mod.bat /symlink                      — symlink mod files into live qml (dev mode)
-::   install-traktor-mod.bat /fresh /symlink               — restore stock first, then symlink mod files
-::   install-traktor-mod.bat /full                         — replace entire qml with complete mod (full replacement)
-::   install-traktor-mod.bat /full /symlink                — symlink complete mod (full replacement dev mode)
-::   install-traktor-mod.bat /full /fresh                  — restore stock first, then replace entire qml
-::   install-traktor-mod.bat /full /fresh /symlink         — restore stock, then symlink complete mod
-::   install-traktor-mod.bat restore                       — restore stock qml and remove all mods/symlinks
-::   install-traktor-mod.bat restore /pull                — fetch stock qml from GitHub (when backup is missing or to force a refresh)
-::   install-traktor-mod.bat logger pull                   — download traktor-logger to local cache from GitHub
-::   install-traktor-mod.bat logger pull /branch dev       — pull from specific branch
-::   install-traktor-mod.bat logger pull /local C:\path   — copy from local directory
-::   install-traktor-mod.bat logger install                — install Logger.qml and Api modules only
-::   install-traktor-mod.bat server start                  — launch traktor-logger server on localhost:8080
-::   install-traktor-mod.bat enable-metadata D2,S8,X1MK3   — inject ApiModule into specified controllers
+::   traktor-mod.bat                                — merge mod on top of current live qml (stack mode)
+::   traktor-mod.bat /fresh                        — restore stock first, then merge mod (clean mode)
+::   traktor-mod.bat /symlink                      — symlink mod files into live qml (dev mode)
+::   traktor-mod.bat /fresh /symlink               — restore stock first, then symlink mod files
+::   traktor-mod.bat /full                         — replace entire qml with complete mod (full replacement)
+::   traktor-mod.bat /full /symlink                — symlink complete mod (full replacement dev mode)
+::   traktor-mod.bat /full /fresh                  — restore stock first, then replace entire qml
+::   traktor-mod.bat /full /fresh /symlink         — restore stock, then symlink complete mod
+::   traktor-mod.bat restore                       — restore stock qml and remove all mods/symlinks
+::   traktor-mod.bat restore /pull                — fetch stock qml from GitHub (when backup is missing or to force a refresh)
+::   traktor-mod.bat logger pull                   — download traktor-logger to local cache from GitHub
+::   traktor-mod.bat logger pull /branch dev       — pull from specific branch
+::   traktor-mod.bat logger pull /local C:\path   — copy from local directory
+::   traktor-mod.bat logger install                — install Logger.qml and Api modules only
+::   traktor-mod.bat server start                  — launch traktor-logger server on localhost:8080
+::   traktor-mod.bat enable-metadata D2,S8,X1MK3   — inject ApiModule into specified controllers
 ::
 :: Specifying source directory (optional; defaults to current directory):
-::   install-traktor-mod.bat -s C:\path\to\mod             — use specific directory
-::   install-traktor-mod.bat --source ..\my-mod            — use subdirectory, relative path
-::   install-traktor-mod.bat -s C:\mods\mod /fresh         — use custom directory, fresh mode
+::   traktor-mod.bat -s C:\path\to\mod             — use specific directory
+::   traktor-mod.bat --source ..\my-mod            — use subdirectory, relative path
+::   traktor-mod.bat -s C:\mods\mod /fresh         — use custom directory, fresh mode
 ::
 :: Stack mode (default): copies overlay mod files into Traktor's live qml. Other installed mods stay.
 :: Fresh mode (/fresh): resets qml to stock first, then applies only this mod.
@@ -37,7 +37,7 @@ setlocal enabledelayedexpansion
 :: Metadata: Enable automatic metadata collection from controllers (requires Api modules installed).
 ::
 :: Syntax checking: Before updating this file, validate with blint to catch batch syntax issues:
-::   python3 blint/blint.py install-traktor-mod.bat
+::   python3 blint/blint.py traktor-mod.bat
 :: See BATCH_FILE_FIXES_REPORT.md for details on blint findings and false positives.
 ::
 :: ============================================================
@@ -251,7 +251,7 @@ if /I "!MODE!"=="restore" (
         echo   Cannot restore — was the mod installed with this script?
         echo.
         echo To fetch stock QML from GitHub instead, run:
-        echo   install-traktor-mod.bat restore /pull
+        echo   traktor-mod.bat restore /pull
         goto :end_error
     )
     echo Restoring stock qml from backup...
@@ -460,7 +460,7 @@ if "!START_SERVER!"=="true" (
 )
 
 echo.
-echo To undo all mods:  install-traktor-mod restore
+echo To undo all mods:  traktor-mod restore
 echo Restart Traktor to apply changes.
 
 goto :end
@@ -702,8 +702,8 @@ echo   Logger { id: logger }
 echo   logger.info('Message', { data: 'value' })
 echo.
 echo For automatic metadata collection (deck state, channels, tempo, browser):
-echo   Use: install-traktor-mod.bat enable-metadata ControllerName
-echo   Example: install-traktor-mod.bat enable-metadata D2,S8,X1MK3
+echo   Use: traktor-mod.bat enable-metadata ControllerName
+echo   Example: traktor-mod.bat enable-metadata D2,S8,X1MK3
 echo   Then open the Logger Web Dashboard at http://localhost:8080
 echo.
 echo Components installed:
@@ -767,11 +767,11 @@ if not exist "!TRAKTOR_QML!\CSI\Common\Api" (
     echo Error: Api modules not found in Traktor qml
     echo.
     echo Install them first with:
-    echo   install-traktor-mod.bat logger install
+    echo   traktor-mod.bat logger install
     echo.
     echo Or pull and install with:
-    echo   install-traktor-mod.bat logger pull
-    echo   install-traktor-mod.bat logger install
+    echo   traktor-mod.bat logger pull
+    echo   traktor-mod.bat logger install
     endlocal
     exit /b 1
 )
@@ -923,7 +923,7 @@ exit /b 1
 
 :showhelp
     echo.
-    echo install-traktor-mod.bat - Install QML mods into Traktor Pro 4 (Windows)
+    echo traktor-mod.bat - Install QML mods into Traktor Pro 4 (Windows)
     echo.
     echo Two installation modes available:
     echo.
@@ -937,34 +937,34 @@ exit /b 1
     echo   Supports copy and symlink sub-modes.
     echo.
     echo Overlay Mode Usage:
-    echo   install-traktor-mod.bat                  - merge mod (default)
-    echo   install-traktor-mod.bat /fresh           - reset to stock, then merge
-    echo   install-traktor-mod.bat /symlink         - symlink mode (dev)
-    echo   install-traktor-mod.bat /fresh /symlink  - reset, then symlink
+    echo   traktor-mod.bat                  - merge mod (default)
+    echo   traktor-mod.bat /fresh           - reset to stock, then merge
+    echo   traktor-mod.bat /symlink         - symlink mode (dev)
+    echo   traktor-mod.bat /fresh /symlink  - reset, then symlink
     echo.
     echo Full Replacement Mode Usage:
-    echo   install-traktor-mod.bat /full            - replace entire qml
-    echo   install-traktor-mod.bat /full /symlink   - replace with symlinks (dev mode)
-    echo   install-traktor-mod.bat /full /fresh     - reset stock first, then replace
-    echo   install-traktor-mod.bat /full /fresh /symlink - reset, then symlink with replacement
+    echo   traktor-mod.bat /full            - replace entire qml
+    echo   traktor-mod.bat /full /symlink   - replace with symlinks (dev mode)
+    echo   traktor-mod.bat /full /fresh     - reset stock first, then replace
+    echo   traktor-mod.bat /full /fresh /symlink - reset, then symlink with replacement
     echo.
     echo Logger (Monitoring) Options:
-    echo   install-traktor-mod.bat logger pull           - download traktor-logger to local cache from GitHub
-    echo   install-traktor-mod.bat logger pull /branch dev - pull from specific branch
-    echo   install-traktor-mod.bat logger pull /local C:\path - copy from local directory
-    echo   install-traktor-mod.bat logger install        - install Logger.qml and Api modules to Traktor qml
-    echo   install-traktor-mod.bat --with-logger         - include Logger with a mod install
+    echo   traktor-mod.bat logger pull           - download traktor-logger to local cache from GitHub
+    echo   traktor-mod.bat logger pull /branch dev - pull from specific branch
+    echo   traktor-mod.bat logger pull /local C:\path - copy from local directory
+    echo   traktor-mod.bat logger install        - install Logger.qml and Api modules to Traktor qml
+    echo   traktor-mod.bat --with-logger         - include Logger with a mod install
     echo.
     echo Server Launch:
-    echo   install-traktor-mod.bat server start - launch traktor-logger server on localhost:8080
+    echo   traktor-mod.bat server start - launch traktor-logger server on localhost:8080
     echo.
     echo Metadata Collection:
-    echo   install-traktor-mod.bat enable-metadata D2,S8,X1MK3 - inject ApiModule into controllers
+    echo   traktor-mod.bat enable-metadata D2,S8,X1MK3 - inject ApiModule into controllers
     echo.
     echo General Options:
-    echo   install-traktor-mod.bat restore         - restore stock qml from backup, remove all mods
-    echo   install-traktor-mod.bat restore /pull  - fetch stock qml from GitHub (ignores backup)
-    echo   install-traktor-mod.bat -s C:\path\to\mod - use specific directory
+    echo   traktor-mod.bat restore         - restore stock qml from backup, remove all mods
+    echo   traktor-mod.bat restore /pull  - fetch stock qml from GitHub (ignores backup)
+    echo   traktor-mod.bat -s C:\path\to\mod - use specific directory
     echo.
     echo Logger Cache Options (used with 'logger pull'):
     echo   /branch ^<name^>        - pull from a specific GitHub branch (default: main)
@@ -972,9 +972,9 @@ exit /b 1
     echo   /symlink (with /local) - symlink local directory into cache instead of copying
     echo.
     echo Help:
-    echo   install-traktor-mod.bat -h              - show this help
-    echo   install-traktor-mod.bat --help          - show this help
-    echo   install-traktor-mod.bat /?              - show this help
+    echo   traktor-mod.bat -h              - show this help
+    echo   traktor-mod.bat --help          - show this help
+    echo   traktor-mod.bat /?              - show this help
     echo.
     echo Notes:
     echo   - Backup created on first install (never overwritten)

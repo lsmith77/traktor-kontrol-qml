@@ -19,7 +19,7 @@ You generally can't damage the hardware by editing controller files. The typical
 - A controller screen displays incorrectly
 - Traktor becomes unstable until you restore a backup
 
-That's why backup/restore is the core safety net. **Use the `install-traktor-mod` script to restore in one command** — see [Chapter 01: Install / Backup / Restore](01_BASICS.md#install--backup--restore-the-safe-workflow) for setup and all available modes.
+That's why backup/restore is the core safety net. **Use the `traktor-mod` script to restore in one command** — see [Chapter 01: Install / Backup / Restore](01_BASICS.md#install--backup--restore-the-safe-workflow) for setup and all available modes.
 
 ### Do I need programming experience?
 
@@ -58,7 +58,7 @@ These terms describe the **same thing** viewed from different angles:
 
 - **Mod**: Any QML customization you make—it could be a single file change or many files combined.
 - **Overlay Mod**: How a mod is _packaged_ for sharing—as only the files it changes, designed to install on top of your existing QML without replacing anything else. This approach is safer because you only get the changes the author made, nothing extra.
-- **Overlay Install**: The process of merging an overlay mod into your current QML using the `install-traktor-mod` script (default `stack mode`).
+- **Overlay Install**: The process of merging an overlay mod into your current QML using the `traktor-mod` script (default `stack mode`).
 
 Example: If you make changes to 3 files and package them as an overlay mod, another user can install them (via overlay install) on top of their own setup, and all their other files stay intact.
 
@@ -89,7 +89,7 @@ Traktor updates reset your custom changes to factory defaults. But Native Access
 
 ### Can I undo changes?
 
-Yes: **use `install-traktor-mod restore`** to reset to stock QML in one command. See [Chapter 01: Install / Backup / Restore](01_BASICS.md#install--backup--restore-the-safe-workflow) for detailed instructions.
+Yes: **use `traktor-mod restore`** to reset to stock QML in one command. See [Chapter 01: Install / Backup / Restore](01_BASICS.md#install--backup--restore-the-safe-workflow) for detailed instructions.
 
 ---
 

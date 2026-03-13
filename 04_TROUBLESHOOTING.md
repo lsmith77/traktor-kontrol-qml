@@ -165,7 +165,7 @@ This works reliably across all controllers, including those without hardware dis
 
 If Traktor becomes unstable, see [Chapter 01: Install / Backup / Restore](01_BASICS.md#install--backup--restore-the-safe-workflow) for detailed steps.
 
-Quick version: Run `install-traktor-mod restore` to reset to stock QML, then re-apply changes one at a time.
+Quick version: Run `traktor-mod restore` to reset to stock QML, then re-apply changes one at a time.
 
 ### Quick path when following a community example
 
@@ -556,7 +556,7 @@ ListView {
 The `traktor-logger` package includes `ApiBrowser.qml` (a `Screens/Common/` component) that uses `Traktor.Browser` to monitor browser state and send it to the dashboard in real time. Enable it with:
 
 ```bash
-install-traktor-mod enable-metadata D2
+traktor-mod enable-metadata D2
 ```
 
 This injects `ApiBrowser` into the Screen.qml of the target controller and sends current path, selected item metadata, and a window of surrounding items (up to 10 above, 20 below) to the **🎵 Browser** tab of the dashboard.
@@ -624,7 +624,7 @@ You have two options depending on your use case:
 **Option 1: Logger with a Mod** (recommended if you're installing a mod)
 
 ```bash
-install-traktor-mod --with-logger
+traktor-mod --with-logger
 ```
 
 Adds Logger.qml to your mod's `Defines/` folder. Logger becomes part of your mod installation.
@@ -632,7 +632,7 @@ Adds Logger.qml to your mod's `Defines/` folder. Logger becomes part of your mod
 **Option 2: Logger Only** (if you just want debugging without a mod)
 
 ```bash
-install-traktor-mod logger install
+traktor-mod logger install
 ```
 
 Installs Logger.qml directly to Traktor's live QML. Use this when you want debugging available everywhere.
@@ -736,7 +736,7 @@ Binding {
 | ------------------------ | -------------------------------------------------------- |
 | No logs appearing        | Start server: `python3 server.py` in Logger repo         |
 | "Logs are old"           | Restart: Page reload doesn't clear—restart Traktor       |
-| Can't find Logger.qml    | Run `install-traktor-mod logger update` to refresh cache |
+| Can't find Logger.qml    | Run `traktor-mod logger update` to refresh cache |
 | No internet (first-time) | Use `logger update` on a machine with internet first     |
 
 **Learn more:**

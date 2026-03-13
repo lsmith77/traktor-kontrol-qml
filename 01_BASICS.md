@@ -401,7 +401,7 @@ An AI code assistant accelerates development by providing real-time suggestions,
 
 ## Install / backup / restore (the safe workflow)
 
-> **Disclaimer:** The install-traktor-mod scripts referenced here are vibe coded via AI with minimal code review. Use with caution and review scripts before production use.
+> **Disclaimer:** The traktor-mod scripts referenced here are vibe coded via AI with minimal code review. Use with caution and review scripts before production use.
 
 **The script automates backup, installation, and restoration.** It works on macOS and Windows and prevents the most common mistakes (incomplete installs, missing files).
 
@@ -410,13 +410,13 @@ An AI code assistant accelerates development by providing real-time suggestions,
 **Quick reference** (from any mod directory):
 
 ```bash
-install-traktor-mod              # Install: merge mod into current qml
-install-traktor-mod --fresh      # Fresh: reset to stock, then install mod
-install-traktor-mod --symlink    # Symlink: use/edit files directly from mod repo
-install-traktor-mod restore      # Restore: reset to stock qml, remove all mods
+traktor-mod              # Install: merge mod into current qml
+traktor-mod --fresh      # Fresh: reset to stock, then install mod
+traktor-mod --symlink    # Symlink: use/edit files directly from mod repo
+traktor-mod restore      # Restore: reset to stock qml, remove all mods
 ```
 
-Flags can be combined (e.g., `install-traktor-mod --fresh --symlink`).
+Flags can be combined (e.g., `traktor-mod --fresh --symlink`).
 
 **Full documentation**: See [08_SHARING_CHANGES.md — Testing your overlay mod](08_SHARING_CHANGES.md#testing-your-overlay-mod) for how the script manages backups, all modes, and troubleshooting.
 
@@ -460,7 +460,7 @@ If you're using AI assistants (Claude, Copilot, etc.) to help develop mods, orga
 
 **Example: Set up symlink mode (macOS/Windows)**:
 
-Use the included `install-traktor-mod` script to create a symlink. Install instructions, all available modes, and detailed workflows are documented in [Chapter 08: Sharing Changes](08_SHARING_CHANGES.md#testing-your-overlay-mod).
+Use the included `traktor-mod` script to create a symlink. Install instructions, all available modes, and detailed workflows are documented in [Chapter 08: Sharing Changes](08_SHARING_CHANGES.md#testing-your-overlay-mod).
 
 **Pro tip for AI workflows**:
 

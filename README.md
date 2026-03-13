@@ -6,7 +6,7 @@ This repo is a **friendly documentation set** for customizing Native Instruments
 
 **If you've created MIDI mappings in Traktor Pro**, you understand the concept of wiring hardware controls to actions. QML works the same way — it's just more powerful: you can change what buttons do, what screens show, and how the UI behaves.
 
-# NOTE: The install-traktor-mod scripts referenced in this documentation are vibe coded via AI with minimal code review. Use with caution and review scripts before production use.
+# NOTE: The traktor-mod scripts referenced in this documentation are vibe coded via AI with minimal code review. Use with caution and review scripts before production use.
 
 ---
 
@@ -24,7 +24,7 @@ Find working mods, understand what they do, and deploy them safely.
 
 1. **[Chapter 03: Community Resources](03_COMMUNITY_RESOURCES.md)** — curated list of GitHub repos and forum mods for S4 MK3, X1 MK3, and other controllers
 2. **[Chapter 01: Basics](01_BASICS.md)** — `qml` folder structure, Traktor architecture
-3. **[Chapter 08: Sharing Changes](08_SHARING_CHANGES.md)** — `install-traktor-mod` script setup (automates backup, overlay install, restore)
+3. **[Chapter 08: Sharing Changes](08_SHARING_CHANGES.md)** — `traktor-mod` script setup (automates backup, overlay install, restore)
 4. **[Chapter 05: FAQ](05_FAQ.md)** — safety, Traktor updates overwriting mods, common questions
 5. **[Chapter 04: Troubleshooting](04_TROUBLESHOOTING.md)** — when something breaks
 

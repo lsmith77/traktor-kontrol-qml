@@ -18,7 +18,7 @@ These three terms will appear throughout the handbook. Here's what they mean:
 
 - **Mod**: Any customization you make to your Traktor QML—could be a single file change or many files combined.
 - **Overlay Mod**: How a mod is packaged for sharing—as only the files it changes, designed to layer on top of your existing setup safely.
-- **Overlay Install**: The process of merging an overlay mod into your current QML using the `install-traktor-mod` script.
+- **Overlay Install**: The process of merging an overlay mod into your current QML using the `traktor-mod` script.
 
 Example: You make changes to 3 files and package them as an overlay mod. Another user can overlay-install them on top of their own setup, and all their other files stay intact.
 
@@ -142,7 +142,7 @@ The handbook includes integrated debugging and metadata collection tools via `tr
 1. **Install Logger** to Traktor's qml:
 
    ```bash
-   install-traktor-mod logger install
+   traktor-mod logger install
    ```
 
 2. **Enable metadata collection on at least one connected controller**:
@@ -150,16 +150,16 @@ The handbook includes integrated debugging and metadata collection tools via `tr
    This step is required if you want data in the **Live Metadata** tab. Without API integration on a connected controller, the logger server runs but receives no deck metadata.
 
    ```bash
-   install-traktor-mod enable-metadata D2,S8,X1MK3
+   traktor-mod enable-metadata D2,S8,X1MK3
    ```
 
 3. **Start the server**:
 
    ```bash
-   install-traktor-mod server start
+   traktor-mod server start
    ```
 
-   `install-traktor-mod` downloads/updates the server package and can launch it directly via `server start`.
+   `traktor-mod` downloads/updates the server package and can launch it directly via `server start`.
 
    Open dashboard: http://localhost:8080
 
@@ -176,16 +176,16 @@ The handbook includes integrated debugging and metadata collection tools via `tr
 
 ```bash
 # Option 1: Add Logger to a mod
-install-traktor-mod --with-logger
+traktor-mod --with-logger
 
 # Option 2: Install Logger standalone (no mod)
-install-traktor-mod logger install
+traktor-mod logger install
 
 # Option 3: Update Logger + Api modules from GitHub
-install-traktor-mod logger update
+traktor-mod logger update
 
 # Option 4: Install Logger and start server in one command
-install-traktor-mod logger install && install-traktor-mod server start
+traktor-mod logger install && traktor-mod server start
 ```
 
 **Logger usage in QML**:

@@ -52,17 +52,17 @@ Include all of this information so people know if your mod will work for them:
 
 The `qml/` folder is the installation target. For **overlay mods**, its contents are merged into Traktor's `qml/` folder. For **full replacement mods**, it completely replaces Traktor's `qml/` folder. This structure gives installation scripts a clear, predictable entry point.
 
-**Note:** The `install-traktor-mod` script validates this structure automatically. If you try to install a mod without a `qml/` folder, it will show an error message with the exact path it was looking for, helping you fix the structure.
+**Note:** The `traktor-mod` script validates this structure automatically. If you try to install a mod without a `qml/` folder, it will show an error message with the exact path it was looking for, helping you fix the structure.
 
 ## Platform-specific notes
 
 ### Windows script status
 
-> ⚠️ **Windows users**: The `install-traktor-mod.bat` script is **not yet tested**. Please test it carefully and report any issues at [github.com/lsmith77/traktor-kontrol-qml/issues](https://github.com/lsmith77/traktor-kontrol-qml/issues). Your feedback helps make this tool reliable for everyone.
+> ⚠️ **Windows users**: The `traktor-mod.bat` script is **not yet tested**. Please test it carefully and report any issues at [github.com/lsmith77/traktor-kontrol-qml/issues](https://github.com/lsmith77/traktor-kontrol-qml/issues). Your feedback helps make this tool reliable for everyone.
 
 ### macOS/Linux
 
-The `install-traktor-mod.sh` script is actively maintained and used in production.
+The `traktor-mod.sh` script is actively maintained and used in production.
 
 ---
 
@@ -77,16 +77,16 @@ Most mods should be shared as **overlay mods**—packaged with only the files yo
 - Take your modified `qml` folder
 - Extract only the files you actually edited
 - Organize them exactly as they appear in Traktor's folder structure
-- Share those files (in a zip) with install instructions using `install-traktor-mod` (default stack mode)
+- Share those files (in a zip) with install instructions using `traktor-mod` (default stack mode)
 
 **Why use overlay mods:** If someone has their own customizations, installing your overlay mod means their files stay intact. Only the files you changed get updated. Users can combine multiple overlay mods without losing previous customizations.
 
 **Combining Multiple Overlay Mods:**
 
 ```bash
-install-traktor-mod  # Apply overlay mod 1 (stack mode)
+traktor-mod  # Apply overlay mod 1 (stack mode)
 # Restart and test
-install-traktor-mod  # Apply overlay mod 2 on top (stack mode)
+traktor-mod  # Apply overlay mod 2 on top (stack mode)
 # Both mods are now active together — as long as they don't edit the same files
 ```
 
@@ -101,8 +101,8 @@ If your mod is a **complete, standalone redesign** (not meant to combine with ot
 **How it works:**
 
 - Include the entire `qml` folder structure (CSI, Screens, Defines, etc.)
-- Distribute with installation instructions using `install-traktor-mod --full`
-- Users run `install-traktor-mod --full` to completely replace their `qml`
+- Distribute with installation instructions using `traktor-mod --full`
+- Users run `traktor-mod --full` to completely replace their `qml`
 - Other installed mods are overwritten
 
 **When to use full replacement:** Your mod is self-contained and provides a complete interface redesign. Users expect it to replace everything, not combine with existing mods.
@@ -113,7 +113,7 @@ If your mod is a **complete, standalone redesign** (not meant to combine with ot
 
 An overlay mod (one that only contains the files it changes, not the full `qml` folder) cannot be dropped directly into Traktor — it needs to be **merged** into the existing `qml` folder first. This extra step is easy to forget during iteration.
 
-The `install-traktor-mod.sh` / `install-traktor-mod.bat` scripts solve this: install them once to your system PATH, then from any mod repo directory, run the command—it finds the `qml` folder in your current working directory and handles backup + merge + launch.
+The `traktor-mod.sh` / `traktor-mod.bat` scripts solve this: install them once to your system PATH, then from any mod repo directory, run the command—it finds the `qml` folder in your current working directory and handles backup + merge + launch.
 
 ### Setup: Install script to system PATH (one-time setup)
 
@@ -126,15 +126,15 @@ Clone the handbook repo to a central location, then create symlinks in your PATH
 git clone https://github.com/lsmith77/traktor-kontrol-qml ~/traktor-kontrol-qml
 
 # Make the script executable
-chmod +x ~/traktor-kontrol-qml/install-traktor-mod.sh
+chmod +x ~/traktor-kontrol-qml/scripts/traktor-mod.sh
 
 # Create a symlink in /usr/local/bin (or another PATH directory)
 # The $HOME variable expands to your absolute home directory path
-sudo ln -s "$HOME/traktor-kontrol-qml/install-traktor-mod.sh" /usr/local/bin/install-traktor-mod
+sudo ln -s "$HOME/traktor-kontrol-qml/scripts/traktor-mod.sh" /usr/local/bin/traktor-mod
 
 # Or use a user-local directory (no sudo needed)
 mkdir -p ~/.local/bin
-ln -s "$HOME/traktor-kontrol-qml/install-traktor-mod.sh" ~/.local/bin/install-traktor-mod
+ln -s "$HOME/traktor-kontrol-qml/scripts/traktor-mod.sh" ~/.local/bin/traktor-mod
 # Then add ~/.local/bin to your PATH if not already there:
 # echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
 ```
@@ -146,11 +146,11 @@ ln -s "$HOME/traktor-kontrol-qml/install-traktor-mod.sh" ~/.local/bin/install-tr
 git clone https://github.com/lsmith77/traktor-kontrol-qml C:\traktor-kontrol-qml
 
 :: Create a symlink in a PATH directory (requires admin PowerShell)
-New-Item -ItemType SymbolicLink -Path "C:\Windows\System32\install-traktor-mod.bat" -Target "C:\traktor-kontrol-qml\install-traktor-mod.bat"
+New-Item -ItemType SymbolicLink -Path "C:\Windows\System32\traktor-mod.bat" -Target "C:\traktor-kontrol-qml\scripts\traktor-mod.bat"
 
 :: Or use a custom directory and add it to PATH (no admin needed for the symlink)
 New-Item -ItemType Directory -Path "C:\Traktor\Scripts" -Force
-New-Item -ItemType SymbolicLink -Path "C:\Traktor\Scripts\install-traktor-mod.bat" -Target "C:\traktor-kontrol-qml\install-traktor-mod.bat"
+New-Item -ItemType SymbolicLink -Path "C:\Traktor\Scripts\traktor-mod.bat" -Target "C:\traktor-kontrol-qml\scripts\traktor-mod.bat"
 :: Then add C:\Traktor\Scripts to your PATH via System Properties > Environment Variables
 ```
 
@@ -163,9 +163,9 @@ cd ~/traktor-kontrol-qml
 git pull
 ```
 
-The next time you run `install-traktor-mod`, you'll automatically get the latest version.
+The next time you run `traktor-mod`, you'll automatically get the latest version.
 
-### macOS: install-traktor-mod
+### macOS: traktor-mod
 
 Your mod repo now only needs the `qml` folder—no script needed:
 
@@ -182,7 +182,7 @@ The script is already installed in your PATH, so no additional setup needed. Jus
 
 ```bash
 cd my-mod
-install-traktor-mod
+traktor-mod
 ```
 
 **Install / test cycle:**
@@ -192,33 +192,33 @@ From your mod directory, use any of these modes:
 ```bash
 # OVERLAY MODES (default — merge with existing qml) —————
 # stack mode: merge mod on top of whatever is currently installed
-install-traktor-mod
+traktor-mod
 
 # fresh mode: reset to stock first, then merge only this mod
-install-traktor-mod --fresh
+traktor-mod --fresh
 
 # symlink mode: symlink mod files into live qml (dev mode — edit & restart, no reinstall)
-install-traktor-mod --symlink
+traktor-mod --symlink
 
 # fresh + symlink: reset to stock, then symlink only this mod (isolated dev environment)
-install-traktor-mod --fresh --symlink
+traktor-mod --fresh --symlink
 
 # FULL REPLACEMENT MODES (—full flag — replace entire qml) —————
 # full replacement: replace entire qml with this complete mod
-install-traktor-mod --full
+traktor-mod --full
 
 # full replacement + symlink: replace entire qml and symlink it (dev mode for complete mods)
-install-traktor-mod --full --symlink
+traktor-mod --full --symlink
 
 # full replacement + fresh: reset to stock first, then replace with this mod
-install-traktor-mod --full --fresh
+traktor-mod --full --fresh
 
 # full replacement + fresh + symlink: reset to stock, then symlink complete mod (isolated full replacement dev)
-install-traktor-mod --full --fresh --symlink
+traktor-mod --full --fresh --symlink
 
 # RESTORE —————
 # undo all mods — restore stock qml
-install-traktor-mod restore
+traktor-mod restore
 ```
 
 **Stack mode** (default overlay): copies overlay mod files into the current live qml. Other installed mods remain. Use this when combining multiple mods.
@@ -233,7 +233,7 @@ install-traktor-mod restore
 
 > **How the backup works:** The stock backup is created on first install and never overwritten — it always reflects unmodified Traktor files. `restore` removes everything back to stock in one step (no "undo just this mod"). After `restore`, the backup is removed, so the next install creates a fresh one from the now-stock qml.
 
-### Windows: install-traktor-mod.bat
+### Windows: traktor-mod.bat
 
 Your mod repo only needs the `qml` folder:
 
@@ -249,33 +249,33 @@ From your mod directory, use the following modes in Command Prompt or PowerShell
 ```bat
 rem OVERLAY MODES (default — merge with existing qml) —————
 rem stack mode — merge mod on top of current live qml
-install-traktor-mod
+traktor-mod
 
 rem fresh mode — reset to stock first, then merge only this mod
-install-traktor-mod /fresh
+traktor-mod /fresh
 
 rem symlink mode — symlink mod files into live qml (dev mode)
-install-traktor-mod /symlink
+traktor-mod /symlink
 
 rem fresh + symlink — reset to stock, then symlink only this mod
-install-traktor-mod /fresh /symlink
+traktor-mod /fresh /symlink
 
 rem FULL REPLACEMENT MODES (/full flag — replace entire qml) —————
 rem full replacement: replace entire qml with this complete mod
-install-traktor-mod /full
+traktor-mod /full
 
 rem full replacement + symlink: replace entire qml and symlink it (dev mode for complete mods)
-install-traktor-mod /full /symlink
+traktor-mod /full /symlink
 
 rem full replacement + fresh: reset to stock first, then replace with this mod
-install-traktor-mod /full /fresh
+traktor-mod /full /fresh
 
 rem full replacement + fresh + symlink: reset to stock, then symlink complete mod (isolated full replacement dev)
-install-traktor-mod /full /fresh /symlink
+traktor-mod /full /fresh /symlink
 
 rem RESTORE —————
 rem undo all mods — restore stock qml
-install-traktor-mod restore
+traktor-mod restore
 ```
 
 The script auto-elevates to admin via UAC, creates a stock backup on first install, and uses `robocopy` for merging/copying. Symlink mode creates directory junctions for complete mods or individual file symlinks for overlays. Behaviour is identical to the macOS script.
@@ -318,7 +318,7 @@ INSTALL:
 1. Backup your current qml folder (see 01_BASICS.md for how)
 2. Extract this zip into a directory
 3. From that directory, run:
-   install-traktor-mod
+   traktor-mod
    (If you don't have it installed, see 08_SHARING_CHANGES.md for setup)
 4. Restart Traktor
 
@@ -333,14 +333,14 @@ as long as they don't modify any of the same files.
 IMPORTANT: Do NOT use --fresh when combining mods. Using --fresh will reset qml to stock before applying, which removes any previously installed mods.
 
 Run the install script from each mod's directory in sequence (stack mode only):
-   install-traktor-mod           # Apply this mod
+   traktor-mod           # Apply this mod
    # Restart and test
-   install-traktor-mod -s ../other-mod  # Apply another mod on top
+   traktor-mod -s ../other-mod  # Apply another mod on top
 If two mods modify the same file, the later install will overwrite the earlier one.
 
 RESTORE:
 To remove all mods at once, run:
-   install-traktor-mod restore
+   traktor-mod restore
 (This restores stock qml and removes all mods)
 Then restart Traktor
 ```
@@ -358,7 +358,7 @@ INSTALL:
 1. Backup your current qml folder (see 01_BASICS.md for how)
 2. Extract this zip into a directory
 3. From that directory, run:
-   install-traktor-mod --full
+   traktor-mod --full
    (If you don't have it installed, see 08_SHARING_CHANGES.md for setup)
 4. Restart Traktor
 
@@ -374,7 +374,7 @@ use the overlay version instead (or ask the mod creator for an overlay version).
 
 RESTORE:
 To restore your previous qml, run:
-   install-traktor-mod restore
+   traktor-mod restore
 Then restart Traktor
 ```
 
@@ -465,7 +465,7 @@ When someone installs your mod, include these steps (assuming they have the inst
 ```
 1. Back up your current qml folder (see [01_BASICS.md](01_BASICS.md#install--backup--restore-the-safe-workflow) for details)
 2. Extract the zip file into a directory
-3. From that directory, run: install-traktor-mod
+3. From that directory, run: traktor-mod
 4. Restart Traktor
 ```
 
@@ -474,7 +474,7 @@ When someone installs your mod, include these steps (assuming they have the inst
 ```
 1. Restart Traktor first (often fixes UI glitches)
 2. If buttons don't respond or screens look broken, restore your backup:
-   install-traktor-mod restore
+   traktor-mod restore
    (Close Traktor first, then restart it)
 3. Let the mod creator know what went wrong (include your Traktor version and controller model)
 ```
@@ -483,7 +483,7 @@ This takes 30 seconds but prevents frustration.
 
 **For users who don't have the script installed:**
 
-If someone doesn't have `install-traktor-mod` installed yet, direct them to [the setup instructions above](#setup-install-script-to-system-path-one-time-setup).
+If someone doesn't have `traktor-mod` installed yet, direct them to [the setup instructions above](#setup-install-script-to-system-path-one-time-setup).
 
 ---
 

@@ -10,11 +10,11 @@
 
 ---
 
-## QML Linter Setup (Optional but Recommended)
+## QML Linter Setup (Optional but Recommended) (Removed)
 
-→ **[See 01_BASICS.md — QML Linter for setup instructions](../01_BASICS.md#qml-linter)**
+**QML Linter**: Have a QML linter installed (optional but recommended, see [QML Linter setup in 01_BASICS.md](../01_BASICS.md#qml-linter))
 
-Three options to choose from (qml-linter, VS Code, Qt Creator). Works on macOS and Windows.
+Three options (qml-linter, VS Code, Qt Creator). Works on both macOS and Windows.
 
 ---
 

@@ -7,21 +7,11 @@
 - The mod repo is cloned in `/mods/[ModName]/`
 - Both the old and new version tags exist in the repo (e.g., `v1.0.0`, `v2.0.0`)
 - You know which features from this mod are currently integrated into your combined `/qml/`
-- **QML Linter**: Have a QML linter installed and configured (see [QML Linter Setup](#qml-linter-setup) below)
+- **QML Linter**: Have a QML linter installed and configured (see [QML Linter setup in 01_BASICS.md](../01_BASICS.md#qml-linter))
 
 **For non-git mods (ZIP/Forum)**: See [update-mod.md](update-mod.md)
 
 **Workflow context**: [Chapter 11 — Updating Later](../11_COMBINING_MODS_WORKFLOW.md#updating-later-when-mods-release-new-versions)
-
----
-
-## QML Linter Setup (Required)
-
-Before running this prompt, ensure a QML linter is available to validate the AI's generated code.
-
-→ **[See 01_BASICS.md — QML Linter for setup instructions](../01_BASICS.md#qml-linter)**
-
-Quick summary: Three options (qml-linter, VS Code, Qt Creator). Works on macOS and Windows.
 
 ---
 

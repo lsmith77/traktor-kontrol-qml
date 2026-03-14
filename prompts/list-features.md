@@ -11,11 +11,8 @@
 ## Prerequisites
 
 - The mod folder exists and is accessible (you can browse its `/qml/` structure)
-- **QML Linter** (optional but recommended): Have a QML linter installed
 
-\u2192 **[See 01_BASICS.md \u2014 QML Linter for setup instructions](../01_BASICS.md#qml-linter)**
-
-Three options are available. Pick whichever works best for your workflow.
+**QML Linter** (optional but recommended): Have a QML linter installed (see [QML Linter setup in 01_BASICS.md](../01_BASICS.md#qml-linter))
 
 ---
 

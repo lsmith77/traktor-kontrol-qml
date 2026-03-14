@@ -7,19 +7,9 @@
 - One baseline: a `traktor-kontrol-qml-files` tag/file tree, or a legacy mod directory with a full `qml/` tree
 - For each mod: either a reviewed feature list (bulleted), or the mod file tree + author feature list
 - If you only have raw file changes with no feature list, run [list-features.md](list-features.md) first, review the output, then return here
-- **QML Linter**: Have a QML linter installed and configured before running this prompt (see [QML Linter Setup](#qml-linter-setup) below)
+- **QML Linter**: Have a QML linter installed and configured before running this prompt (see [QML Linter setup in 01_BASICS.md](../01_BASICS.md#qml-linter))
 
 **Workflow context**: [Chapter 11 — Combining Mods Workflow](../11_COMBINING_MODS_WORKFLOW.md)
-
----
-
-## QML Linter Setup (Required)
-
-Before running this prompt, ensure you have a QML linter available.
-
-→ **[See 01_BASICS.md — QML Linter for setup instructions](../01_BASICS.md#qml-linter)**
-
-Quick summary: Pick one of three options (qml-linter, VS Code, or Qt Creator). All work on macOS and Windows.
 
 ---
 
@@ -69,7 +59,7 @@ Place this block after `My Setup` and before any pasted documentation or file li
 
 ### Configuration
 
-QML_LINTER_COMMAND = ""  # Set to your linter command (see QML_LINTER_SETUP.md for options)
+QML_LINTER_COMMAND = ""  # Set to your linter command (see 01_BASICS.md for options)
 # Example: "qml-linter ./qml/ --output-format compact"
 # If left empty, linter validation will be skipped.
 

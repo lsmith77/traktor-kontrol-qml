@@ -7,21 +7,11 @@
 - Both `mods/[ModName-vOLD]/` and `mods/[ModName-vNEW]/` directories exist side by side
 - You know which features from this mod are currently integrated into your combined `/qml/`
 - See [Chapter 11 — Updating Non-Git Mods](../11_COMBINING_MODS_WORKFLOW.md#updating-non-git-mods-zips-forum-posts) for setup
-- **QML Linter**: Have a QML linter installed and configured (see [QML Linter Setup](#qml-linter-setup) below)
+- **QML Linter**: Have a QML linter installed and configured (see [QML Linter setup in 01_BASICS.md](../01_BASICS.md#qml-linter))
 
 **For git-tracked mods**: See [update-mod-git.md](update-mod-git.md)
 
 **Workflow context**: [Chapter 11 — Updating Later](../11_COMBINING_MODS_WORKFLOW.md#updating-later-when-mods-release-new-versions)
-
----
-
-## QML Linter Setup (Required)
-
-Before running this prompt, have a QML linter available so you can validate the AI's output.
-
-→ **[See 01_BASICS.md — QML Linter for setup instructions](../01_BASICS.md#qml-linter)**
-
-Quick summary: Three options available (qml-linter, VS Code, Qt Creator). Pick one based on your workflow.
 
 ---
 

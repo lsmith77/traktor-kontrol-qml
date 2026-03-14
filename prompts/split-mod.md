@@ -5,19 +5,9 @@
 **Prerequisites**:
 
 - A reviewed, human-edited feature list — either from the mod author or produced by [list-features.md](list-features.md)
-- **QML Linter**: Have a QML linter installed and configured (see [QML Linter Setup](#qml-linter-setup) below)
+- **QML Linter**: Have a QML linter installed and configured (see [QML Linter setup in 01_BASICS.md](../01_BASICS.md#qml-linter))
 
 **Workflow context**: [Chapter 11 — Feature extraction and splitting](../11_COMBINING_MODS_WORKFLOW.md#ai-prompt-templates-feature-extraction-and-feature-splitting)
-
----
-
-## QML Linter Setup (Required)
-
-Before running this prompt, have a QML linter available to validate the AI's split modules.
-
-\u2192 **[See 01_BASICS.md \u2014 QML Linter for setup instructions](../01_BASICS.md#qml-linter)**
-
-Quick summary: Three options (qml-linter, VS Code, Qt Creator). Works on both macOS and Windows.
 
 ---
 

@@ -1,6 +1,6 @@
 # Traktor QML Mods (Documentation)
 
-**Handbook Version**: v0.8.0
+**Handbook Version**: v1.0.0
 
 This repo is a **friendly documentation set** for customizing Native Instruments **Traktor Pro** using **QML** — the language Traktor uses for its controller UI. No deep programming knowledge required.
 

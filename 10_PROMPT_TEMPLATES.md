@@ -49,10 +49,14 @@
 
 ## Before Running Any Prompt
 
-**Open your workspace** at the root directory (`~/my-traktor-setup/`) in your editor. This gives the AI access to both:
+**Open this handbook folder as your workspace root** in your editor — even if the mod you're working on lives in a subdirectory. This gives the AI access to everything it needs in one session:
 
-- `/qml/` — your current combined QML
-- `/mods/` — your mod source directories
+- The handbook chapters (API reference, troubleshooting, compatibility fixes)
+- Stock QML baseline in `traktor-kontrol-qml-files/` (if cloned — see [setup guide](00_HANDBOOK.md#companion-repositories-recommended-setup))
+- Any community mod repos cloned as subdirectories (e.g. `traktor-kontrol-d2/qml/`)
+- The logger in `traktor-logger/`
+
+When a prompt asks for a mod path, give it as a relative path from this root (e.g. `traktor-kontrol-d2/qml/`).
 
 ---
 

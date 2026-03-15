@@ -12,6 +12,31 @@
 
 ---
 
+## Companion Repositories (Recommended Setup)
+
+For the full experience — debugging tools, AI-assisted mod work, and access to stock QML files — check out these two repositories alongside this handbook:
+
+```bash
+# 1. Stock Traktor QML baseline (used by AI tools for comparison and code examples)
+git clone https://github.com/lsmith77/traktor-kontrol-qml-files traktor-kontrol-qml-files
+
+# 2. Logger server (required for the real-time debugging dashboard)
+git clone https://github.com/lsmith77/traktor-logger traktor-logger
+```
+
+Run both commands from inside this handbook's folder. Once cloned, they'll appear as `traktor-kontrol-qml-files/` and `traktor-logger/`.
+
+**Why these matter:**
+
+- `traktor-kontrol-qml-files/` — gives AI tools like Claude access to the original, unmodified Traktor QML so they can understand what you're changing and why
+- `traktor-logger/` — powers the live monitoring dashboard at http://localhost:8080 (see the [Debugging section below](#debugging--metadata-collection-tools))
+
+You can also clone any community mod repos you want to draw inspiration from into subdirectories here (e.g. [traktor-kontrol-d2](https://github.com/lsmith77/traktor-kontrol-d2), [X1MK3_PerformanceMod](https://github.com/lsmith77/X1MK3_PerformanceMod)). Keeping them alongside the handbook means AI tools can read both the mod code and the handbook docs in one session.
+
+> **Tip for AI-assisted work**: Always open this handbook folder as your workspace root — even when you're working on a mod that lives in a subdirectory. This gives the AI access to the API reference, troubleshooting guides, stock QML files, and any community mods all at once, which leads to much better results.
+
+---
+
 ## Key Concepts (Quick Definition)
 
 These three terms will appear throughout the handbook. Here's what they mean:

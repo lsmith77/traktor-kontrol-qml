@@ -2,8 +2,7 @@
 
 **Handbook Version**: v1.0.0
 
-This repo is a **friendly documentation set** for customizing Native Instruments **Traktor Pro** using **QML** — the language Traktor uses for its controller UI. No deep programming knowledge required.
-
+This repo is a **documentation set** for customizing Native Instruments **Traktor Pro** using **QML** — the language Traktor uses for its controller UI.
 **If you've created MIDI mappings in Traktor Pro**, you understand the concept of wiring hardware controls to actions. QML works the same way — it's just more powerful: you can change what buttons do, what screens show, and how the UI behaves.
 
 # NOTE: The traktor-mod scripts referenced in this documentation are vibe coded via AI with minimal code review. Use with caution and review scripts before production use.
@@ -12,7 +11,7 @@ This repo is a **friendly documentation set** for customizing Native Instruments
 
 ## Setup: Companion Repositories
 
-Clone these two repositories alongside this handbook for debugging tools and AI-assisted mod work:
+Clone these two repositories alongside this handbook:
 
 ```bash
 git clone https://github.com/lsmith77/traktor-kontrol-qml-files traktor-kontrol-qml-files
@@ -24,17 +23,11 @@ git clone https://github.com/lsmith77/traktor-logger traktor-logger
 
 ---
 
-🧭 **Navigation**
-
-- 👉 **Start here**: [00_HANDBOOK.md](00_HANDBOOK.md) for complete reading guide
-- 📚 **Learn basics**: [01_BASICS.md](01_BASICS.md)
-- 🔑 **All chapters**: [Full list below](#reference-all-chapters)
+**Navigation**: [00_HANDBOOK.md](00_HANDBOOK.md) · [01_BASICS.md](01_BASICS.md) · [Full chapter list](#all-chapters)
 
 ---
 
 ## I want to install a community mod
-
-Find working mods, understand what they do, and deploy them safely.
 
 1. **[Chapter 03: Community Resources](03_COMMUNITY_RESOURCES.md)** — curated list of GitHub repos and forum mods for S4 MK3, X1 MK3, and other controllers
 2. **[Chapter 01: Basics](01_BASICS.md)** — `qml` folder structure, Traktor architecture
@@ -42,13 +35,9 @@ Find working mods, understand what they do, and deploy them safely.
 4. **[Chapter 05: FAQ](05_FAQ.md)** — safety, Traktor updates overwriting mods, common questions
 5. **[Chapter 04: Troubleshooting](04_TROUBLESHOOTING.md)** — when something breaks
 
-**The one rule**: always back up your `qml` folder before editing. Quit Traktor, copy the folder, make one change, restart and test.
-
 ---
 
 ## I want to combine features from multiple mods
-
-Combining mods by hand is error-prone: the same file appears in both, conflict resolutions get lost, and there's no record of what came from where. This handbook provides **AI prompt templates** that handle this systematically.
 
 1. **[Chapter 10: Prompt Templates](10_PROMPT_TEMPLATES.md)** — full index with workflow order
 2. **[Chapter 11: Combining Mods — Complete Workflow](11_COMBINING_MODS_WORKFLOW.md)** — step-by-step guide (preparation → AI generation → save → deploy)
@@ -62,22 +51,18 @@ Paste the prompt into Claude, ChatGPT, Copilot, or any AI chat — no tooling be
 
 ## I want to create a custom feature
 
-**Describe what you want in plain English. Get production-ready code + test checklist.**
-
 Example: _"Pressing PLAY while the deck is playing should trigger a 700ms vinyl brake ramp, then stop."_
 
 1. **[Prompt Template: Create Feature](prompts/create-feature.md)** — copy the template into Claude, ChatGPT, or Copilot
-2. **Answer a few questions** about your feature (trigger, behavior, configuration)
-3. **Get complete QML code** + documentation + test checklist
-4. **Deploy and test** in Traktor — use **[traktor-logger](https://github.com/lsmith77/traktor-logger/README.md)** for real-time monitoring
+2. Answer a few questions about your feature (trigger, behavior, configuration)
+3. Get complete QML code + documentation + test checklist
+4. Deploy and test in Traktor — use **[traktor-logger](https://github.com/lsmith77/traktor-logger/README.md)** for real-time monitoring
 
 See [Chapter 10: Prompt Templates](10_PROMPT_TEMPLATES.md) for details, or jump straight to [prompts/create-feature.md](prompts/create-feature.md).
 
 ---
 
 ## I'm a new mod author
-
-You want to create something and share it with the community.
 
 1. **[Chapter 01: Basics](01_BASICS.md)** — QML fundamentals, folder structure, how Traktor loads files
 2. **[Chapter 02: API Reference](02_API_REFERENCE.md)** — control value paths, copy-paste code patterns
@@ -91,11 +76,9 @@ The format in Chapter 09 — one markdown file per feature, semantic version tag
 
 ## I have an existing mod and want to adopt these conventions
 
-Right now most Traktor mods are shared as ZIP files with no feature listing, no version history, and no way to apply just one part. When you release an update, users have no idea what changed.
+Two changes make your mod compatible:
 
-Two changes fix this:
-
-**1. Use git and semantic version tags** — tag your releases (`v1.2.3`). Users can then run `git diff v1.2.2..v1.2.3` to see exactly what changed. No changelog needed — the diff _is_ the changelog.
+**1. Use git and semantic version tags** — tag your releases (`v1.2.3`). Users can run `git diff v1.2.2..v1.2.3` to see exactly what changed.
 
 **2. One feature = one markdown file** — document each feature alongside your QML:
 
@@ -110,12 +93,6 @@ your-mod/
 ```
 
 Each file lists: what the feature does, which QML files it touches, settings/toggles, and a 3-step test checklist.
-
-**Why this matters for your users:**
-
-- They can apply just the features they want
-- AI tools (Claude, Copilot) can read your feature files and combine mods automatically — tracking exactly which version of which feature came from your mod
-- Conflict detection is visible before anyone starts editing
 
 **→ [Chapter 09: Mod Documentation Guide](09_MOD_DOCUMENTATION_GUIDE.md)** — full format spec, real examples, pitfalls to avoid, and the reasoning behind each convention
 

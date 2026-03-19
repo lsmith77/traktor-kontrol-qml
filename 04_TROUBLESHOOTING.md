@@ -56,25 +56,7 @@ Use this flowchart to isolate problems quickly. For detailed steps, see **Debugg
 
 **This is the most direct way to find problems—do this first.**
 
-When you run Traktor from a Terminal (a text-based command interface), all QML errors, warnings, and undefined variables print to the screen. This tells you exactly what's broken and where.
-
-**What is a Terminal?** A Terminal is an app where you type commands instead of clicking. Think of it as a text-based way to launch programs.
-
-**How to open Terminal:**
-
-**macOS:**
-
-- Open Spotlight (Cmd+Space)
-- Type "Terminal" and press Enter
-- (Or navigate to Applications → Utilities → Terminal)
-
-**Windows:**
-
-- Right-click on the Start menu
-- Select "Windows Terminal" or "Command Prompt"
-- (Or search for "cmd" in the Start menu)
-
----
+When you run Traktor from a terminal, all QML errors, warnings, and undefined variables print to the screen. This tells you exactly what's broken and where.
 
 **macOS: Run Traktor from Terminal:**
 
@@ -183,14 +165,10 @@ If you're working from an example in [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RE
 
 ### ⚡ Quick Fixes First (Solve 90% of Issues)
 
-**Did you try turning it off and on again?**
-
 ✅ **File saved?** (Easy to forget!)
 ✅ **Traktor completely closed?** (Quit, not minimize - Cmd+Q / File → Exit)
 ✅ **Traktor restarted?** (Required for QML changes to load)
 ✅ **Test the specific feature** (Don't assume it worked)
-
-**💡 If fixed, you're done! If still broken, continue below...**
 
 ---
 
@@ -744,61 +722,6 @@ Binding {
 - [GitHub: traktor-logger](https://github.com/lsmith77/traktor-logger) — Full source, examples, and troubleshooting
 - Logger.qml source: [Logger.qml on GitHub](https://github.com/lsmith77/traktor-logger/blob/main/qml/Logger.qml)
 - HTTP server: [server.py on GitHub](https://github.com/lsmith77/traktor-logger/blob/main/server.py)
-
-**Security Best Practices:**
-
-⚠️ **DO NOT log sensitive data** — All logs are visible in the browser dashboard and terminal output.
-
-**❌ NEVER log:**
-
-- Passwords or API keys
-- Database credentials
-- Authentication tokens
-- User PII (names, email addresses, IDs)
-- File paths (could reveal system structure)
-- Entire response objects if they contain secrets
-
-**✅ Instead, log descriptively:**
-
-```qml
-// GOOD: Descriptive without exposing secrets
-logger.info("Authentication successful", {
-    userId: user.id,
-    method: "oauth",
-    timestamp: now
-})
-
-// GOOD: Log state without dumping entire objects
-logger.debug("API request", {
-    endpoint: "/api/v1/data",
-    status: response.status,
-    duration_ms: elapsed
-})
-
-// BAD: Never log credentials
-logger.error("Login failed", {
-    username: username,
-    password: password,  // ← DON'T DO THIS
-    apiKey: apiKey       // ← DON'T DO THIS
-})
-
-// BAD: Never log entire response bodies
-logger.info("Response received", { body: JSON.stringify(largeObject) })  // ← Could be huge
-```
-
-**Why this matters:**
-
-- When using AI assistants with this logger, they might inadvertently log secrets if you don't set boundaries
-- Logs are stored in memory while the server runs—visible to anyone with browser access to `localhost:8080`
-- If you share a log transcript with teammates, you could leak credentials
-- Rate limiting (100 logs/sec) and payload limits (100KB per entry) protect against abuse but don't hide sensitive data
-
-**If logs contain secrets:**
-
-1. Stop the server immediately (`Ctrl+C`)
-2. Logs are only in memory—they're lost on shutdown
-3. Don't share logs with others if they contained credentials
-4. Restart the server with cleaner logging going forward
 
 ---
 

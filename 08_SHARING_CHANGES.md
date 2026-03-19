@@ -92,8 +92,6 @@ traktor-mod  # Apply overlay mod 2 on top (stack mode)
 
 **Do not use `--fresh` when combining overlay mods** — it will reset to stock and erase the first mod. Use stack mode (the default) only.
 
-**macOS reminder:** When copying folders in Finder, it will ask "Merge" or "Replace." You want **Merge**—this installs your changes without erasing anything else. See the section on [merging folders](01_BASICS.md#install--backup--restore-the-safe-workflow) in [01_BASICS.md](01_BASICS.md) for a visual walkthrough.
-
 ### Full replacement mods (for standalone complete mods)
 
 If your mod is a **complete, standalone redesign** (not meant to combine with other mods), package it as a full replacement mod.
@@ -384,22 +382,12 @@ Include this README in your zip file.
 
 **When to use this:** If you plan to improve your mod over time and want to track all your changes, or if you want to collaborate with others.
 
-Think of Git like **version history in your DAW**—every time you make changes, you record what changed and why. Later, you (or someone else) can see the full timeline of edits and even undo changes if needed.
-
 **Basic workflow:**
 
 1. Initialize Git in your controller setup folder (one-time setup)
 2. Make small, focused edits
 3. After each completed change, "save" it with a clear message like: `"Fix: Adjust button spacing in S4MK3 screen"`
 4. When ready to share, push to GitHub or send a "change file" that others can apply
-
-**Don't worry if this is new.** Start with Option A (zip) until you're comfortable. Git is optional.
-
-**Learn more (if curious):**
-
-- Git Mastery (beginner-friendly interactive guide): https://www.gitmastery.me
-- Git basics: https://git-scm.com/book/en/v2
-- GitHub quick start: https://docs.github.com/en/get-started
 
 ---
 
@@ -437,14 +425,6 @@ The **X1MK3 Performance Mod** is a professional example of how to structure and 
 - **Main Thread**: https://community.native-instruments.com/discussion/17167/x1mk3-community-performance-mod-qml-coding
 - **Installation Instructions**: In GitHub README
 
-**Why this pattern works:**
-
-- Users can clone the entire mod or just study individual features
-- Git history shows feature evolution and debugging
-- Community forum provides real-world support and feedback
-- Cross-links make it easy to understand feature dependencies
-- GitHub provides automatic backup and change history
-
 **If you want to follow this pattern:**
 
 1. Create a GitHub repository for your mod
@@ -478,8 +458,6 @@ When someone installs your mod, include these steps (assuming they have the inst
    (Close Traktor first, then restart it)
 3. Let the mod creator know what went wrong (include your Traktor version and controller model)
 ```
-
-This takes 30 seconds but prevents frustration.
 
 **For users who don't have the script installed:**
 

@@ -18,10 +18,6 @@
 
 ## How to Use This Prompt
 
----
-
-## How to Use This Prompt
-
 1. Copy the entire prompt block below
 2. Paste into Claude/Copilot
 3. Provide the baseline (tag or file tree) and the mod files/changes

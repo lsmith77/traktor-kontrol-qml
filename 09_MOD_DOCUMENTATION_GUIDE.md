@@ -371,8 +371,6 @@ Mod 3: Community Z1    v0.8.0  (versioned ✓)
 
 **Advantage**: You only need to track updates for versioned mods. Unversioned mods stay stable; you don't touch them unless they specifically release updates.
 
-**Expected outcome**: Over time, more mods adopt versioning. Your setup gradually becomes more updatable. Community naturally incentivizes developers to version (musicians ask "what version?").
-
 ---
 
 ## Forum Snippets: Simple Approach
@@ -1411,72 +1409,6 @@ Feature docs link to: `github.com/author/repo/blob/main/feature.md`
 2. **Get feedback** from a friend or community
 3. **Submit** to a community mod repository
 4. **Help others** apply your feature using this format
-
----
-
-## Why This Approach (And Alternatives Considered)
-
-This handbook recommends **semantic versioning + metadata lock files** for tracking mod combinations. This approach was selected after evaluating 8 different strategies:
-
-### Approaches Considered and Why They Were Rejected
-
-**Option 2: Branch-Based Stability** (separate branches per Traktor version)
-
-- ❌ Requires maintaining multiple branches for each Traktor version
-- ❌ Impossible for community mods (ZIP files, distributed sources)
-- ❌ Steep learning curve for musician-contributors
-
-**Option 3: Git Submodules** (pinning dependencies in source)
-
-- ❌ Too complex for musicians who aren't professional developers
-- ❌ `git clone`, `git pull` become complicated
-- ❌ Incompatible with ZIP file distributions
-
-**Option 4: Tags + Commit Hashes** (dual references for verification)
-
-- ⚠️ Adds complexity without much benefit for this community
-- ⚠️ Musicians don't need cryptographic verification; semantic versions suffice
-
-**Option 5: Version Manifests** (JSON metadata files)
-
-- ❌ Requires additional infrastructure
-- ❌ Another file format to maintain and parse
-- ❌ Simpler to track versions in QML comments
-
-**Option 6: Time-Based Stability** ("known good" dated releases)
-
-- ❌ Less clear than semantic versioning
-- ❌ Musicians can't tell if "2026-03-01" is old or current
-- ❌ Doesn't convey compatibility info (major vs. minor change)
-
-**Option 7: Inline Code Snapshots** (embed full code in docs)
-
-- ❌ Massive documentation bloat
-- ❌ Hard to see actual changes across versions
-- ❌ Difficult to use `git diff` to understand updates
-
-### Why Semantic Versioning + Metadata Lock Files ✅
-
-**Musicians understand version numbers** — They already use Traktor 4.4.1, firmware v2.3.0. The `v1.2.3` format is native to their vocabulary.
-
-**Self-contained system** — No custom infrastructure required. Authors use GitHub releases (built-in). Musicians track versions in QML comments (no external tool).
-
-**Enables incremental updates** — Metadata lock files let musicians understand what each component version does and update only what changed, without replacing entire setups.
-
-**Works with any distribution** — Semantic versions work in GitHub repos, ZIP files, forum links, personal email — anywhere mods are shared.
-
-**Community-proven** — WordPress (60,000 plugins), Node.js (millions of packages), Arduino (10,000+ libraries), and Max for Live all use semantic versioning successfully at scale.
-
-**Graceful with incomplete adoption** — If some mods aren't versioned yet, the system still works. Unversioned mods use descriptive identifiers as fallback. No single point of failure.
-
-### Referenced Standards
-
-This approach follows community best practices from:
-
-- **Semantic Versioning** (semver.org) — Version numbering convention
-- **Package-Lock Pattern** — Metadata files for tracking component combinations (npm, pip, poetry)
-- **GitHub Releases** — Standard versioning distribution mechanism
-- **Git Tags** — Native version markers in version control
 
 ---
 

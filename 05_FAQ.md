@@ -28,7 +28,7 @@ Not for many useful mods.
 - **Safe beginner edits**: Adjusting timing, remapping where buttons send data, changing text labels, toggling visibility.
 - **Challenging edits**: Building new interaction sequences, complex multi-touch combinations, major screen redesigns.
 
-Start with beginner edits and the working examples in the **[X1MK3 Performance Mod](https://github.com/lsmith77/X1MK3_PerformanceMod)** (see [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md)). Most musicians can make useful customizations without deep programming skills.
+Start with beginner edits and the working examples in the **[X1MK3 Performance Mod](https://github.com/lsmith77/X1MK3_PerformanceMod)** (see [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md)).
 
 ### Can I access browser/playlist data (track names, current selection)?
 
@@ -66,7 +66,7 @@ Most community mods are shared as overlay mods. See [08_SHARING_CHANGES.md](08_S
 
 ### Can I use community mods from the forums, or only what's in this repo?
 
-You can use community mods from anywhere—this repo is just documentation. However:
+However:
 
 - Community customizations may stop working after Traktor updates.
 - **Always back up before installing any mod** (see [Chapter 01: Install / Backup / Restore](01_BASICS.md#install--backup--restore-the-safe-workflow)).

@@ -2,7 +2,7 @@
 
 ## Audience
 
-The target audience of this handbook are **musicians, not programmers**. Use music terminology over programmer lingo. Prefer simple patterns and focus on building confidence — these topics may feel intimidating.
+The target audience of this handbook are **musicians, not programmers**. Use music terminology over programmer lingo. Prefer simple patterns and focus on building confidence — these topics may feel intimidating. But keep it short and assume basic knowledge of the respective operating system and Traktor Pro.
 
 ## Subdirectories Are Intentionally Excluded from Git
 

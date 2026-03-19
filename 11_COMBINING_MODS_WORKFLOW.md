@@ -48,8 +48,6 @@ This proves the workflow works. You can do the same thing.
 - List which features you're using from each mod
 - Record Traktor compatibility and controller support
 
-**→ At this point**: You have information, not code. No tools needed.
-
 Baseline (what this means)
 
 - A "baseline" is the upstream Traktor QML state you are comparing mods against. It can be either:
@@ -105,8 +103,6 @@ How to phrase integration instructions in the prompt
   - Full QML file contents
   - METADATA.md with version tracking
   - Testing checklist
-
-**→ At this point**: You have AI-generated code and directory structure (displayed in chat).
 
 ### Expectation Management — merging large "baseline" mods
 
@@ -166,8 +162,6 @@ git add .
 git commit -m "Initial: Combined mods (D2 v1.2.3 + X1MK3 v0.12.0 + forum snippet MX2-GridAdjust)"
 ```
 
-**→ At this point**: You have a local directory with git tracking at the root level, `.gitignore` preventing accidental commits of `/mods/`, and METADATA.md documenting all sources (including forum snippet URLs).
-
 ---
 
 ### Phase 4: Deploy to Traktor
@@ -195,8 +189,6 @@ traktor-mod              # Merges your qml/ into Traktor's qml/
 cd ~/my-traktor-setup
 git commit -m "deployed: all tests passing"
 ```
-
-**→ At this point**: Your custom QML is live in Traktor Pro.
 
 ---
 
@@ -314,8 +306,6 @@ git commit -m "Update: ModName v1.2.3 -> v1.2.4 (description)"
 rm -rf ~/my-traktor-setup/mods/ModName-v1.2.3/
 ```
 
-**Are separate version directories confusing?** No — the shared name prefix (`ModName-`) plus the METADATA.md entry (which records the logical mod name alongside the version) makes the old→new relationship unambiguous. The AI update prompt also references both directories explicitly, so there is no risk of treating them as separate mods.
-
 ---
 
 ## Removing or Switching Features
@@ -369,15 +359,6 @@ After deployment, check (in two places):
 - **METADATA.md file** in the directory root: Full version info + testing checklist
 
 **Why metadata is embedded**: Since metadata describes your specific combination, it lives with the files that implement it. The metadata comment in the main controller file AND the METADATA.md summary ensure you always know exactly what got combined.
-
----
-
-## For Background Reading
-
-**Want to understand the full system?** See:
-
-- [Chapter 09: Mod Documentation Guide](https://github.com/lsmith77/traktor-kontrol-qml/blob/main/09_MOD_DOCUMENTATION_GUIDE.md) — Understand versioning, metadata lock files, how to find version info, mixing versions
-- [Chapter 10: Prompt Templates](10_PROMPT_TEMPLATES.md) — Index of all AI prompt templates
 
 ---
 

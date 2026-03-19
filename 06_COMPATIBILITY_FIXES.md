@@ -7,13 +7,6 @@
 
 🧭 **Navigation** — ← [05_FAQ.md](05_FAQ.md) | **You are here** | → [07_GLOSSARY.md](07_GLOSSARY.md) | 📖 [API: 02_API_REFERENCE.md](02_API_REFERENCE.md)
 
-This file covers:
-
-- Compatibility notes and known fixes across Traktor versions
-- Specific solutions for reported bugs
-
-For debugging + testing, use: [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md)
-
 ## 🧭 Quick Navigation
 
 - [Version Compatibility Matrix](#version-compatibility-matrix) - Which versions break what

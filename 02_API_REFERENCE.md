@@ -7,23 +7,11 @@
 
 🧭 **Navigation** — ← [01_BASICS.md](01_BASICS.md) | **You are here** | → [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) | 📖 [Examples: 03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md)
 
-This is the “API/reference” section of the handbook.
-
-- Basics (syntax + folder layout + install/restore): [01_BASICS.md](01_BASICS.md)
-- Community mods & working examples: [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md)
-- Troubleshooting (debugging + testing): [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md)
-- Version compatibility + known fixes: [06_COMPATIBILITY_FIXES.md](06_COMPATIBILITY_FIXES.md)
-- How to package & share mods: [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md)
-
-For real-world code examples, see [**Chapter 03: Community Resources**](03_COMMUNITY_RESOURCES.md) for links to working mods and their documentation.
-
 **Path format reference**: Before copy-pasting any paths in this chapter, check [00_HANDBOOK.md#path-format-guide](00_HANDBOOK.md#path-format-guide) to understand what `[Placeholder]` means and how property paths work.
 
 ---
 
-## ⚡ Quick Reference (TL;DR for Busy People)
-
-If you already know QML basics and just need a **quick lookup table**:
+## Quick Reference
 
 | I want to...                    | File to edit             | Key building block         |
 | ------------------------------- | ------------------------ | -------------------------- |
@@ -38,32 +26,6 @@ If you already know QML basics and just need a **quick lookup table**:
 **Jump to property paths**: [Common Property Paths](#common-property-paths)  
 **Need code template?**: [Common Tasks Cheat Sheet](#common-tasks-cheat-sheet)  
 **Full reference below** with explanations and examples.
-
----
-
-## 🧭 Full Topic Navigation
-
-**1) Orientation (where to edit)**
-
-- [File Locations & Decision Tree](#file-locations-quick-map)
-- [When to Use Each Layer](#when-to-use-each-layer)
-
-**2) API reference (Traktor-QML building blocks)**
-
-- [Traktor QML Building Blocks](#traktor-qml-building-blocks)
-- [Wire Adapters Quick Reference](#wire-adapters-quick-reference)
-- [Common Property Paths](#common-property-paths)
-
-**3) Patterns & templates (copy/paste)**
-
-- [Common Tasks Cheat Sheet](#common-tasks-cheat-sheet) — quick recipes
-- [Advanced Patterns & State Management](#advanced-patterns--state-management) — detailed deep dives
-
-**4) Operations & Troubleshooting**
-
-- [Installation Quick Steps](#installation-quick-steps)
-- Restore stock QML files: [01_BASICS.md](01_BASICS.md#restore-stock)
-- Troubleshooting: [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md)
 
 ---
 
@@ -450,12 +412,8 @@ Rectangle {
 ## Common Property Paths
 
 > **Complete reference**: See [Full AppProperty Path Catalog](#full-appproperty-path-catalog) for the full list of all known `AppProperty` paths organized by category (global, browser, deck, track, stem, remix, mixer, effects, settings). The table below covers the most common ones with usage examples.
->
-> **Source**: [NI Community Forum - S4MK3/S3 Performance Mod QML Coding](https://community.native-instruments.com/discussion/26956/s4mk3-s3-performance-mod-qml-coding)
 
 ### Find Property by Use Case
-
-**Quick lookup: "I want to do X, which property do I need?"**
 
 | I want to...                     | Property Path                                       | Example Usage                                                 |
 | -------------------------------- | --------------------------------------------------- | ------------------------------------------------------------- |
@@ -875,8 +833,6 @@ app.traktor.[context].[id/index].[category].[property]
 
 ### Common Patterns & Tips
 
-### Common Patterns & Tips
-
 **Dynamic Deck Selection**
 
 ```qml
@@ -945,22 +901,6 @@ Text {
 
 ---
 
-## Installation Quick Steps
-
-This handbook keeps the **canonical** install / backup / restore steps in one place:
-
-- Safe workflow (paths + backup + overlay install): [01_BASICS.md](01_BASICS.md#install--backup--restore-the-safe-workflow)
-- Version pitfalls when overlaying mods: [06_COMPATIBILITY_FIXES.md](06_COMPATIBILITY_FIXES.md)
-
-If you’re in the middle of editing an example, the shortest path is:
-
-1. Quit Traktor
-2. Back up `qml`
-3. Apply the change
-4. Restart Traktor
-
----
-
 ## Syntax Quick Reference
 
 ### Comments
@@ -1023,18 +963,6 @@ property int waveformColors: X
 5:  Yellow
 13: Violet
 ```
-
----
-
-## Keyboard Shortcuts for Editing
-
-**VS Code**:
-
-- `Cmd/Ctrl + P` - Quick file open
-- `Cmd/Ctrl + F` - Find in file
-- `Cmd/Ctrl + Shift + F` - Find in all files
-- `Cmd/Ctrl + D` - Select next occurrence
-- `Cmd/Ctrl + /` - Toggle comment
 
 ---
 

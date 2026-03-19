@@ -1,73 +1,57 @@
-# Traktor QML Modder’s Handbook
+# Traktor QML Modder's Handbook
 
-**Handbook Version**: v1.0.0  
-**Purpose**: Index and reading guide for the handbook docs  
+**Handbook Version**: v1.0.0
+**Purpose**: Index and reading guide for the handbook docs
 **Use when**: Starting your QML modding journey or navigating between docs
 
 ---
 
 🧭 **Navigation** — Start here, then go → [01_BASICS.md](01_BASICS.md)
 
-> **New & Easy**: Want to combine mods without coding? Check out the **Mod Combination System** section below. It's designed for musicians, not programmers.
+> **New & Easy**: Want to combine mods without coding? Check out the **Mod Combination System** section below.
 
 ---
 
 ## Companion Repositories (Recommended Setup)
 
-For the full experience — debugging tools, AI-assisted mod work, and access to stock QML files — check out these two repositories alongside this handbook:
-
 ```bash
-# 1. Stock Traktor QML baseline (used by AI tools for comparison and code examples)
-git clone https://github.com/lsmith77/traktor-kontrol-qml-files traktor-kontrol-qml-files
-
-# 2. Logger server (required for the real-time debugging dashboard)
-git clone https://github.com/lsmith77/traktor-logger traktor-logger
+git clone https://github.com/lsmith77/traktor-kontrol-qml-files
+git clone https://github.com/lsmith77/traktor-logger
 ```
 
-Run both commands from inside this handbook's folder. Once cloned, they'll appear as `traktor-kontrol-qml-files/` and `traktor-logger/`.
+- **`traktor-kontrol-qml-files/`** — stock Traktor QML baseline for AI comparison and code examples
+- **`traktor-logger/`** — real-time debugging dashboard (see [Debugging](#debugging--metadata-collection-tools))
 
-**Why these matter:**
+You can also clone community mod repos into subdirectories here — both overlay mods (e.g. [X1MK3_PerformanceMod](https://github.com/lsmith77/X1MK3_PerformanceMod)) and full replacement mods (e.g. [traktor-kontrol-d2](https://github.com/lsmith77/traktor-kontrol-d2)) that ship a complete `qml/` folder.
 
-- `traktor-kontrol-qml-files/` — gives AI tools like Claude access to the original, unmodified Traktor QML so they can understand what you're changing and why
-- `traktor-logger/` — powers the live monitoring dashboard at http://localhost:8080 (see the [Debugging section below](#debugging--metadata-collection-tools))
-
-You can also clone any community mod repos you want to draw inspiration from into subdirectories here (e.g. [traktor-kontrol-d2](https://github.com/lsmith77/traktor-kontrol-d2), [X1MK3_PerformanceMod](https://github.com/lsmith77/X1MK3_PerformanceMod)). Keeping them alongside the handbook means AI tools can read both the mod code and the handbook docs in one session.
-
-> **Tip for AI-assisted work**: Always open this handbook folder as your workspace root — even when you're working on a mod that lives in a subdirectory. This gives the AI access to the API reference, troubleshooting guides, stock QML files, and any community mods all at once, which leads to much better results.
+> **Tip for AI-assisted work**: Always open this handbook folder as your workspace root — even when working on a mod in a subdirectory. This gives the AI access to the API reference, troubleshooting guides, stock QML files, and community mods in one session.
 
 ---
 
 ## Key Concepts (Quick Definition)
 
-These three terms will appear throughout the handbook. Here's what they mean:
-
-- **Mod**: Any customization you make to your Traktor QML—could be a single file change or many files combined.
-- **Overlay Mod**: How a mod is packaged for sharing—as only the files it changes, designed to layer on top of your existing setup safely.
+- **Mod**: Any customization you make to your Traktor QML — a single file change or many files combined.
+- **Full Replacement Mod**: A mod packaged that was based on ful copy of the Traktor qml directory, designed to replace the qml directory.
+- **Overlay Mod**: A mod packaged as only the files it changes, designed to layer on top of your existing setup safely.
 - **Overlay Install**: The process of merging an overlay mod into your current QML using the `traktor-mod` script.
 
-Example: You make changes to 3 files and package them as an overlay mod. Another user can overlay-install them on top of their own setup, and all their other files stay intact.
-
-**See also**: [Chapter 05 FAQ](05_FAQ.md#whats-the-difference-between-a-mod-and-an-overlay-mod) for more detail.
+**See also**: [Chapter 05 FAQ](05_FAQ.md#whats-the-difference-between-a-mod-and-an-overlay-mod)
 
 ---
 
 ## Path Format Guide (Copy-Paste Safe Reference)
 
-Throughout this handbook, you'll see paths to files and Traktor properties. Here's what each format means:
-
 ### File System Paths (Folder & File Locations)
 
-Always use `/` (forward slash), never `\` (backslash):
+Always use `/` (forward slash) in documentation and terminal commands:
 
-| Format                            | Meaning                                                   | Example                                |
-| --------------------------------- | --------------------------------------------------------- | -------------------------------------- |
-| `qml/`                            | Absolute folder path (from Traktor install root)          | `~/Traktor 4.4.1/Resources/qml/`       |
-| `CSI/[ControllerName]/D2.qml`     | **`[Placeholder]` = replace with your controller**        | `CSI/X1MK3/D2.qml` (not `X1MK3` alone) |
-| `Screens/[ControllerName]/...`    | Folder path with placeholder                              | `Screens/S4MK3/`                       |
-| `~/MyMod/qml/CSI/X1MK3/D2.qml`    | Home directory shortcut (macOS/Linux) = your user folder  | `/Users/yourname/MyMod/qml/...`        |
-| `C:\Users\YourName\MyMod\qml\...` | Windows (still use `/` in code, but `\` in file explorer) | Windows file browser shows `\`         |
-
-**Key Rule**: In documentation and terminal commands, **always write paths with `/`**, never `\`. If you copy a Windows path, convert `\` → `/`.
+| Format                            | Meaning                                            | Example                          |
+| --------------------------------- | -------------------------------------------------- | -------------------------------- |
+| `qml/`                            | Absolute folder path (from Traktor install root)   | `~/Traktor 4.4.1/Resources/qml/` |
+| `CSI/[ControllerName]/D2.qml`     | **`[Placeholder]` = replace with your controller** | `CSI/X1MK3/D2.qml`               |
+| `Screens/[ControllerName]/...`    | Folder path with placeholder                       | `Screens/S4MK3/`                 |
+| `~/MyMod/qml/CSI/X1MK3/D2.qml`    | Home directory                                     | `/Users/yourname/MyMod/qml/...`  |
+| `C:\Users\YourName\MyMod\qml\...` | Windows path (use `/` in code)                     | Windows file browser shows `\`   |
 
 ### Traktor Control / Property Paths (What You Wire To)
 
@@ -81,11 +65,9 @@ These are **data paths** in Traktor (not file paths). Format: dots separate leve
 | `mapping.state.SETTING_NAME`           | User-defined mapping state (persistent)       | `mapping.state.my_custom_toggle` |
 | `app.traktor.mix.crossfader`           | Special properties (well-known)               | Direct access (no placeholder)   |
 
-**Key Rule**: Uppercase placeholders like `DECK_ID` = **replace with a number**. Lowercase like `setting_name` = **replace with your chosen name**.
+**Key Rule**: Uppercase placeholders like `DECK_ID` = replace with a number. Lowercase like `setting_name` = replace with your chosen name.
 
 ### Variable Naming Conventions
-
-When you create new properties or IDs, follow these:
 
 | Context           | Convention            | Example                                  |
 | ----------------- | --------------------- | ---------------------------------------- |
@@ -109,7 +91,7 @@ When you create new properties or IDs, follow these:
 **Advanced guides**:
 
 - How to document mods for sharing: [09_MOD_DOCUMENTATION_GUIDE.md](09_MOD_DOCUMENTATION_GUIDE.md)
-- How to combine multiple mods (musician's guide): [11_COMBINING_MODS_WORKFLOW.md](11_COMBINING_MODS_WORKFLOW.md)
+- How to combine multiple mods: [11_COMBINING_MODS_WORKFLOW.md](11_COMBINING_MODS_WORKFLOW.md)
 - Prompt templates (AI prompts for combining, updating, removing): [10_PROMPT_TEMPLATES.md](10_PROMPT_TEMPLATES.md)
 
 **Appendices**:
@@ -122,7 +104,7 @@ When you create new properties or IDs, follow these:
 
 **For individual mod creation**:
 
-- Start with [01_BASICS.md](01_BASICS.md) (you only need the first half to do safe edits)
+- Start with [01_BASICS.md](01_BASICS.md)
 - Keep [02_API_REFERENCE.md](02_API_REFERENCE.md) open while making changes
 - Pick one small change from a [community mod example](03_COMMUNITY_RESOURCES.md) (like X1MK3)
 - If a change doesn't work, go to [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md)
@@ -132,37 +114,34 @@ When you create new properties or IDs, follow these:
 **For creating a brand-new custom feature**:
 
 - Use the AI prompt template in [10_PROMPT_TEMPLATES.md](10_PROMPT_TEMPLATES.md) → [prompts/create-feature.md](prompts/create-feature.md)
-- Describe what you want in natural language (trigger, behavior, configuration)
+- Describe what you want (trigger, behavior, configuration)
 - Get production-ready code + test checklist
 - Reference [02_API_REFERENCE.md](02_API_REFERENCE.md) for control paths and patterns
 - Document your feature following [09_MOD_DOCUMENTATION_GUIDE.md](09_MOD_DOCUMENTATION_GUIDE.md)
 
 **For combining multiple community mods**:
 
-- Read [09_MOD_DOCUMENTATION_GUIDE.md](09_MOD_DOCUMENTATION_GUIDE.md) to understand the **metadata lock file** pattern — your key to safe, incremental updates
+- Read [09_MOD_DOCUMENTATION_GUIDE.md](09_MOD_DOCUMENTATION_GUIDE.md) to understand the **metadata lock file** pattern
 - Follow the complete workflow in [11_COMBINING_MODS_WORKFLOW.md](11_COMBINING_MODS_WORKFLOW.md) (4 phases: preparation, AI generation, save, deploy)
 - Use the prompt templates in [10_PROMPT_TEMPLATES.md](10_PROMPT_TEMPLATES.md) with Claude or Copilot to:
   - Gather version information and combine mods ([prompts/combine-mods.md](prompts/combine-mods.md))
   - Update a mod to a new version ([prompts/update-mod.md](prompts/update-mod.md))
   - Remove or swap a feature ([prompts/remove-feature.md](prompts/remove-feature.md))
 - Learn from professional implementations in [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md)
-- When mods update, use metadata lock files to understand which components changed and whether you need the update
 
 **For mod authors creating features for community**:
 
-- Read [09_MOD_DOCUMENTATION_GUIDE.md](09_MOD_DOCUMENTATION_GUIDE.md) to understand the documentation-first approach used by community feature creators
+- Read [09_MOD_DOCUMENTATION_GUIDE.md](09_MOD_DOCUMENTATION_GUIDE.md) for the documentation-first approach
 - Follow the feature documentation template to create shareable .md files
 - Use AI tools (Copilot, Claude) with your documentation to generate code
-- See [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) for real examples of documented features
+- See [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) for real examples
 - Use [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md) to track and share your mods via git
 
 ---
 
 ## Debugging & Metadata Collection Tools
 
-The handbook includes integrated debugging and metadata collection tools via `traktor-logger`:
-
-**Quick Start (3 steps)**:
+**Quick Start**:
 
 1. **Install Logger** to Traktor's qml:
 
@@ -172,15 +151,13 @@ The handbook includes integrated debugging and metadata collection tools via `tr
 
 2. **Enable metadata collection on one connected controller**:
 
-   This step is required if you want data in the **Live Metadata** tab. Without API integration on a connected controller, the logger server runs but receives no deck metadata.
-
-   Pick whichever controller is always connected and pass its name:
+   Required for the **Live Metadata** tab. Pick whichever controller is always connected:
 
    ```bash
    traktor-mod enable-metadata D2
    ```
 
-   Only inject into one controller. `ApiModule` monitors all decks and channels globally — adding it to multiple controllers causes every event to be reported multiple times.
+   Only inject into one controller — `ApiModule` monitors all decks globally, so multiple injections cause duplicate events.
 
 3. **Start the server**:
 
@@ -188,15 +165,13 @@ The handbook includes integrated debugging and metadata collection tools via `tr
    traktor-mod server start
    ```
 
-   `traktor-mod` downloads/updates the server package and can launch it directly via `server start`.
-
    Open dashboard: http://localhost:8080
 
 **Supported Controllers**: D2, S8, S5, S4MK3, S3, S2MK3, X1MK3, Z1MK2, MX2, CDJ3000, XDJ700, XDJ1000MK2
 
 **What's included**:
 
-- **Automatic metadata**: Track loaded, play/pause, tempo, key, sync, BPM, mixer channels (requires metadata/API integration on a connected controller)
+- **Automatic metadata**: Track loaded, play/pause, tempo, key, sync, BPM, mixer channels (requires API integration on a connected controller)
 - **Manual logging**: `Logger` QML component for structured debug messages with severity levels
 - **Real-time dashboard**: Browser UI with live metadata view and console log viewer
 - **Color-coded CLI**: Terminal output with visual severity indicators
@@ -204,16 +179,16 @@ The handbook includes integrated debugging and metadata collection tools via `tr
 **Installation options**:
 
 ```bash
-# Option 1: Add Logger to a mod
+# Add Logger to a mod
 traktor-mod --with-logger
 
-# Option 2: Install Logger standalone (no mod)
+# Install Logger standalone (no mod)
 traktor-mod logger install
 
-# Option 3: Update Logger + Api modules from GitHub
+# Update Logger + Api modules from GitHub
 traktor-mod logger update
 
-# Option 4: Install Logger and start server in one command
+# Install Logger and start server in one command
 traktor-mod logger install && traktor-mod server start
 ```
 
@@ -236,25 +211,7 @@ Module {
 **For complete documentation**:
 
 - **Logger usage & examples**: See [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md) → "Technique 4: Advanced Debugging with HTTP Logger"
-- **Server/API documentation (primary)**: https://github.com/lsmith77/traktor-logger
-
-**Security note**: Don't log passwords, API keys, or personal data—all logs are visible in the browser dashboard and terminal.
-
----
-
-## Visual Guide: Emoji System
-
-The handbook uses emoji consistently to aid quick scanning:
-
-| Symbol   | Meaning                                          | Used In                  |
-| -------- | ------------------------------------------------ | ------------------------ |
-| 🧭       | Quick Navigation section header                  | All main docs            |
-| 🟢🟡🟠🔴 | Difficulty rating (Beginner → Advanced → Expert) | Practical Examples       |
-| 🎯🔄📊   | Example category icons                           | Practical Examples       |
-| ⚡💡🔍✅ | Troubleshooting sections                         | Troubleshooting doc      |
-| 📖🗂️🎯   | Guide section categories                         | Practical Examples intro |
-
-Not all sections use emoji — some use **bold titles** instead. Emoji are added where visual scanning speed helps.
+- **Server/API documentation**: https://github.com/lsmith77/traktor-logger
 
 ---
 

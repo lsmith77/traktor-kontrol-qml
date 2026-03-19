@@ -97,8 +97,6 @@ If using code snippets from NI forum discussions (e.g., the [MX2 QML Mods thread
 
 Yes. Each prompt is designed to work with Claude, ChatGPT, Copilot, or any text-based AI. Simply copy the prompt text into your AI tool's chat window.
 
-**Note**: Results may vary by AI model and version.
-
 ### What if the AI output doesn't work?
 
 1. **Copy the full error message** from Traktor's startup output (or use the [Debugging Workflow](04_TROUBLESHOOTING.md#debugging-workflow) to capture it)
@@ -112,8 +110,6 @@ Yes. Each prompt is designed to work with Claude, ChatGPT, Copilot, or any text-
 - If mods have **feature documentation** → use [combine-mods.md](prompts/combine-mods.md) directly
 - If mods **lack documentation** → use [list-features.md](prompts/list-features.md) first, then combine
 - For **large monolithic mods** → use [split-mod.md](prompts/split-mod.md) before combining
-
-This prevents conflicts and ensures clear tracking of what came from which mod.
 
 ### Can these prompts generate documentation for my mod?
 

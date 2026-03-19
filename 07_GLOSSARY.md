@@ -53,7 +53,6 @@ Short definitions for common terms you’ll see when working with Traktor QML mo
 - **Deck ID**: Which deck (1–4) a piece of logic applies to.
 - **Restart required**: Traktor loads QML at startup; changes usually require quitting and reopening Traktor.
 - **Rollback**: Restoring your backed-up `qml` folder to undo changes.
-- **Terminal / Command line**: A text-based interface to your computer's file system and programs. On macOS, it's called "Terminal"; on Windows, it's "Command Prompt" or "PowerShell". Instead of clicking folders in Finder, you type commands like `cd folder_name` to navigate and run scripts.
 
 ---
 

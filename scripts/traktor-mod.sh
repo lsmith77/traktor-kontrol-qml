@@ -29,7 +29,7 @@
 #   traktor-mod logger pull --symlink --local /path  — symlink local logger directory into cache
 #   traktor-mod logger install                       — install Logger.qml and Api modules to Traktor qml
 #   traktor-mod server start                         — launch traktor-logger server on localhost:8080
-#   traktor-mod enable-metadata D2,S8,X1MK3         — inject ApiModule into controller files
+#   traktor-mod enable-metadata D2                   — inject ApiModule into one controller file
 #
 # Help:
 #   traktor-mod -h                                   — show this help text
@@ -90,7 +90,7 @@ Standalone Commands:
   traktor-mod logger pull            — download traktor-logger to local cache from GitHub
   traktor-mod logger install         — install Logger.qml and Api modules to Traktor qml
   traktor-mod server start           — launch traktor-logger server on localhost:8080
-  traktor-mod enable-metadata D2,S8,X1MK3  — inject ApiModule into controller files
+  traktor-mod enable-metadata D2     — inject ApiModule into one controller file
   traktor-mod restore                — restore stock qml from backup, remove all mods
   traktor-mod restore --pull         — fetch stock qml from GitHub (ignores backup)
 
@@ -336,12 +336,12 @@ QMLDIR
 
 enable_metadata_for_traktor() {
     # Enable metadata for Traktor's installed qml (standalone operation)
-    # Injects ApiModule into controller files
+    # Injects ApiModule into a single controller file
     # Note: Api modules must be installed first via 'logger pull' + 'logger install'
     local controller_list="$1"
-    
+
     if [ -z "$controller_list" ]; then
-        echo "Error: No controllers specified for metadata"
+        echo "Error: No controller specified for metadata"
         return 1
     fi
     
@@ -366,23 +366,20 @@ enable_metadata_for_traktor() {
 }
 
 enable_metadata_for_controllers() {
-    # Enable metadata collection for specified controllers (comma-separated list)
+    # Enable metadata collection for a single controller
     # Uses safe insertion with validation to prevent file corruption
     local controller_list="$1"
     local target_dir="${2:-$TRAKTOR_QML}"
-    
+
     if [ -z "$controller_list" ]; then
-        echo "Error: No controllers specified for metadata"
+        echo "Error: No controller specified for metadata"
         return 1
     fi
-    
-    echo "Enabling metadata collection for controllers: $controller_list"
+
+    echo "Enabling metadata collection for controller: $controller_list"
     echo "Target: $target_dir"
-    
-    # Parse comma-separated list
-    IFS=',' read -ra CONTROLLERS <<< "$controller_list"
-    
-    for controller in "${CONTROLLERS[@]}"; do
+
+    for controller in "$controller_list"; do
         controller=$(echo "$controller" | xargs)  # trim whitespace
         local controller_file="$target_dir/CSI/${controller}/${controller}.qml"
         
@@ -675,7 +672,7 @@ QMLDIR
     echo ""
     echo "For automatic metadata collection (deck state, channels, tempo, browser):"
     echo "  Use: traktor-mod enable-metadata ControllerName"
-    echo "  Example: traktor-mod enable-metadata D2,S8,X1MK3"
+    echo "  Example: traktor-mod enable-metadata D2"
     echo "  Then open the Logger Web Dashboard at http://localhost:8080"
     echo ""
     echo "Components installed:"
@@ -857,7 +854,7 @@ while [ $# -gt 0 ]; do
         enable-metadata)
             shift
             if [ -z "$1" ]; then
-                echo "Error: 'enable-metadata' requires controller names"
+                echo "Error: 'enable-metadata' requires a controller name"
                 exit 1
             fi
             enable_metadata_for_traktor "$1"

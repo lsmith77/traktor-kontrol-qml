@@ -170,13 +170,17 @@ The handbook includes integrated debugging and metadata collection tools via `tr
    traktor-mod logger install
    ```
 
-2. **Enable metadata collection on at least one connected controller**:
+2. **Enable metadata collection on one connected controller**:
 
    This step is required if you want data in the **Live Metadata** tab. Without API integration on a connected controller, the logger server runs but receives no deck metadata.
 
+   Pick whichever controller is always connected and pass its name:
+
    ```bash
-   traktor-mod enable-metadata D2,S8,X1MK3
+   traktor-mod enable-metadata D2
    ```
+
+   Only inject into one controller. `ApiModule` monitors all decks and channels globally — adding it to multiple controllers causes every event to be reported multiple times.
 
 3. **Start the server**:
 

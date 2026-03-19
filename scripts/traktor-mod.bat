@@ -21,7 +21,7 @@ setlocal enabledelayedexpansion
 ::   traktor-mod.bat logger pull /local C:\path   — copy from local directory
 ::   traktor-mod.bat logger install                — install Logger.qml and Api modules only
 ::   traktor-mod.bat server start                  — launch traktor-logger server on localhost:8080
-::   traktor-mod.bat enable-metadata D2,S8,X1MK3   — inject ApiModule into specified controllers
+::   traktor-mod.bat enable-metadata D2            — inject ApiModule into one controller file
 ::
 :: Specifying source directory (optional; defaults to current directory):
 ::   traktor-mod.bat -s C:\path\to\mod             — use specific directory
@@ -703,7 +703,7 @@ echo   logger.info('Message', { data: 'value' })
 echo.
 echo For automatic metadata collection (deck state, channels, tempo, browser):
 echo   Use: traktor-mod.bat enable-metadata ControllerName
-echo   Example: traktor-mod.bat enable-metadata D2,S8,X1MK3
+echo   Example: traktor-mod.bat enable-metadata D2
 echo   Then open the Logger Web Dashboard at http://localhost:8080
 echo.
 echo Components installed:
@@ -754,10 +754,10 @@ exit /b 0
 :enable_metadata_traktor
 :: Enable metadata for Traktor's installed QML
 setlocal enabledelayedexpansion
-set "CONTROLLERS=%~1"
+set "CONTROLLER=%~1"
 
-if "!CONTROLLERS!"=="" (
-    echo Error: No controllers specified for metadata
+if "!CONTROLLER!"=="" (
+    echo Error: No controller specified for metadata
     endlocal
     exit /b 1
 )
@@ -776,58 +776,54 @@ if not exist "!TRAKTOR_QML!\CSI\Common\Api" (
     exit /b 1
 )
 
-echo Enabling metadata collection for controllers: !CONTROLLERS!
+echo Enabling metadata collection for controller: !CONTROLLER!
 echo Target: !TRAKTOR_QML!
 
-:: Parse comma-separated list and enable metadata for each controller
-for %%C in (!CONTROLLERS!) do (
-    set "CONTROLLER=%%C"
-    set "CONTROLLER_FILE=!TRAKTOR_QML!\CSI\!CONTROLLER!\!CONTROLLER!.qml"
+set "CONTROLLER_FILE=!TRAKTOR_QML!\CSI\!CONTROLLER!\!CONTROLLER!.qml"
 
-    if exist "!CONTROLLER_FILE!" (
-        echo   Enabling: !CONTROLLER!
+if exist "!CONTROLLER_FILE!" (
+    echo   Enabling: !CONTROLLER!
 
-        :: Check if ApiModule is already present (idempotent)
-        findstr /M "ApiModule" "!CONTROLLER_FILE!" >nul 2>&1
-        if !ERRORLEVEL! NEQ 0 (
-            :: Use PowerShell to safely inject import and ApiModule
-            powershell -NoProfile -Command ^
-                "& {" ^
-                "$file = '!CONTROLLER_FILE!';" ^
-                "$content = Get-Content -Path $file -Raw;" ^
-                "$lines = $content -split \"`n\";" ^
-                "$newLines = @(); $importAdded = $false; $inImports = $false;" ^
-                "foreach ($line in $lines) {" ^
-                "  if ($line -match '^import ') { $inImports = $true; $newLines += $line }" ^
-                "  elseif ($inImports -and -not $importAdded -and $line -notmatch '^import ' -and $line -notmatch '^\s*$') {" ^
-                "    if ($content -notmatch 'import.*Common/Api') { $newLines += 'import \"../Common/Api\"' };" ^
-                "    $newLines += $line; $importAdded = $true; $inImports = $false" ^
-                "  } else { $newLines += $line }" ^
-                "};" ^
-                "$content = $newLines -join \"`n\";" ^
-                "$lines2 = $content -split \"`n\";" ^
-                "$out = @(); $done = $false; $pastImports = $false;" ^
-                "foreach ($line in $lines2) {" ^
-                "  if ($line -match '^import ') { $pastImports = $true; $out += $line; continue };" ^
-                "  if ($pastImports -and -not $done -and $line -match 'Mapping\s*\{') {" ^
-                "    $out += $line; $out += '  // Automatic metadata collection';" ^
-                "    $out += '  ApiModule {}'; $done = $true; continue" ^
-                "  };" ^
-                "  $out += $line" ^
-                "};" ^
-                "Set-Content -Path $file -Value ($out -join \"`n\") -NoNewline }"
+    :: Check if ApiModule is already present (idempotent)
+    findstr /M "ApiModule" "!CONTROLLER_FILE!" >nul 2>&1
+    if !ERRORLEVEL! NEQ 0 (
+        :: Use PowerShell to safely inject import and ApiModule
+        powershell -NoProfile -Command ^
+            "& {" ^
+            "$file = '!CONTROLLER_FILE!';" ^
+            "$content = Get-Content -Path $file -Raw;" ^
+            "$lines = $content -split \"`n\";" ^
+            "$newLines = @(); $importAdded = $false; $inImports = $false;" ^
+            "foreach ($line in $lines) {" ^
+            "  if ($line -match '^import ') { $inImports = $true; $newLines += $line }" ^
+            "  elseif ($inImports -and -not $importAdded -and $line -notmatch '^import ' -and $line -notmatch '^\s*$') {" ^
+            "    if ($content -notmatch 'import.*Common/Api') { $newLines += 'import \"../Common/Api\"' };" ^
+            "    $newLines += $line; $importAdded = $true; $inImports = $false" ^
+            "  } else { $newLines += $line }" ^
+            "};" ^
+            "$content = $newLines -join \"`n\";" ^
+            "$lines2 = $content -split \"`n\";" ^
+            "$out = @(); $done = $false; $pastImports = $false;" ^
+            "foreach ($line in $lines2) {" ^
+            "  if ($line -match '^import ') { $pastImports = $true; $out += $line; continue };" ^
+            "  if ($pastImports -and -not $done -and $line -match 'Mapping\s*\{') {" ^
+            "    $out += $line; $out += '  // Automatic metadata collection';" ^
+            "    $out += '  ApiModule {}'; $done = $true; continue" ^
+            "  };" ^
+            "  $out += $line" ^
+            "};" ^
+            "Set-Content -Path $file -Value ($out -join \"`n\") -NoNewline }"
 
-            if !ERRORLEVEL! EQU 0 (
-                echo   [OK] !CONTROLLER!: metadata enabled
-            ) else (
-                echo   [FAIL] Could not enable metadata for !CONTROLLER!
-            )
+        if !ERRORLEVEL! EQU 0 (
+            echo   [OK] !CONTROLLER!: metadata enabled
         ) else (
-            echo   [OK] !CONTROLLER!: metadata already enabled
+            echo   [FAIL] Could not enable metadata for !CONTROLLER!
         )
     ) else (
-        echo   [SKIP] !CONTROLLER! not found: !CONTROLLER_FILE!
+        echo   [OK] !CONTROLLER!: metadata already enabled
     )
+) else (
+    echo   [SKIP] !CONTROLLER! not found: !CONTROLLER_FILE!
 )
 
 call :enable_browser_in_all_screens "!TRAKTOR_QML!"
@@ -959,7 +955,7 @@ exit /b 1
     echo   traktor-mod.bat server start - launch traktor-logger server on localhost:8080
     echo.
     echo Metadata Collection:
-    echo   traktor-mod.bat enable-metadata D2,S8,X1MK3 - inject ApiModule into controllers
+    echo   traktor-mod.bat enable-metadata D2    - inject ApiModule into one controller
     echo.
     echo General Options:
     echo   traktor-mod.bat restore         - restore stock qml from backup, remove all mods

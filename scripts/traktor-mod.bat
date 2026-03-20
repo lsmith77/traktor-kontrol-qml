@@ -356,6 +356,12 @@ if not exist "!TRAKTOR_QML_BACKUP!" (
 :: In fresh mode, reset live qml to stock
 if "!FRESH!"=="true" (
     echo Fresh mode: resetting live qml to stock...
+    :: If qml is a symlink/junction (e.g. from a prior /full /symlink), remove it first
+    :: so robocopy creates a real directory rather than writing through the link
+    fsutil reparsepoint query "!TRAKTOR_QML!" >nul 2>&1
+    if !ERRORLEVEL! EQU 0 (
+        rmdir "!TRAKTOR_QML!"
+    )
     robocopy "!TRAKTOR_QML_BACKUP!" "!TRAKTOR_QML!" /MIR /NFL /NDL /NJH /NJS >nul
     if !ERRORLEVEL! GTR 7 (
         echo Error: Could not reset to stock. Aborting.

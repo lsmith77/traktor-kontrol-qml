@@ -1092,6 +1092,11 @@ if [ "$IS_MOD_INSTALL" = "true" ]; then
     # In fresh mode, reset live qml to stock before applying
     if [ "$FRESH" = "true" ]; then
         echo "Fresh mode: resetting live qml to stock..."
+        # If qml is a symlink (e.g. from a prior --full --symlink), remove it first
+        # so rsync creates a real directory rather than writing through the symlink
+        if [ -L "$TRAKTOR_QML" ]; then
+            sudo rm "$TRAKTOR_QML"
+        fi
         sudo rsync -a --delete "$TRAKTOR_QML_BACKUP/" "$TRAKTOR_QML/"
     fi
 

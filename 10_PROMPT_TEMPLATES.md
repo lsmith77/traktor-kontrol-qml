@@ -8,6 +8,17 @@
 
 ---
 
+## General Tips for Effective Prompting
+
+- **For complex tasks:** Ask the AI to first write a step-by-step plan in markdown for your review and iteration before requesting an implementation. If your AI tool supports it, switch to "plan mode" for this stage.  
+  Example: "Before you start coding, write a detailed plan in markdown for me to review."
+- **Identify gaps:** Prompt the AI to spot any missing pieces or unclear requirements in your concept, and ask it to present options or questions to resolve these gaps before proceeding.  
+  Example: "Please identify any gaps or unclear parts in my idea and suggest options to resolve them."
+- **Final review:** When finished—especially after trying multiple approaches—ask the AI to review the final change set for consistency and maintainability, and to remove any changes that are no longer necessary.  
+  Example: "Now review the final changes for consistency and maintainability, and remove anything that's no longer needed."
+
+---
+
 ## Prompt Index
 
 | Prompt               | When to use                                                      | File                                                     |

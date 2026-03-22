@@ -278,6 +278,14 @@ traktor-mod restore
 
 The script auto-elevates to admin via UAC, creates a stock backup on first install, and uses `robocopy` for merging/copying. Symlink mode creates directory junctions for complete mods or individual file symlinks for overlays. Behaviour is identical to the macOS script.
 
+### Manual installation
+
+> ⚠️ **`traktor-mod.bat` is not yet fully tested on Windows.** If it works for you, great — please [let us know](https://github.com/lsmith77/traktor-kontrol-qml/issues). If it fails, the manual guide below covers every step the script performs, including logger and metadata setup. Your feedback (even just "it worked on Windows 11") helps make the script reliable for everyone.
+
+Full step-by-step instructions — backup, overlay/fresh/full install, restore from GitHub, logger, metadata API, and how to report issues or fix the script yourself with AI:
+
+**→ [scripts/manual-install.md](scripts/manual-install.md)**
+
 ---
 
 ## How to capture your changes (two common options)

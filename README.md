@@ -32,6 +32,7 @@ git clone https://github.com/lsmith77/traktor-logger traktor-logger
 1. **[Chapter 03: Community Resources](03_COMMUNITY_RESOURCES.md)** — curated list of GitHub repos and forum mods for S4 MK3, X1 MK3, and other controllers
 2. **[Chapter 01: Basics](01_BASICS.md)** — `qml` folder structure, Traktor architecture
 3. **[Chapter 08: Sharing Changes](08_SHARING_CHANGES.md)** — `traktor-mod` script setup (automates backup, overlay install, restore)
+   - **macOS users**: run `traktor-mod.sh` instead; if the script fails, **[scripts/manual-install.md](scripts/manual-install.md)** covers every step manually
 4. **[Chapter 05: FAQ](05_FAQ.md)** — safety, Traktor updates overwriting mods, common questions
 5. **[Chapter 04: Troubleshooting](04_TROUBLESHOOTING.md)** — when something breaks
 

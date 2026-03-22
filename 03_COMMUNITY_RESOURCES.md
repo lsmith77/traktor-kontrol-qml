@@ -37,7 +37,7 @@ The prompt template and workflow help you:
 
 ### X1MK3 Performance Mod
 
-**Status**: Stable • **Traktor**: 4.4.1 • **Controller**: Native Instruments X1 MK3
+**Status**: Stable • **Traktor**: 4.4.1 • **Controller**: Native Instruments X1 MK3 • **Install**: Overlay
 
 11 documented features including tempo control, beatgrid, browser mode, mixer overlay, stem/remix controls, FX section, and transport LED feedback.
 
@@ -49,7 +49,7 @@ The prompt template and workflow help you:
 
 ### D2 Performance Mod
 
-**Status**: Stable • **Traktor**: 4.4.1 • **Controller**: Native Instruments D2
+**Status**: Stable • **Traktor**: 4.4.1 • **Controller**: Native Instruments D2 • **Install**: Overlay
 
 Community-maintained performance modifications with documented features.
 
@@ -60,7 +60,7 @@ Community-maintained performance modifications with documented features.
 
 ### S4MK3/S3 Community Performance Mod
 
-**Status**: Community-maintained • **Traktor**: 4.4.1+ • **Controllers**: S4 MK3, S3
+**Status**: Community-maintained • **Traktor**: 4.4.1+ • **Controllers**: S4 MK3, S3 • **Install**: Overlay
 
 Active community effort documenting features and mods for S4MK3 and S3 controllers.
 
@@ -70,7 +70,7 @@ Active community effort documenting features and mods for S4MK3 and S3 controlle
 
 ### Traktor Kontrol Screens (Erik Minekus)
 
-**Status**: Reference • **Traktor**: 4.4.1+
+**Status**: Reference • **Traktor**: 4.4.1+ • **Install**: Full replacement
 
 Comprehensive screen customization project with layouts and visual modifications.
 
@@ -81,7 +81,7 @@ Comprehensive screen customization project with layouts and visual modifications
 
 ### Traktor Kontrol Screens Master
 
-**Status**: Stable • **Traktor**: 4.4.1+
+**Status**: Stable • **Traktor**: 4.4.1+ • **Install**: Full replacement
 
 Screen customization reference implementation.
 
@@ -91,7 +91,7 @@ Screen customization reference implementation.
 
 ### Traktor S4 MK3 Mod
 
-**Status**: Community • **Traktor**: 4.4.1+ • **Controller**: S4 MK3
+**Status**: Community • **Traktor**: 4.4.1+ • **Controller**: S4 MK3 • **Install**: Overlay
 
 Community S4 MK3 modifications.
 
@@ -101,7 +101,7 @@ Community S4 MK3 modifications.
 
 ### MX2 QML Mods
 
-**Status**: Community Discussion • **Traktor**: 4.4.1+ • **Controller**: Native Instruments MX2
+**Status**: Community Discussion • **Traktor**: 4.4.1+ • **Controller**: Native Instruments MX2 • **Install**: Overlay
 
 Community-contributed QML modifications with code snippets and implementation guides.
 
@@ -113,7 +113,7 @@ Community-contributed QML modifications with code snippets and implementation gu
 
 ### Traktor QML Multi-Mod Combination (Real-World Example)
 
-**What**: A single repository that combines features from 3 separate performance mods into one coherent setup, with versioning and update tracking.
+**Install**: Full replacement • **What**: A single repository that combines features from 3 separate performance mods into one coherent setup, with versioning and update tracking.
 
 **Why it matters**: Shows how the [combining workflow](11_COMBINING_MODS_WORKFLOW.md) (with AI prompts and metadata lock files) works in practice—combining multiple community mods, then maintaining them through updates.
 
@@ -141,9 +141,9 @@ Community-contributed QML modifications with code snippets and implementation gu
 
 Premium Traktor QML mods and customization available through subscription services:
 
-- **DJ Mirror for Traktor**: https://www.patreon.com/cw/DjMirrorTraktor
-- **Traktor Mods Community**: https://www.patreon.com/c/traktormods/home
-- **Supreme Edition**: https://www.patreon.com/c/supremeedition/home
+- **DJ Mirror for Traktor** (Full replacement): https://www.patreon.com/cw/DjMirrorTraktor
+- **Traktor Mods Community** (Full replacement): https://www.patreon.com/c/traktormods/home
+- **Supreme Edition** (Full replacement): https://www.patreon.com/c/supremeedition/home
 
 ---
 

@@ -146,8 +146,8 @@ For each `Screen.qml` under `qml\Screens\` (e.g., `Screens\S4MK3\Screen.qml`):
 1. Open the file in a text editor.
 
 2. Add an import after the last `import` line. The path is relative — count how many folders deep the file sits below `qml\Screens\`:
-   - One folder deep (e.g., `Screens\S4MK3\Screen.qml`): `import "../../Common" as LoggerScreens`
-   - Two folders deep: `import "../../../Common" as LoggerScreens`
+   - One folder deep (e.g., `Screens\S4MK3\Screen.qml`): `import "../Common" as LoggerScreens`
+   - Two folders deep: `import "../../Common" as LoggerScreens`
 
 3. Find the first `{` after the imports (the root element's opening brace). Add on the next line:
 

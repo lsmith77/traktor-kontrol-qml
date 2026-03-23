@@ -834,6 +834,20 @@ if exist "!CONTROLLER_FILE!" (
 
 call :enable_browser_in_all_screens "!TRAKTOR_QML!"
 
+if /I "!CONTROLLER!"=="S8" (
+    echo.
+    echo Configure Traktor S8 Controller (only needed if no physical S8 is connected)
+    echo.
+    echo   Traktor only loads a controller's QML when it is registered.
+    echo   Add S8 as a pre-mapped controller:
+    echo.
+    echo   1. Launch Traktor Pro
+    echo   2. Go to Preferences (Ctrl+, on Windows)
+    echo   3. Select the Controller Manager tab
+    echo   4. Click Add ^> Pre-Mapped ^> Traktor Kontrol ^> S8
+    echo.
+)
+
 endlocal
 exit /b 0
 

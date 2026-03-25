@@ -128,6 +128,17 @@ TRAKTOR_QML="$TRAKTOR_RESOURCES/qml"
 TRAKTOR_QML_BACKUP="$TRAKTOR_RESOURCES/qml.mod-backup"
 TRAKTOR_APP="/Applications/Native Instruments/Traktor Pro 4/Traktor Pro 4.app"
 
+# Run a command with sudo if $TRAKTOR_QML is not writable by the current user.
+# Used for writes *into* qml subdirectories — when qml is a user-owned symlink
+# no sudo is needed; when it is a root-owned directory sudo is required.
+qml_cmd() {
+    if [ -w "$TRAKTOR_QML" ]; then
+        "$@"
+    else
+        sudo "$@"
+    fi
+}
+
 check_traktor_installed() {
     if [ ! -d "$TRAKTOR_QML" ]; then
         echo "Error: Traktor Pro 4 not found at expected path."
@@ -408,16 +419,11 @@ enable_metadata_for_controllers() {
             continue
         fi
         
-        # Need to modify - use sudo if target is Traktor qml
-        local use_sudo=""
-        if [[ "$target_dir" == "$TRAKTOR_QML"* ]]; then
-            use_sudo="sudo"
-        fi
-        
         # Step 1: Ensure import for ApiModule is present (add if missing)
         if ! grep -q 'import.*"\.\./Common/Api"' "$controller_file"; then
             # Use awk to insert import after last import statement
-            local temp_file="${controller_file}.tmp1"
+            local temp_file
+            temp_file=$(mktemp /tmp/traktor-mod.XXXXXX)
             awk '
                 /^import / {
                     print $0
@@ -433,13 +439,14 @@ enable_metadata_for_controllers() {
                 }
                 { print }
             ' "$controller_file" > "$temp_file"
-            
-            $use_sudo mv "$temp_file" "$controller_file"
+
+            qml_cmd mv "$temp_file" "$controller_file"
             echo "  → Added import for ApiModule"
         fi
-        
+
         # Step 2: Inject ApiModule into Mapping block
-        local temp_file="${controller_file}.tmp2"
+        local temp_file
+        temp_file=$(mktemp /tmp/traktor-mod.XXXXXX)
         awk '
             /^Mapping\s*$/ {
                 # "Mapping" on its own line - look for opening brace next
@@ -470,7 +477,7 @@ enable_metadata_for_controllers() {
         fi
         
         # Replace original with temp
-        $use_sudo mv "$temp_file" "$controller_file"
+        qml_cmd mv "$temp_file" "$controller_file"
         echo "  ✓ $controller: metadata enabled (validated)"
     done
 
@@ -487,11 +494,6 @@ enable_browser_in_all_screens() {
     if [ ! -d "$screens_dir" ]; then
         echo "  ⚠ No Screens directory found at $screens_dir — browser monitoring skipped"
         return 0
-    fi
-
-    local use_sudo=""
-    if [[ "$target_dir" == "$TRAKTOR_QML"* ]]; then
-        use_sudo="sudo"
     fi
 
     local found=0
@@ -524,7 +526,8 @@ enable_browser_in_all_screens() {
         # Step 1: Add import for Screens/Common if not already present
         local import_quoted="\"${import_path}\""
         if ! grep -q "\"${import_path}\"" "$screen_file" && ! grep -q "'${import_path}'" "$screen_file"; then
-            local temp_file="${screen_file}.tmp1"
+            local temp_file
+            temp_file=$(mktemp /tmp/traktor-mod.XXXXXX)
             awk -v imp="import ${import_quoted} as LoggerScreens" '
                 /^import / {
                     print $0
@@ -539,13 +542,14 @@ enable_browser_in_all_screens() {
                 }
                 { print }
             ' "$screen_file" > "$temp_file"
-            $use_sudo mv "$temp_file" "$screen_file"
+            qml_cmd mv "$temp_file" "$screen_file"
         fi
 
         # Step 2: Inject ApiBrowser after the first { that follows all import lines.
         # That { is always the root Item's opening brace in a Screen.qml file.
         # Avoids \s which is not portable across awk implementations (BSD awk on macOS).
-        local temp_file="${screen_file}.tmp2"
+        local temp_file
+        temp_file=$(mktemp /tmp/traktor-mod.XXXXXX)
         awk -v component="$browser_instance" '
             BEGIN { past_imports = 0; done = 0 }
             /^import /  { past_imports = 1; print; next }
@@ -565,7 +569,7 @@ enable_browser_in_all_screens() {
             continue
         fi
 
-        $use_sudo mv "$temp_file" "$screen_file"
+        qml_cmd mv "$temp_file" "$screen_file"
         echo "  ✓ ${screen_file#$target_dir/}: browser monitoring enabled"
     done < <(find "$screens_dir" -name "Screen.qml" 2>/dev/null)
 
@@ -630,29 +634,26 @@ install_logger_to_traktor() {
 
     # Create Defines folder in Traktor's live QML if it doesn't exist
     if [ ! -d "$TRAKTOR_QML/Defines" ]; then
-        sudo mkdir -p "$TRAKTOR_QML/Defines"
+        qml_cmd mkdir -p "$TRAKTOR_QML/Defines"
     fi
 
     # Register Logger in qmldir
     if [ ! -f "$TRAKTOR_QML/Defines/qmldir" ]; then
-        sudo tee "$TRAKTOR_QML/Defines/qmldir" > /dev/null << 'QMLDIR'
-module Traktor.Defines
-Logger 1.0 Logger.qml
-QMLDIR
+        printf 'module Traktor.Defines\nLogger 1.0 Logger.qml\n' | qml_cmd tee "$TRAKTOR_QML/Defines/qmldir" > /dev/null
     else
         if ! grep -q "^Logger" "$TRAKTOR_QML/Defines/qmldir"; then
-            echo "Logger 1.0 Logger.qml" | sudo tee -a "$TRAKTOR_QML/Defines/qmldir" > /dev/null
+            echo "Logger 1.0 Logger.qml" | qml_cmd tee -a "$TRAKTOR_QML/Defines/qmldir" > /dev/null
         fi
     fi
 
-    sudo cp "$logger_src" "$TRAKTOR_QML/Defines/Logger.qml"
+    qml_cmd cp "$logger_src" "$TRAKTOR_QML/Defines/Logger.qml"
     echo "  ✓ Logger.qml: $TRAKTOR_QML/Defines/Logger.qml"
 
     # Copy Api modules
     local api_src
     if api_src=$(get_api_modules_path 2>/dev/null) && [ -d "$api_src" ] && [ -n "$(ls -A "$api_src" 2>/dev/null)" ]; then
-        sudo mkdir -p "$TRAKTOR_QML/CSI/Common/Api"
-        if sudo cp -r "$api_src"/* "$TRAKTOR_QML/CSI/Common/Api/" 2>&1; then
+        qml_cmd mkdir -p "$TRAKTOR_QML/CSI/Common/Api"
+        if qml_cmd cp -r "$api_src"/* "$TRAKTOR_QML/CSI/Common/Api/" 2>&1; then
             echo "  ✓ Api modules: $TRAKTOR_QML/CSI/Common/Api/"
         else
             echo "  ⚠ Api modules: could not copy (but Logger.qml is installed)"
@@ -664,15 +665,15 @@ QMLDIR
     # Copy Screens modules
     local screens_src
     if screens_src=$(get_screen_modules_path 2>/dev/null) && [ -d "$screens_src" ] && [ -n "$(ls -A "$screens_src" 2>/dev/null)" ]; then
-        sudo mkdir -p "$TRAKTOR_QML/Screens/Common"
-        if sudo cp -r "$screens_src"/* "$TRAKTOR_QML/Screens/Common/" 2>&1; then
+        qml_cmd mkdir -p "$TRAKTOR_QML/Screens/Common"
+        if qml_cmd cp -r "$screens_src"/* "$TRAKTOR_QML/Screens/Common/" 2>&1; then
             echo "  ✓ Screens modules: $TRAKTOR_QML/Screens/Common/"
         else
             echo "  ⚠ Screens modules: could not copy"
         fi
         local apiclient_src
         if apiclient_src=$(get_api_modules_path 2>/dev/null) && [ -f "$apiclient_src/ApiClient.js" ]; then
-            sudo cp "$apiclient_src/ApiClient.js" "$TRAKTOR_QML/Screens/Common/ApiClient.js" 2>/dev/null || true
+            qml_cmd cp "$apiclient_src/ApiClient.js" "$TRAKTOR_QML/Screens/Common/ApiClient.js" 2>/dev/null || true
         fi
     fi
 
@@ -879,6 +880,10 @@ while [ $# -gt 0 ]; do
         --full)    FULL=true; shift ;;
         --pull)    PULL_RESTORE=true; shift ;;
         --with-logger) WITH_LOGGER=true; shift ;;
+        --branch=*)
+            BRANCH="${arg#--branch=}"
+            shift
+            ;;
         --branch)
             shift
             if [ -z "$1" ] || [[ "$1" =~ ^- ]]; then
@@ -886,6 +891,10 @@ while [ $# -gt 0 ]; do
                 exit 1
             fi
             BRANCH="$1"
+            shift
+            ;;
+        --local=*)
+            LOGGER_LOCAL_PATH="${arg#--local=}"
             shift
             ;;
         --local)
@@ -898,6 +907,10 @@ while [ $# -gt 0 ]; do
             shift
             ;;
         -h|--help) show_help; exit 0 ;;
+        --source=*)
+            SOURCE_DIR="${arg#--source=}"
+            shift
+            ;;
         -s|--source)
             shift
             if [ -z "$1" ] || [[ "$1" =~ ^- ]]; then
@@ -1135,9 +1148,9 @@ if [ "$IS_MOD_INSTALL" = "true" ]; then
         while IFS= read -r -d '' src; do
             rel="${src#${MOD_QML}/}"
             dst="$TRAKTOR_QML/$rel"
-            sudo mkdir -p "$(dirname "$dst")"
-            sudo rm -f "$dst"
-            sudo ln -s "$src" "$dst"
+            qml_cmd mkdir -p "$(dirname "$dst")"
+            qml_cmd rm -f "$dst"
+            qml_cmd ln -s "$src" "$dst"
         done < <(find "$MOD_QML" -type f -print0)
         echo "Done."
         echo ""
@@ -1145,7 +1158,7 @@ if [ "$IS_MOD_INSTALL" = "true" ]; then
         echo "Edit files there and restart Traktor — no reinstall needed."
     else
         echo "Installing mod (merging overlay into Traktor qml)..."
-        sudo rsync -a "$MOD_QML/" "$TRAKTOR_QML/"
+        qml_cmd rsync -a "$MOD_QML/" "$TRAKTOR_QML/"
         echo "Done."
     fi
 fi

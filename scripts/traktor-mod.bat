@@ -216,8 +216,23 @@ if "!NEXT_IS_SOURCE!"=="true" (
     set "MODE=enable-metadata"
     shift
 ) else (
-    echo Error: Unknown argument: %~1
-    goto :end_error
+    set "_ARG=%~1"
+    if "!_ARG:~0,9!"=="--source=" (
+        set "SOURCE_DIR=!_ARG:~9!"
+        if not exist "!SOURCE_DIR!" (
+            echo Error: Source directory not found: !SOURCE_DIR!
+            goto :end_error
+        )
+        for /f "delims=" %%D in ('cd /d "!SOURCE_DIR!" 2^>nul ^&^& cd') do set "SOURCE_DIR=%%D"
+        set "MOD_QML=!SOURCE_DIR!\qml"
+    ) else if "!_ARG:~0,9!"=="--branch=" (
+        set "BRANCH=!_ARG:~9!"
+    ) else if "!_ARG:~0,8!"=="--local=" (
+        set "LOGGER_LOCAL_PATH=!_ARG:~8!"
+    ) else (
+        echo Error: Unknown argument: %~1
+        goto :end_error
+    )
 )
 
 shift

@@ -42,7 +42,7 @@ The **AppProperty API** does not expose browser item selection (`list_selected_i
 - ✅ Whether a content list (tracks) or folder list is showing (`isContentList`)
 - ❌ Not accessible in the CSI layer or from screen-less controllers (X1, Z1, F1, etc.)
 
-The `traktor-logger` package's `enable-metadata` command injects an `ApiBrowser` monitor into your controller's Screen.qml that uses this to stream live browser state to the dashboard.
+The `traktor-logger` package's `logger api` command injects an `ApiBrowser` monitor into your controller's Screen.qml that uses this to stream live browser state to the dashboard.
 
 **Credit**: The Screens-layer reverse engineering that made this possible was pioneered by [DJMirror](https://www.patreon.com/cw/DjMirrorTraktor/home).
 

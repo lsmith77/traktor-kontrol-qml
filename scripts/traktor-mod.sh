@@ -25,11 +25,10 @@
 # Logger and server commands:
 #   traktor-mod logger pull                          — download traktor-logger to local cache
 #   traktor-mod logger pull --branch dev             — pull from a specific branch
-#   traktor-mod logger pull --local /path/to/logger  — copy from local directory
-#   traktor-mod logger pull --symlink --local /path  — symlink local logger directory into cache
-#   traktor-mod logger install                       — install Logger.qml and Api modules to Traktor qml
+#   traktor-mod logger pull --source /path/to/logger — copy from local directory
+#   traktor-mod logger pull --symlink --source /path — symlink local logger directory into cache
 #   traktor-mod server start                         — launch traktor-logger server on localhost:8080
-#   traktor-mod enable-metadata D2                   — inject ApiModule into one controller file
+#   traktor-mod logger api D2                        — inject ApiModule into one controller file
 #
 # Help:
 #   traktor-mod -h                                   — show this help text
@@ -83,21 +82,17 @@ Full Replacement Mode Usage:
   traktor-mod --full --fresh         — reset stock first, then replace
   traktor-mod --full --fresh --symlink — reset stock, then symlink with replacement
 
-Installation Modifiers:
-  traktor-mod --with-logger          — include Logger.qml and Api modules with a mod
-
 Standalone Commands:
   traktor-mod logger pull            — download traktor-logger to local cache from GitHub
-  traktor-mod logger install         — install Logger.qml and Api modules to Traktor qml
   traktor-mod server start           — launch traktor-logger server on localhost:8080
-  traktor-mod enable-metadata D2     — inject ApiModule into one controller file
+  traktor-mod logger api D2          — inject ApiModule into one controller file
   traktor-mod restore                — restore stock qml from backup, remove all mods
   traktor-mod restore --pull         — fetch stock qml from GitHub (ignores backup)
 
   Logger cache options (used with 'logger pull'):
     --branch <name>                          — pull from a specific GitHub branch (default: main)
-    --local /path/to/logger                  — copy from a local traktor-logger directory
-    --symlink (with --local)                 — symlink local directory into cache instead of copying
+    --source /path/to/logger                 — copy from a local traktor-logger directory
+    --symlink (with --source)                — symlink local directory into cache instead of copying
 
   Logger and Api modules use hybrid fallback chain:
     1. Cached ~/.traktor-mod/traktor-logger/ (offline after first download)
@@ -111,8 +106,6 @@ Notes:
   - Backup created on first install (never overwritten)
   - Restore returns to stock and removes all mods/symlinks
   - Symlinks use absolute paths; moving repo breaks them (run again to fix)
-  - With --with-logger: installed to mod's Defines/ folder
-  - Logger components (logger install): installed to Traktor's Defines/ folder
 EOF
 }
 
@@ -154,8 +147,8 @@ check_traktor_installed() {
 
 get_logger_qml() {
     # Returns path to Logger.qml using hybrid fallback chain: cache → GitHub
-    local logger_path="$SERVER_CACHE_DIR/qml/Logger.qml"
-    local logger_url="$SERVER_GITHUB_REPO/qml/Logger.qml"
+    local logger_path="$SERVER_CACHE_DIR/qml/Defines/Logger.qml"
+    local logger_url="$SERVER_GITHUB_REPO/qml/Defines/Logger.qml"
     # 1. Check cache (for offline use, one-time download)
     if [ -f "$logger_path" ]; then
         echo "$logger_path"
@@ -205,8 +198,8 @@ get_server_package() {
         return 0
     fi
 
-    # 2. Check cache
-    if [ -f "$SERVER_CACHE_DIR/server.py" ] && [ -f "$SERVER_CACHE_DIR/qml/Logger.qml" ]; then
+    # 2. Check cache (presence of qml/Defines/Logger.qml implicitly requires v1.2.0+ layout)
+    if [ -f "$SERVER_CACHE_DIR/server.py" ] && [ -f "$SERVER_CACHE_DIR/qml/Defines/Logger.qml" ]; then
         echo "$SERVER_CACHE_DIR"
         return 0
     fi
@@ -251,104 +244,10 @@ get_screen_modules_path() {
     return 0
 }
 
-get_logger_version() {
-    # Extract version from traktor-logger README (deterministic marker: "Version: X")
-    local server_dir readme version
-    if ! server_dir=$(get_server_package 2>/dev/null); then
-        echo "unknown"
-        return 0
-    fi
-    readme="$server_dir/README.md"
-    if [ -f "$readme" ]; then
-        version=$(grep -E '^Version:[[:space:]]*' "$readme" | head -n 1 | sed -E 's/^Version:[[:space:]]*//')
-    fi
-    if [ -z "$version" ]; then
-        version="unknown"
-    fi
-    echo "$version"
-    return 0
-}
-
-install_logger_qml() {
-    # Install Logger.qml and Api modules into mod's qml/ (symlink or copy)
-    local server_dir
-    if ! server_dir=$(get_server_package); then
-        echo "Error: Could not obtain traktor-logger package"
-        return 1
-    fi
-
-    if [ "$SYMLINK" = "true" ]; then
-        local logger_qml_abs
-        logger_qml_abs="$(cd "$server_dir/qml" && pwd)"
-        # Symlink individual top-level entries so the mod qml remains a real directory
-        # (preserving other mod files alongside the logger symlinks)
-        mkdir -p "$MOD_QML"
-        for entry in Defines CSI Screens; do
-            local src="$logger_qml_abs/$entry"
-            local dst="$MOD_QML/$entry"
-            [ -d "$src" ] || continue
-            rm -rf "$dst"
-            ln -s "$src" "$dst"
-            echo "  ✓ $entry: $dst -> $src"
-        done
-        return 0
-    fi
-
-    # Copy mode
-    if [ ! -d "$MOD_QML/Defines" ]; then
-        mkdir -p "$MOD_QML/Defines"
-    fi
-
-    local logger_src
-    if ! logger_src=$(get_logger_qml); then
-        echo "Error: Could not obtain Logger.qml"
-        return 1
-    fi
-
-    # Create qmldir if it doesn't exist
-    if [ ! -f "$MOD_QML/Defines/qmldir" ]; then
-        cat > "$MOD_QML/Defines/qmldir" << 'QMLDIR'
-module Traktor.Defines
-Logger 1.0 Logger.qml
-QMLDIR
-    fi
-
-    cp "$logger_src" "$MOD_QML/Defines/Logger.qml"
-    echo "  ✓ Logger.qml: $MOD_QML/Defines/Logger.qml"
-
-    local api_src
-    if api_src=$(get_api_modules_path 2>/dev/null) && [ -d "$api_src" ] && [ -n "$(ls -A "$api_src" 2>/dev/null)" ]; then
-        mkdir -p "$MOD_QML/CSI/Common/Api"
-        if cp -r "$api_src"/* "$MOD_QML/CSI/Common/Api/" 2>&1; then
-            echo "  ✓ Api modules: $MOD_QML/CSI/Common/Api/"
-        else
-            echo "  ⚠ Api modules: could not copy (but Logger.qml is installed)"
-        fi
-    else
-        echo "  ⚠ Api modules: not available (Logger.qml is installed)"
-    fi
-
-    local screens_src
-    if screens_src=$(get_screen_modules_path 2>/dev/null) && [ -d "$screens_src" ] && [ -n "$(ls -A "$screens_src" 2>/dev/null)" ]; then
-        mkdir -p "$MOD_QML/Screens/Common"
-        if cp -r "$screens_src"/* "$MOD_QML/Screens/Common/" 2>&1; then
-            echo "  ✓ Screens modules: $MOD_QML/Screens/Common/"
-        else
-            echo "  ⚠ Screens modules: could not copy"
-        fi
-        local apiclient_src
-        if apiclient_src=$(get_api_modules_path 2>/dev/null) && [ -f "$apiclient_src/ApiClient.js" ]; then
-            cp "$apiclient_src/ApiClient.js" "$MOD_QML/Screens/Common/ApiClient.js" 2>/dev/null || true
-        fi
-    fi
-
-    return 0
-}
-
 enable_metadata_for_traktor() {
     # Enable metadata for Traktor's installed qml (standalone operation)
     # Injects ApiModule into a single controller file
-    # Note: Api modules must be installed first via 'logger pull' + 'logger install'
+    # Note: Api modules must be installed first via 'logger pull' + '--source ~/.traktor-mod/traktor-logger'
     local controller_list="$1"
 
     if [ -z "$controller_list" ]; then
@@ -363,13 +262,21 @@ enable_metadata_for_traktor() {
         echo "Error: Api modules not found in Traktor qml"
         echo ""
         echo "Install them first with:"
-        echo "  traktor-mod logger install"
-        echo ""
-        echo "Or pull and install with:"
-        echo "  traktor-mod logger pull && traktor-mod logger install"
+        echo "  traktor-mod logger pull"
+        echo "  traktor-mod --source ~/.traktor-mod/traktor-logger"
         return 1
     fi
-    
+
+    # Install Screens/Common/ApiBrowser.qml (required for browser monitoring)
+    local screen_src
+    if screen_src=$(get_screen_modules_path) && [ -d "$screen_src" ]; then
+        qml_cmd mkdir -p "$TRAKTOR_QML/Screens/Common"
+        qml_cmd cp -r "$screen_src/." "$TRAKTOR_QML/Screens/Common/"
+        echo "  ✓ Screens/Common: browser modules installed"
+    else
+        echo "  ⚠ Screens/Common source not found — browser monitoring may be unavailable"
+    fi
+
     # Enable CSI metadata collection per-controller
     enable_metadata_for_controllers "$controller_list" "$TRAKTOR_QML"
     # Enable browser monitoring in all Screen.qml files (shared across controllers)
@@ -580,123 +487,6 @@ enable_browser_in_all_screens() {
     return 0
 }
 
-install_logger_to_traktor() {
-    # Install Logger.qml and Api modules directly to Traktor's live QML (not to a mod)
-    check_traktor_installed
-
-    # Create backup on first install
-    if [ ! -d "$TRAKTOR_QML_BACKUP" ]; then
-        echo "Creating backup of stock qml..."
-        sudo cp -r "$TRAKTOR_QML" "$TRAKTOR_QML_BACKUP"
-        echo "  Backup saved: $TRAKTOR_QML_BACKUP"
-    else
-        echo "Backup exists: $TRAKTOR_QML_BACKUP"
-    fi
-
-    # Symlink mode: copy logger files into local mod's qml, then symlink Traktor's qml to it
-    if [ "$SYMLINK" = "true" ]; then
-        if [ ! -d "$MOD_QML" ]; then
-            echo "Error: No local mod qml found at $MOD_QML"
-            echo "  Run from a mod directory containing a qml/ folder, or use without --symlink"
-            return 1
-        fi
-        # Copy logger files into the local mod's qml (no symlinks inside the mod)
-        local saved_symlink="$SYMLINK"
-        SYMLINK=false
-        install_logger_qml
-        SYMLINK="$saved_symlink"
-        # Symlink Traktor's qml to the local mod's qml
-        local mod_qml_abs
-        mod_qml_abs="$(cd "$MOD_QML" && pwd)"
-        sudo rm -rf "$TRAKTOR_QML"
-        sudo ln -s "$mod_qml_abs" "$TRAKTOR_QML"
-        echo "  ✓ qml: $TRAKTOR_QML -> $mod_qml_abs"
-        echo ""
-        echo "✓ Logger installation complete!"
-        echo ""
-        echo "For simple debug logging in your controller:"
-        echo "  import Traktor.Defines 1.0"
-        echo "  Logger { id: logger }"
-        echo "  logger.info('Message', { data: 'value' })"
-        echo ""
-        echo "Edit files in $mod_qml_abs and restart Traktor — no reinstall needed."
-        return 0
-    fi
-
-    # Copy mode: install individual files into Traktor's live QML
-
-    # Get Logger.qml using hybrid fallback
-    local logger_src
-    if ! logger_src=$(get_logger_qml); then
-        echo "Error: Could not obtain Logger.qml"
-        return 1
-    fi
-
-    # Create Defines folder in Traktor's live QML if it doesn't exist
-    if [ ! -d "$TRAKTOR_QML/Defines" ]; then
-        qml_cmd mkdir -p "$TRAKTOR_QML/Defines"
-    fi
-
-    # Register Logger in qmldir
-    if [ ! -f "$TRAKTOR_QML/Defines/qmldir" ]; then
-        printf 'module Traktor.Defines\nLogger 1.0 Logger.qml\n' | qml_cmd tee "$TRAKTOR_QML/Defines/qmldir" > /dev/null
-    else
-        if ! grep -q "^Logger" "$TRAKTOR_QML/Defines/qmldir"; then
-            echo "Logger 1.0 Logger.qml" | qml_cmd tee -a "$TRAKTOR_QML/Defines/qmldir" > /dev/null
-        fi
-    fi
-
-    qml_cmd cp "$logger_src" "$TRAKTOR_QML/Defines/Logger.qml"
-    echo "  ✓ Logger.qml: $TRAKTOR_QML/Defines/Logger.qml"
-
-    # Copy Api modules
-    local api_src
-    if api_src=$(get_api_modules_path 2>/dev/null) && [ -d "$api_src" ] && [ -n "$(ls -A "$api_src" 2>/dev/null)" ]; then
-        qml_cmd mkdir -p "$TRAKTOR_QML/CSI/Common/Api"
-        if qml_cmd cp -r "$api_src"/* "$TRAKTOR_QML/CSI/Common/Api/" 2>&1; then
-            echo "  ✓ Api modules: $TRAKTOR_QML/CSI/Common/Api/"
-        else
-            echo "  ⚠ Api modules: could not copy (but Logger.qml is installed)"
-        fi
-    else
-        echo "  ⚠ Api modules: not available in cache (Logger.qml is installed)"
-    fi
-
-    # Copy Screens modules
-    local screens_src
-    if screens_src=$(get_screen_modules_path 2>/dev/null) && [ -d "$screens_src" ] && [ -n "$(ls -A "$screens_src" 2>/dev/null)" ]; then
-        qml_cmd mkdir -p "$TRAKTOR_QML/Screens/Common"
-        if qml_cmd cp -r "$screens_src"/* "$TRAKTOR_QML/Screens/Common/" 2>&1; then
-            echo "  ✓ Screens modules: $TRAKTOR_QML/Screens/Common/"
-        else
-            echo "  ⚠ Screens modules: could not copy"
-        fi
-        local apiclient_src
-        if apiclient_src=$(get_api_modules_path 2>/dev/null) && [ -f "$apiclient_src/ApiClient.js" ]; then
-            qml_cmd cp "$apiclient_src/ApiClient.js" "$TRAKTOR_QML/Screens/Common/ApiClient.js" 2>/dev/null || true
-        fi
-    fi
-
-    echo ""
-    echo "✓ Logger installation complete!"
-    echo ""
-    echo "For simple debug logging in your controller:"
-    echo "  import Traktor.Defines 1.0"
-    echo "  Logger { id: logger }"
-    echo "  logger.info('Message', { data: 'value' })"
-    echo ""
-    echo "For automatic metadata collection (deck state, channels, tempo, browser):"
-    echo "  Use: traktor-mod enable-metadata ControllerName"
-    echo "  Example: traktor-mod enable-metadata D2"
-    echo "  Then open the Logger Web Dashboard at http://localhost:8080"
-    echo ""
-    echo "Components installed:"
-    echo "  • Logger.qml: $TRAKTOR_QML/Defines/Logger.qml"
-    echo "  • Api modules: $TRAKTOR_QML/CSI/Common/Api/"
-    echo "  • Screens modules: $TRAKTOR_QML/Screens/Common/"
-    return 0
-}
-
 
 
 # --- restore from GitHub helpers ---
@@ -824,14 +614,13 @@ restore_from_github() {
 FRESH=false
 SYMLINK=false
 FULL=false
-WITH_LOGGER=false
 START_SERVER=false
 PULL_RESTORE=false
 MODE="install"
 SOURCE_DIR="."
 
 
-# --- argument parsing with --branch and --local ---
+# --- argument parsing ---
 BRANCH="main"
 SERVER_GITHUB_REPO="https://raw.githubusercontent.com/lsmith77/traktor-logger/${BRANCH}"
 LOGGER_LOCAL_PATH=""
@@ -842,14 +631,22 @@ while [ $# -gt 0 ]; do
         logger)
             shift
             if [ -z "$1" ]; then
-                echo "Error: 'logger' requires a subcommand (pull or install)"
+                echo "Error: 'logger' requires a subcommand (pull)"
                 exit 1
             fi
             subarg="$1"
             case "$subarg" in
                 pull) MODE="pull-logger" ;;
-                install) MODE="install-logger-only" ;;
-                *) echo "Error: Unknown logger subcommand: $subarg"; exit 1 ;;
+                api)
+                    shift
+                    if [ -z "$1" ]; then
+                        echo "Error: 'logger api' requires a controller name"
+                        exit 1
+                    fi
+                    enable_metadata_for_traktor "$1"
+                    exit 0
+                    ;;
+                *) echo "Error: Unknown logger subcommand: $subarg (valid: pull, api)"; exit 1 ;;
             esac
             shift
             ;;
@@ -866,20 +663,10 @@ while [ $# -gt 0 ]; do
             esac
             shift
             ;;
-        enable-metadata)
-            shift
-            if [ -z "$1" ]; then
-                echo "Error: 'enable-metadata' requires a controller name"
-                exit 1
-            fi
-            enable_metadata_for_traktor "$1"
-            exit 0
-            ;;
         --fresh)   FRESH=true; shift ;;
         --symlink) SYMLINK=true; shift ;;
         --full)    FULL=true; shift ;;
         --pull)    PULL_RESTORE=true; shift ;;
-        --with-logger) WITH_LOGGER=true; shift ;;
         --branch=*)
             BRANCH="${arg#--branch=}"
             shift
@@ -893,22 +680,13 @@ while [ $# -gt 0 ]; do
             BRANCH="$1"
             shift
             ;;
-        --local=*)
-            LOGGER_LOCAL_PATH="${arg#--local=}"
-            shift
-            ;;
-        --local)
-            shift
-            if [ -z "$1" ] || [[ "$1" =~ ^- ]]; then
-                echo "Error: --local requires a path to local traktor-logger directory"
-                exit 1
-            fi
-            LOGGER_LOCAL_PATH="$1"
-            shift
-            ;;
         -h|--help) show_help; exit 0 ;;
         --source=*)
-            SOURCE_DIR="${arg#--source=}"
+            if [ "$MODE" = "pull-logger" ]; then
+                LOGGER_LOCAL_PATH="${arg#--source=}"
+            else
+                SOURCE_DIR="${arg#--source=}"
+            fi
             shift
             ;;
         -s|--source)
@@ -917,7 +695,11 @@ while [ $# -gt 0 ]; do
                 echo "Error: -s/--source requires a directory path"
                 exit 1
             fi
-            SOURCE_DIR="$1"
+            if [ "$MODE" = "pull-logger" ]; then
+                LOGGER_LOCAL_PATH="$1"
+            else
+                SOURCE_DIR="$1"
+            fi
             shift
             ;;
         *)
@@ -929,8 +711,6 @@ done
 
 
 # --- logger pull logic ---
-SERVER_GITHUB_REPO="https://raw.githubusercontent.com/lsmith77/traktor-logger/${BRANCH}"
-
 logger_pull() {
     # Pull traktor-logger into ~/.traktor-mod/traktor-logger from GitHub or local
     if [ -n "$LOGGER_LOCAL_PATH" ]; then
@@ -964,7 +744,7 @@ logger_pull() {
 
 # --- start server only (if 'server start' with no other action flags) ---
 
-if [ "$START_SERVER" = "true" ] && [ "$MODE" = "install" ] && [ "$FRESH" = "false" ] && [ "$SYMLINK" = "false" ] && [ "$FULL" = "false" ] && [ "$WITH_LOGGER" = "false" ]; then
+if [ "$START_SERVER" = "true" ] && [ "$MODE" = "install" ] && [ "$FRESH" = "false" ] && [ "$SYMLINK" = "false" ] && [ "$FULL" = "false" ]; then
     # Just start the server without modifying qml
     echo "Starting traktor-logger server..."
     
@@ -1037,47 +817,9 @@ if [ "$MODE" = "restore" ]; then
     exit 0
 fi
 
-# --- install logger only ---
-
-
 if [ "$MODE" = "pull-logger" ]; then
     logger_pull
     exit $?
-fi
-
-if [ "$MODE" = "install-logger-only" ]; then
-    echo "Installing Logger.qml and Api modules to Traktor qml from cache..."
-    if install_logger_to_traktor; then
-        logger_version=$(get_logger_version)
-        server_path=$(get_server_path 2>/dev/null || true)
-        echo ""
-        echo "traktor-logger version: $logger_version"
-        if [ -n "$server_path" ]; then
-            echo "Server path: $server_path"
-        fi
-        # If 'server start' was specified, start the server
-        if [ "$START_SERVER" = "true" ]; then
-            echo ""
-            echo "Starting traktor-logger server..."
-            echo ""
-            if command -v python3 &> /dev/null; then
-                echo "Server running on http://localhost:8080"
-                echo "Press Ctrl+C to stop the server"
-                echo ""
-                python3 "$server_path"
-                exit 0
-            else
-                echo "Error: python3 is not installed or not in PATH"
-                exit 1
-            fi
-        fi
-        echo ""
-        echo "Restart Traktor to apply changes."
-    else
-        echo "Error: Installation failed"
-        exit 1
-    fi
-    exit 0
 fi
 
 # --- install ---
@@ -1160,26 +902,6 @@ if [ "$IS_MOD_INSTALL" = "true" ]; then
         echo "Installing mod (merging overlay into Traktor qml)..."
         qml_cmd rsync -a "$MOD_QML/" "$TRAKTOR_QML/"
         echo "Done."
-    fi
-fi
-
-# Optional: Install Logger.qml
-if [ "$WITH_LOGGER" = "true" ]; then
-    echo ""
-    echo "Installing Logger.qml and Api modules for debugging..."
-    if install_logger_qml; then
-        echo ""
-        echo "Usage in your QML:"
-        echo "  import Traktor.Defines 1.0"
-        echo "  Logger { id: logger }"
-        echo "  logger.info('Message', { data: 'value' })"
-        echo ""
-        echo "Components installed:"
-        echo "  • Logger.qml: $MOD_QML/Defines/"
-        echo "  • Api modules: $MOD_QML/CSI/Common/Api/"
-        echo "  • Screens modules: $MOD_QML/Screens/Common/"
-    else
-        echo "Warning: Installation failed"
     fi
 fi
 

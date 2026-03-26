@@ -534,7 +534,7 @@ ListView {
 The `traktor-logger` package includes `ApiBrowser.qml` (a `Screens/Common/` component) that uses `Traktor.Browser` to monitor browser state and send it to the dashboard in real time. Enable it with:
 
 ```bash
-traktor-mod enable-metadata D2
+traktor-mod logger api D2
 ```
 
 This injects `ApiBrowser` into the Screen.qml of the target controller and sends current path, selected item metadata, and a window of surrounding items (up to 10 above, 20 below) to the **🎵 Browser** tab of the dashboard.
@@ -599,26 +599,19 @@ When to use:
 
 You have two options depending on your use case:
 
-**Option 1: Logger with a Mod** (recommended if you're installing a mod)
+**Option 1: Install traktor-logger as an overlay mod** (recommended)
 
 ```bash
-traktor-mod --with-logger
+traktor-mod logger pull
+traktor-mod --source ~/.traktor-mod/traktor-logger
+traktor-mod logger api S8  # or D2, S4MK3, etc.
 ```
 
-Adds Logger.qml to your mod's `Defines/` folder. Logger becomes part of your mod installation.
+Installs Logger.qml, the qmldir module registration, and all Api components into Traktor's QML. Then injects `ApiModule {}` into the specified controller.
 
-**Option 2: Logger Only** (if you just want debugging without a mod)
+**Option 2: Manual install** (without traktor-mod)
 
-```bash
-traktor-mod logger install
-```
-
-Installs Logger.qml directly to Traktor's live QML. Use this when you want debugging available everywhere.
-
-Both options use the hybrid fallback to automatically fetch Logger.qml from:
-
-1. Cached (`~/.traktor-mod/logger/Logger.qml`) — offline-friendly after first download
-2. GitHub (https://github.com/lsmith77/traktor-logger) — first-time download (requires internet)
+Download the package from https://github.com/lsmith77/traktor-logger and copy `qml/Defines/Logger.qml` to `<qml>/Defines/Logger.qml` manually. See the [traktor-logger README](https://github.com/lsmith77/traktor-logger) for full instructions.
 
 **Usage in your QML:**
 

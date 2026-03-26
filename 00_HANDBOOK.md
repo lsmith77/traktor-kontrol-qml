@@ -143,10 +143,11 @@ These are **data paths** in Traktor (not file paths). Format: dots separate leve
 
 **Quick Start**:
 
-1. **Install Logger** to Traktor's qml:
+1. **Pull and install the logger package** into Traktor's qml:
 
    ```bash
-   traktor-mod logger install
+   traktor-mod logger pull
+   traktor-mod --source ~/.traktor-mod/traktor-logger
    ```
 
 2. **Enable metadata collection on one connected controller**:
@@ -154,7 +155,7 @@ These are **data paths** in Traktor (not file paths). Format: dots separate leve
    Required for the **Live Metadata** tab. Pick whichever controller is always connected:
 
    ```bash
-   traktor-mod enable-metadata D2
+   traktor-mod logger api D2
    ```
 
    Only inject into one controller — `ApiModule` monitors all decks globally, so multiple injections cause duplicate events.
@@ -179,17 +180,17 @@ These are **data paths** in Traktor (not file paths). Format: dots separate leve
 **Installation options**:
 
 ```bash
-# Add Logger to a mod
-traktor-mod --with-logger
+# Pull latest traktor-logger from GitHub into local cache
+traktor-mod logger pull
 
-# Install Logger standalone (no mod)
-traktor-mod logger install
+# Install traktor-logger as an overlay mod (Logger.qml + Api modules)
+traktor-mod --source ~/.traktor-mod/traktor-logger
 
-# Update Logger + Api modules from GitHub
-traktor-mod logger update
+# Wire ApiModule into a controller (run after install above)
+traktor-mod logger api S8
 
-# Install Logger and start server in one command
-traktor-mod logger install && traktor-mod server start
+# Install and start server in one go
+traktor-mod --source ~/.traktor-mod/traktor-logger && traktor-mod server start
 ```
 
 **Logger usage in QML**:

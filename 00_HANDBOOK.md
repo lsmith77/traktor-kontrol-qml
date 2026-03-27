@@ -1,6 +1,6 @@
 # Traktor QML Modder's Handbook
 
-**Handbook Version**: v1.0.1
+**Handbook Version**: v1.1.0
 **Purpose**: Index and reading guide for the handbook docs
 **Use when**: Starting your QML modding journey or navigating between docs
 

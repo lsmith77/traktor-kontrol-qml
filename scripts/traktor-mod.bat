@@ -16,7 +16,8 @@ setlocal enabledelayedexpansion
 ::   traktor-mod.bat /full /fresh /symlink         — restore stock, then symlink complete mod
 ::   traktor-mod.bat restore                       — restore stock qml and remove all mods/symlinks
 ::   traktor-mod.bat restore /pull                — fetch stock qml from GitHub (when backup is missing or to force a refresh)
-::   traktor-mod.bat logger pull                   — download traktor-logger to local cache from GitHub
+::   traktor-mod.bat logger pull                   — download latest stable traktor-logger release
+::   traktor-mod.bat logger pull /tag v1.2.0       — pull a specific release tag
 ::   traktor-mod.bat logger pull /branch dev       — pull from specific branch
 ::   traktor-mod.bat logger pull --source C:\path  — copy from local directory
 ::   traktor-mod.bat server start                  — launch traktor-logger server on localhost:8080
@@ -94,7 +95,8 @@ set "PULL_RESTORE=false"
 set "MODE=install"
 set "NEXT_IS_SOURCE=false"
 set "ENABLE_METADATA="
-set "BRANCH=main"
+set "BRANCH="
+set "BRANCH_REF_TYPE=heads"
 set "LOGGER_LOCAL_PATH="
 
 :: --- parse arguments ---
@@ -154,6 +156,7 @@ if "!NEXT_IS_SOURCE!"=="true" (
         goto :end_error
     )
     set "BRANCH=%~1"
+    set "BRANCH_REF_TYPE=heads"
 ) else if /I "%~1"=="--branch" (
     shift
     if "%~1"=="" (
@@ -161,6 +164,23 @@ if "!NEXT_IS_SOURCE!"=="true" (
         goto :end_error
     )
     set "BRANCH=%~1"
+    set "BRANCH_REF_TYPE=heads"
+) else if /I "%~1"=="/tag" (
+    shift
+    if "%~1"=="" (
+        echo Error: /tag requires a tag name
+        goto :end_error
+    )
+    set "BRANCH=%~1"
+    set "BRANCH_REF_TYPE=tags"
+) else if /I "%~1"=="--tag" (
+    shift
+    if "%~1"=="" (
+        echo Error: --tag requires a tag name
+        goto :end_error
+    )
+    set "BRANCH=%~1"
+    set "BRANCH_REF_TYPE=tags"
 ) else if /I "%~1"=="restore" (
     set "MODE=restore"
 ) else if /I "%~1"=="logger" (
@@ -211,6 +231,10 @@ if "!NEXT_IS_SOURCE!"=="true" (
         )
     ) else if "!_ARG:~0,9!"=="--branch=" (
         set "BRANCH=!_ARG:~9!"
+        set "BRANCH_REF_TYPE=heads"
+    ) else if "!_ARG:~0,6!"=="--tag=" (
+        set "BRANCH=!_ARG:~6!"
+        set "BRANCH_REF_TYPE=tags"
     ) else (
         echo Error: Unknown argument: %~1
         goto :end_error
@@ -451,11 +475,13 @@ goto :end
 
 :download_traktor_logger_from_github
 :: Download entire traktor-logger repo from GitHub as a zip archive
-:: Arguments: %1=branch name
+:: Arguments: %1=ref value (branch or tag name), %2=ref type (heads or tags, default: heads)
 setlocal enabledelayedexpansion
-set "DL_BRANCH=%~1"
-if "!DL_BRANCH!"=="" set "DL_BRANCH=main"
-set "ZIP_URL=https://github.com/lsmith77/traktor-logger/archive/refs/heads/!DL_BRANCH!.zip"
+set "DL_REF=%~1"
+set "DL_REF_TYPE=%~2"
+if "!DL_REF!"=="" set "DL_REF=main"
+if "!DL_REF_TYPE!"=="" set "DL_REF_TYPE=heads"
+set "ZIP_URL=https://github.com/lsmith77/traktor-logger/archive/refs/!DL_REF_TYPE!/!DL_REF!.zip"
 set "TMP_ZIP=%TEMP%\traktor-logger-download.zip"
 set "TMP_DIR=%TEMP%\traktor-logger-download"
 set "CACHE_DIR=%LOGGER_CACHE_DIR%"
@@ -513,7 +539,24 @@ if not "!LOGGER_LOCAL_PATH!"=="" (
     exit /b 0
 )
 
-call :download_traktor_logger_from_github "!BRANCH!"
+set "PULL_REF=!BRANCH!"
+set "PULL_REF_TYPE=!BRANCH_REF_TYPE!"
+if "!PULL_REF!"=="" (
+    echo Fetching latest traktor-logger release...
+    set "LATEST_TAG_TMP=%TEMP%\traktor-logger-latest-tag.txt"
+    powershell -NoProfile -Command "try { $r = Invoke-RestMethod 'https://api.github.com/repos/lsmith77/traktor-logger/releases/latest'; $r.tag_name } catch { '' }" > "!LATEST_TAG_TMP!" 2>nul
+    set /p PULL_REF= < "!LATEST_TAG_TMP!"
+    del "!LATEST_TAG_TMP!" 2>nul
+    if not "!PULL_REF!"=="" (
+        echo Latest release: !PULL_REF!
+        set "PULL_REF_TYPE=tags"
+    ) else (
+        echo No releases found, falling back to main branch.
+        set "PULL_REF=main"
+        set "PULL_REF_TYPE=heads"
+    )
+)
+call :download_traktor_logger_from_github "!PULL_REF!" "!PULL_REF_TYPE!"
 endlocal
 exit /b %ERRORLEVEL%
 

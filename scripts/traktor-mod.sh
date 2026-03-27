@@ -23,7 +23,8 @@
 #   traktor-mod -s ~/my-mod --symlink                — use home directory, symlink mode
 #
 # Logger and server commands:
-#   traktor-mod logger pull                          — download traktor-logger to local cache
+#   traktor-mod logger pull                          — download latest stable traktor-logger release
+#   traktor-mod logger pull --tag v1.2.0             — pull a specific release tag
 #   traktor-mod logger pull --branch dev             — pull from a specific branch
 #   traktor-mod logger pull --source /path/to/logger — copy from local directory
 #   traktor-mod logger pull --symlink --source /path — symlink local logger directory into cache
@@ -83,14 +84,15 @@ Full Replacement Mode Usage:
   traktor-mod --full --fresh --symlink — reset stock, then symlink with replacement
 
 Standalone Commands:
-  traktor-mod logger pull            — download traktor-logger to local cache from GitHub
+  traktor-mod logger pull            — download latest stable traktor-logger release from GitHub
   traktor-mod server start           — launch traktor-logger server on localhost:8080
   traktor-mod logger api D2          — inject ApiModule into one controller file
   traktor-mod restore                — restore stock qml from backup, remove all mods
   traktor-mod restore --pull         — fetch stock qml from GitHub (ignores backup)
 
   Logger cache options (used with 'logger pull'):
-    --branch <name>                          — pull from a specific GitHub branch (default: main)
+    --tag <name>                             — pull a specific release tag (e.g. v1.2.0)
+    --branch <name>                          — pull from a specific branch instead of latest release
     --source /path/to/logger                 — copy from a local traktor-logger directory
     --symlink (with --source)                — symlink local directory into cache instead of copying
 
@@ -172,10 +174,23 @@ get_logger_qml() {
 
 SERVER_CACHE_DIR="$HOME/.traktor-mod/traktor-logger"
 
+_fetch_latest_traktor_logger_tag() {
+    # Returns the tag_name of the latest release, or empty string if none
+    local api_url="https://api.github.com/repos/lsmith77/traktor-logger/releases/latest"
+    local release_json
+    if ! release_json=$(curl -sS --fail "$api_url" 2>/dev/null); then
+        return 1
+    fi
+    echo "$release_json" | grep '"tag_name"' | sed -E 's/.*"tag_name": *"([^"]*)".*/\1/' | head -1
+}
+
 _download_traktor_logger_from_github() {
     # Download entire traktor-logger repo from GitHub as a tarball
-    local branch="$1"
-    local archive_url="https://github.com/lsmith77/traktor-logger/archive/refs/heads/${branch}.tar.gz"
+    # $1: ref value (branch name or tag name)
+    # $2: ref type — "heads" (branch) or "tags" (tag), defaults to "heads"
+    local ref="$1"
+    local ref_type="${2:-heads}"
+    local archive_url="https://github.com/lsmith77/traktor-logger/archive/refs/${ref_type}/${ref}.tar.gz"
     echo "Downloading traktor-logger from: $archive_url" >&2
     rm -rf "$SERVER_CACHE_DIR"
     mkdir -p "$SERVER_CACHE_DIR"
@@ -205,7 +220,7 @@ get_server_package() {
     fi
 
     # 3. Download from GitHub
-    if ! _download_traktor_logger_from_github "$BRANCH" >&2; then
+    if ! _download_traktor_logger_from_github "$BRANCH" "$BRANCH_REF_TYPE" >&2; then
         return 1
     fi
     echo "Downloaded to: $SERVER_CACHE_DIR" >&2
@@ -621,8 +636,9 @@ SOURCE_DIR="."
 
 
 # --- argument parsing ---
-BRANCH="main"
-SERVER_GITHUB_REPO="https://raw.githubusercontent.com/lsmith77/traktor-logger/${BRANCH}"
+BRANCH=""
+BRANCH_REF_TYPE="heads"
+SERVER_GITHUB_REPO="https://raw.githubusercontent.com/lsmith77/traktor-logger/main"
 LOGGER_LOCAL_PATH=""
 while [ $# -gt 0 ]; do
     arg="$1"
@@ -669,6 +685,7 @@ while [ $# -gt 0 ]; do
         --pull)    PULL_RESTORE=true; shift ;;
         --branch=*)
             BRANCH="${arg#--branch=}"
+            BRANCH_REF_TYPE="heads"
             shift
             ;;
         --branch)
@@ -678,6 +695,22 @@ while [ $# -gt 0 ]; do
                 exit 1
             fi
             BRANCH="$1"
+            BRANCH_REF_TYPE="heads"
+            shift
+            ;;
+        --tag=*)
+            BRANCH="${arg#--tag=}"
+            BRANCH_REF_TYPE="tags"
+            shift
+            ;;
+        --tag)
+            shift
+            if [ -z "$1" ] || [[ "$1" =~ ^- ]]; then
+                echo "Error: --tag requires a tag name"
+                exit 1
+            fi
+            BRANCH="$1"
+            BRANCH_REF_TYPE="tags"
             shift
             ;;
         -h|--help) show_help; exit 0 ;;
@@ -734,7 +767,22 @@ logger_pull() {
         fi
     fi
     # Otherwise, pull from GitHub
-    if ! _download_traktor_logger_from_github "$BRANCH"; then
+    local ref="$BRANCH"
+    local ref_type="$BRANCH_REF_TYPE"
+    if [ -z "$ref" ]; then
+        echo "Fetching latest traktor-logger release..."
+        local latest_tag
+        if latest_tag=$(_fetch_latest_traktor_logger_tag) && [ -n "$latest_tag" ]; then
+            echo "Latest release: $latest_tag"
+            ref="$latest_tag"
+            ref_type="tags"
+        else
+            echo "No releases found, falling back to main branch."
+            ref="main"
+            ref_type="heads"
+        fi
+    fi
+    if ! _download_traktor_logger_from_github "$ref" "$ref_type"; then
         return 1
     fi
     echo "Downloaded to: $SERVER_CACHE_DIR"

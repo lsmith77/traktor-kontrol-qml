@@ -140,7 +140,10 @@ I have downloaded the mod source files here (for reference):
 ├── X1MK3-v0.12.0/
 └── Z1-unknown/
 
-Provide the directory listing or key file paths from /mods/ so I can generate the combined QML directly from the actual mod sources.
+## Roles — read carefully before acting
+
+- **Source (read-only):** `./mods/` directories — reference only. Read these to understand each mod's code. Do NOT write anything here.
+- **Target (read-write):** `/qml/` — the unified output directory. All generated files go here and only here.
 
 ---
 

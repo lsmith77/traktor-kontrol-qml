@@ -64,6 +64,8 @@ If QML_LINTER_COMMAND is empty:
 
 ---
 
+**Output only — do not write or modify any files.** This is a read-only analysis step. Return a report for human review; no code changes should be applied to any directory.
+
 You are an expert Traktor QML analyst. I will provide a baseline (tag or file tree) and either a consolidated list of file changes or the mod file tree. I only want information about one specific feature: [FEATURE_NAME] (e.g., vinyl break, library view in Browse mode, screen display in REL mode).
 
 Tasks:

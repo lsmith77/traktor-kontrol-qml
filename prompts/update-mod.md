@@ -73,6 +73,11 @@ If QML_LINTER_COMMAND is empty:
 
 I need to update my combined QML from [MOD_NAME] [OLD_VER] → [NEW_VER].
 
+## Roles — read carefully before acting
+
+- **Source (read-only):** `mods/[MOD_NAME]-[OLD_VER]/` and `mods/[MOD_NAME]-[NEW_VER]/` — the upstream mod snapshots. Use them only to extract what changed between versions. Do NOT check whether changes are already present in either source directory; both are reference-only.
+- **Target (read-write):** `/qml/` — my combined QML. This is the only place where you must check what's present and apply changes.
+
 ## Current State:
 
 - METADATA.md currently records: [paste the METADATA.md line for this mod]
@@ -82,14 +87,14 @@ I need to update my combined QML from [MOD_NAME] [OLD_VER] → [NEW_VER].
 
 ## Task:
 
-1. Compare the two directories to identify what changed (structure, file additions, deletions, modifications)
-2. Determine which changes affect my combined /qml/ (only the features listed above)
-3. Apply the relevant changes to my /qml/ files
+1. Compare `mods/[MOD_NAME]-[OLD_VER]/` and `mods/[MOD_NAME]-[NEW_VER]/` to identify what changed (structure, file additions, deletions, modifications)
+2. From that diff, identify changes relevant to the features listed above
+3. For each relevant change: locate the corresponding code in **my `/qml/`** and apply the change there
 4. Update METADATA.md: change the version entry from [OLD_VER] to [NEW_VER]
 5. List any new conflicts introduced by the new version, with recommended resolutions
 6. Generate a testing checklist specific to the changed behavior
 
 ## Optional: Preview first
 
-Walk me through the key file differences side-by-side before I apply changes.
+Walk me through the key file differences between the two source directories before applying changes to /qml/.
 ```

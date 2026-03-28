@@ -73,6 +73,11 @@ If QML_LINTER_COMMAND is empty:
 
 I need to update my combined QML from [MOD_NAME] [OLD_TAG] → [NEW_TAG].
 
+## Roles — read carefully before acting
+
+- **Source (read-only):** `mods/[MOD_NAME]/` — the upstream mod repo. Use it only to extract the diff between the two tags. Do NOT check whether changes are already present here; they will be — that's the point of a tagged release.
+- **Target (read-write):** `/qml/` — my combined QML. This is the only place where you must check what's present and apply changes.
+
 ## Current State:
 
 - METADATA.md currently records: [paste the METADATA.md line for this mod]
@@ -81,9 +86,9 @@ I need to update my combined QML from [MOD_NAME] [OLD_TAG] → [NEW_TAG].
 
 ## Task:
 
-1. Run: git diff [OLD_TAG]..[NEW_TAG] in the mod repo to see all changes
-2. Identify changes in the files I'm using (only the features listed above)
-3. Apply the relevant changes to my /qml/ files
+1. Run: `git diff [OLD_TAG]..[NEW_TAG]` inside `mods/[MOD_NAME]/` to extract the upstream diff
+2. From that diff, identify changes relevant to the features listed above
+3. For each relevant change: locate the corresponding code in **my `/qml/`** and apply the change there
 4. Update METADATA.md: change the version entry from [OLD_TAG] to [NEW_TAG]
 5. Create a commit: "Update [MOD_NAME] [OLD_TAG] → [NEW_TAG]"
 6. List any new conflicts introduced by the new version, with recommended resolutions
@@ -91,5 +96,5 @@ I need to update my combined QML from [MOD_NAME] [OLD_TAG] → [NEW_TAG].
 
 ## Optional: Preview first
 
-Run: git diff --stat [OLD_TAG]..[NEW_TAG] to see file changes before applying them.
+Run: `git diff --stat [OLD_TAG]..[NEW_TAG]` inside `mods/[MOD_NAME]/` to see which files changed before applying them.
 ```

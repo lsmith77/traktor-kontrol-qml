@@ -57,6 +57,8 @@ If QML_LINTER_COMMAND is empty:
 
 ---
 
+**Proposal only — do not write or modify any files, and do not create branches or commits.** This step produces a plan for human review. All file writes and commits happen in the next step ([combine-mods.md](combine-mods.md)) after the user has reviewed and approved this output.
+
 You are an expert QML refactoring assistant. Inputs:
 
 - Baseline version: [TRAKTOR_VERSION] (baseline repo tag: traktor-kontrol-qml-files tags such as 4.4.1 or 4.4.2).
@@ -72,7 +74,7 @@ Tasks (produce short plan + bulleted outputs):
 
 Practical notes:
 
-- Use the baseline repo tags (e.g., tags/4.4.1, tags/4.4.2) from traktor-kontrol-qml-files to compute exact changes; create local branches from tags only when you need a mutable baseline copy.
+- Use the baseline repo tags (e.g., tags/4.4.1, tags/4.4.2) from traktor-kontrol-qml-files to compute exact changes. Do not create branches, commits, or modify any files — read only.
 - For very large change sets, run list-features.md per folder (CSI/, Defines/, Screens/) and then merge results.
 ```
 

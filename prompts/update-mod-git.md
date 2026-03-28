@@ -90,9 +90,8 @@ I need to update my combined QML from [MOD_NAME] [OLD_TAG] → [NEW_TAG].
 2. From that diff, identify changes relevant to the features listed above
 3. For each relevant change: locate the corresponding code in **my `/qml/`** and apply the change there
 4. Update METADATA.md: change the version entry from [OLD_TAG] to [NEW_TAG]
-5. Create a commit: "Update [MOD_NAME] [OLD_TAG] → [NEW_TAG]"
-6. List any new conflicts introduced by the new version, with recommended resolutions
-7. Generate a testing checklist specific to the changed behavior
+5. List any new conflicts introduced by the new version, with recommended resolutions
+6. Generate a testing checklist specific to the changed behavior
 
 ## Optional: Preview first
 

@@ -56,24 +56,28 @@ Use this flowchart to isolate problems quickly. For detailed steps, see **Debugg
 
 **This is the most direct way to find problems—do this first.**
 
-When you run Traktor from a terminal, all QML errors, warnings, and undefined variables print to the screen. This tells you exactly what's broken and where.
+When you run Traktor from a terminal, all QML errors, warnings, and undefined variables print to the screen with the exact file and line number.
 
-**macOS: Run Traktor from Terminal:**
+**Using traktor-mod (easiest):**
 
-Paste this into Terminal and press Enter:
+```bash
+traktor-mod traktor start
+```
+
+**Or directly (macOS):**
 
 ```bash
 /Applications/Native\ Instruments/Traktor\ Pro\ 4/Traktor\ Pro\ 4.app/Contents/MacOS/Traktor\ Pro\ 4
 ```
 
-Watch the Terminal window as Traktor loads. Look for error messages like:
+Watch the terminal as Traktor loads. Look for error messages like:
 
 - `ReferenceError: someVariable is not defined`
 - `Cannot open: file:///...undefined.png`
 - `Error: Cannot assign [undefined] to QString`
 - `Binding loop detected for property "propertyName"`
 
-Each error tells you the exact file and line number where the problem is.
+> **Note:** Traktor always logs some warnings on startup — those are normal and can be ignored. Focus on errors that reference your modified files.
 
 **Windows:**
 The command path will be different. If you know the installation path to Traktor Pro 4, you can try a similar approach.

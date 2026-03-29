@@ -87,6 +87,7 @@ Standalone Commands:
   traktor-mod logger pull            — download latest stable traktor-logger release from GitHub
   traktor-mod server start           — launch traktor-logger server on localhost:8080
   traktor-mod logger api D2          — inject ApiModule into one controller file
+  traktor-mod traktor start          — launch Traktor from terminal (QML errors print with file + line number)
   traktor-mod restore                — restore stock qml from backup, remove all mods
   traktor-mod restore --pull         — fetch stock qml from GitHub (ignores backup)
 
@@ -630,6 +631,7 @@ FRESH=false
 SYMLINK=false
 FULL=false
 START_SERVER=false
+START_TRAKTOR=false
 PULL_RESTORE=false
 MODE="install"
 SOURCE_DIR="."
@@ -676,6 +678,19 @@ while [ $# -gt 0 ]; do
             case "$subarg" in
                 start) START_SERVER=true ;;
                 *) echo "Error: Unknown server subcommand: $subarg"; exit 1 ;;
+            esac
+            shift
+            ;;
+        traktor)
+            shift
+            if [ -z "$1" ]; then
+                echo "Error: 'traktor' requires a subcommand (start)"
+                exit 1
+            fi
+            subarg="$1"
+            case "$subarg" in
+                start) START_TRAKTOR=true ;;
+                *) echo "Error: Unknown traktor subcommand: $subarg (valid: start)"; exit 1 ;;
             esac
             shift
             ;;
@@ -818,6 +833,24 @@ if [ "$START_SERVER" = "true" ] && [ "$MODE" = "install" ] && [ "$FRESH" = "fals
         echo "Tried cache: $SERVER_CACHE_DIR"
         exit 1
     fi
+fi
+
+# --- start traktor from terminal (traktor start) ---
+
+if [ "$START_TRAKTOR" = "true" ]; then
+    TRAKTOR_BIN="$TRAKTOR_APP/Contents/MacOS/Traktor Pro 4"
+    if [ ! -f "$TRAKTOR_BIN" ]; then
+        echo "Error: Traktor Pro 4 not found at expected path:"
+        echo "  $TRAKTOR_BIN"
+        echo ""
+        echo "Make sure Traktor Pro 4 is installed in /Applications/Native Instruments/"
+        exit 1
+    fi
+    echo "Launching Traktor Pro 4 — QML errors will print below with file and line number."
+    echo "Note: Traktor logs some warnings on every startup; those are normal."
+    echo "Press Ctrl+C to quit."
+    echo ""
+    exec "$TRAKTOR_BIN"
 fi
 
 if ! RESOLVED_SOURCE="$(cd "$SOURCE_DIR" 2>/dev/null && pwd)"; then

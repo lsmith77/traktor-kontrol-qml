@@ -21,6 +21,7 @@ setlocal enabledelayedexpansion
 ::   traktor-mod.bat logger pull /branch dev       — pull from specific branch
 ::   traktor-mod.bat logger pull --source C:\path  — copy from local directory
 ::   traktor-mod.bat server start                  — launch traktor-logger server on localhost:8080
+::   traktor-mod.bat traktor start                 — launch Traktor from terminal (QML errors print with file + line number)
 ::   traktor-mod.bat logger api D2                 — inject ApiModule into one controller file
 ::
 :: Specifying source directory (optional; defaults to current directory):
@@ -91,6 +92,7 @@ set "FRESH=false"
 set "SYMLINK=false"
 set "FULL=false"
 set "START_SERVER=false"
+set "START_TRAKTOR=false"
 set "PULL_RESTORE=false"
 set "MODE=install"
 set "NEXT_IS_SOURCE=false"
@@ -215,6 +217,18 @@ if "!NEXT_IS_SOURCE!"=="true" (
         echo Error: Unknown server subcommand: %~1
         goto :end_error
     )
+) else if /I "%~1"=="traktor" (
+    shift
+    if "%~1"=="" (
+        echo Error: 'traktor' requires a subcommand (start)
+        goto :end_error
+    )
+    if /I "%~1"=="start" (
+        set "START_TRAKTOR=true"
+    ) else (
+        echo Error: Unknown traktor subcommand: %~1 (valid: start)
+        goto :end_error
+    )
 ) else (
     set "_ARG=%~1"
     if "!_ARG:~0,9!"=="--source=" (
@@ -314,6 +328,13 @@ if /I "!MODE!"=="pull-logger" (
 
 if "!START_SERVER!"=="true" if "!MODE!"=="install" if "!FRESH!"=="false" if "!SYMLINK!"=="false" if "!FULL!"=="false" (
     call :start_server
+    goto :end
+)
+
+:: --- START TRAKTOR FROM TERMINAL (traktor start) ---
+
+if "!START_TRAKTOR!"=="true" (
+    call :start_traktor
     goto :end
 )
 
@@ -745,6 +766,27 @@ powershell -NoProfile -Command ^
 endlocal
 exit /b 0
 
+:start_traktor
+:: Launch Traktor Pro 4 from terminal so QML errors print with file and line number
+setlocal enabledelayedexpansion
+
+if not exist "!TRAKTOR_APP!" (
+    echo Error: Traktor Pro 4 not found at expected path:
+    echo   !TRAKTOR_APP!
+    echo.
+    echo Make sure Traktor Pro 4 is installed in C:\Program Files\Native Instruments\
+    endlocal
+    exit /b 1
+)
+
+echo Launching Traktor Pro 4 - QML errors will print below with file and line number.
+echo Note: Traktor logs some warnings on every startup; those are normal.
+echo Press Ctrl+C to quit.
+echo.
+endlocal
+start "" /wait "!TRAKTOR_APP!"
+exit /b 0
+
 :start_server
 :: Start the traktor-logger HTTP server
 setlocal enabledelayedexpansion
@@ -819,6 +861,10 @@ exit /b 1
     echo.
     echo Server Launch:
     echo   traktor-mod.bat server start - launch traktor-logger server on localhost:8080
+    echo.
+    echo Traktor Launch:
+    echo   traktor-mod.bat traktor start - launch Traktor from terminal (QML errors print with file + line number)
+    echo   Note: Traktor always logs some warnings on startup; focus on errors in your modified files.
     echo.
     echo Metadata Collection:
     echo   traktor-mod.bat logger api D2          - inject ApiModule into one controller

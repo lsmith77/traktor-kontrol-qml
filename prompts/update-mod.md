@@ -17,13 +17,7 @@
 
 ## Before Running This Prompt
 
-Replace these placeholders with your actual values:
-
-| Placeholder  | What it means      | Example  |
-| ------------ | ------------------ | -------- |
-| `[MOD_NAME]` | Name of the mod    | `D2`     |
-| `[OLD_VER]`  | Old version number | `v1.2.3` |
-| `[NEW_VER]`  | New version number | `v1.2.4` |
+Fill in the "Values to use:" section at the top of the prompt block. Every customizable value lives there.
 
 ---
 
@@ -32,20 +26,23 @@ Replace these placeholders with your actual values:
 1. Copy the entire prompt block below
 2. Paste into Claude/Copilot
 3. **Only update the "Values to use:" section** with your actual values
-4. Leave all the `[MOD_NAME]`, `[OLD_VER]`, `[NEW_VER]` placeholders as-is throughout the rest of the prompt — the AI will use the values you declared at the top
+4. Leave all `[MOD_NAME]`, `[OLD_VER]`, `[NEW_VER]`, `[METADATA_LINE]`, `[FEATURES]`, `[UPDATE_SCOPE]`, and `[QML_LINTER_COMMAND]` placeholders as-is throughout the rest of the prompt — the AI will substitute them from the values you declared at the top
 
 ---
 
 ## Prompt (copy everything below into Claude/Copilot)
 
 ```
-## Instructions for AI Assistant
+# Instructions for AI Assistant
 
-### Configuration
+## Values to use:
 
-QML_LINTER_COMMAND = ""  # Set to your linter command (see QML_LINTER_SETUP.md for options)
-# Example: "qml-linter ./qml/ --output-format compact"
-# If left empty, linter validation will be skipped.
+- MOD_NAME: [fill in]
+- OLD_VER: [fill in]
+- NEW_VER: [fill in]
+- QML_LINTER_COMMAND: [fill in, or leave empty to skip linting]
+- FEATURES: [list features from this mod currently integrated into your /qml/]
+- UPDATE_SCOPE: [all — or name a specific feature to target only that]
 
 ### Behavior
 
@@ -63,14 +60,6 @@ If QML_LINTER_COMMAND is empty:
 
 ---
 
-## Values to use:
-
-- MOD_NAME: [fill in]
-- OLD_VER: [fill in]
-- NEW_VER: [fill in]
-
----
-
 I need to update my combined QML from [MOD_NAME] [OLD_VER] → [NEW_VER].
 
 ## Roles — read carefully before acting
@@ -80,21 +69,18 @@ I need to update my combined QML from [MOD_NAME] [OLD_VER] → [NEW_VER].
 
 ## Current State:
 
-- METADATA.md currently records: [paste the METADATA.md line for this mod]
-- My /qml/ includes these features from this mod: [list features]
+- METADATA.md currently records the current state
+- My /qml/ includes these features from this mod: [FEATURES]
+- Update scope: [UPDATE_SCOPE]
 - Old mod directory: mods/[MOD_NAME]-[OLD_VER]/
 - New mod directory: mods/[MOD_NAME]-[NEW_VER]/
 
 ## Task:
 
 1. Compare `mods/[MOD_NAME]-[OLD_VER]/` and `mods/[MOD_NAME]-[NEW_VER]/` to identify what changed (structure, file additions, deletions, modifications)
-2. From that diff, identify changes relevant to the features listed above
+2. From that diff, identify changes relevant to [UPDATE_SCOPE] — if UPDATE_SCOPE is `all`, consider all features listed above; if it names a specific feature, limit changes to that feature only
 3. For each relevant change: locate the corresponding code in **my `/qml/`** and apply the change there
 4. Update METADATA.md: change the version entry from [OLD_VER] to [NEW_VER]
 5. List any new conflicts introduced by the new version, with recommended resolutions
 6. Generate a testing checklist specific to the changed behavior
-
-## Optional: Preview first
-
-Walk me through the key file differences between the two source directories before applying changes to /qml/.
 ```

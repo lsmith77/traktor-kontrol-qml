@@ -582,6 +582,7 @@ app.traktor.[context].[id/index].[category].[property]
 | `app.traktor.decks.X.is_loaded`     | bool [read-only] | Track loaded on deck         | `enabled: isLoaded.value`                 |
 | `app.traktor.decks.X.play`          | bool             | Play/pause state             | Toggle via wire                           |
 | `app.traktor.decks.X.cue`           | bool             | Cue point active             | Listen control                            |
+| `app.traktor.decks.X.cup`           | trigger          | Cue + play (CUP)             | Jump to cue and start playback            |
 | `app.traktor.decks.X.reverse`       | bool             | Reverse playback             | Scratch mode                              |
 | `app.traktor.decks.X.running`       | bool [read-only] | Deck actively playing        | LED feedback                              |
 | `app.traktor.decks.X.direct_thru`   | bool             | Direct monitoring            | Headphone pre-fader                       |
@@ -655,6 +656,7 @@ app.traktor.[context].[id/index].[category].[property]
 | Path                                                 | Type               | Purpose               | Index             |
 | ---------------------------------------------------- | ------------------ | --------------------- | ----------------- |
 | `app.traktor.decks.X.cue`                            | bool               | Main cue point        | Hardwired         |
+| `app.traktor.decks.X.cup`                            | trigger            | Cue + play (CUP)      | Jump to cue and start playback |
 | `app.traktor.decks.X.track.cue.hotcues.Y.exists`     | bool [read-only]   | Hotcue Y placed       | Y = 1–8           |
 | `app.traktor.decks.X.track.cue.hotcues.Y.start_pos`  | real               | Position in track     | Seconds           |
 | `app.traktor.decks.X.track.cue.hotcues.Y.length`     | real               | Hotcue entry duration | Sample length     |

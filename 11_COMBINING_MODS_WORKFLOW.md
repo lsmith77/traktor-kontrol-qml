@@ -451,7 +451,7 @@ After combining:
 1. **Verify syntax**: Use a QML validator or paste your merged file into a QML editor for syntax checking
 2. **Check for duplicate IDs**: Search for `id:` to ensure no component is defined twice
 3. **Review imports**: Ensure all `import` statements are present (most common cause of silent failures)
-4. **Test with 3-Pass Approach**: [04_TROUBLESHOOTING.md#3-pass-testing-approach-normal--edge--reversal](04_TROUBLESHOOTING.md#3-pass-testing-approach-normal--edge--reversal)
+4. **Test with 3-Pass Approach**: [04_TROUBLESHOOTING.md — Testing Framework](04_TROUBLESHOOTING.md#testing-framework-3-pass-approach--checklist)
 
 ### Preventing Conflicts (For Mod Authors)
 

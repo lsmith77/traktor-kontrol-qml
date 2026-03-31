@@ -79,12 +79,6 @@ If QML_LINTER_COMMAND is empty:
 
 ---
 
----
-
-## Prompt (copy and fill in all bracketed zones)
-
-```
-
 I'm combining multiple Traktor QML mods into a single unified QML directory.
 
 ## Mods Being Combined:
@@ -170,7 +164,7 @@ I have downloaded the mod source files here (for reference):
      - Last updated date
      - Application order
    - Create METADATA.md in root of directory with:
-   - Prompt/handbook version used (e.g., v0.5.0)
+     - Prompt/handbook version used (e.g., v0.5.0)
      - Full version details for each component
      - Conflict resolutions applied
      - Testing checklist (which features to test, in what order)

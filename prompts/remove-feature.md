@@ -1,3 +1,7 @@
+# Prompt: Remove or Switch a Feature
+
+**When to use**: Remove a feature from your combined `/qml/`, or swap it for a different mod's implementation.
+
 **Workflow context**: [Chapter 11 — Removing or Switching Features](../11_COMBINING_MODS_WORKFLOW.md#removing-or-switching-features)
 
 ---
@@ -8,7 +12,7 @@ Before running this prompt, have a QML linter ready to validate the modified out
 
 \u2192 **[See 01_BASICS.md \u2014 QML Linter for setup instructions](../01_BASICS.md#qml-linter)**
 
-## Quick summary: Choose from qml-linter (CLI), VS Code, or Qt Creator. Works on macOS and Windows.
+Three options: qml-linter (CLI), VS Code, or Qt Creator. Works on macOS and Windows.
 
 ## Before Running This Prompt
 
@@ -33,6 +37,7 @@ Replace these placeholders with your actual values:
 
 ## Prompt (copy and fill in all bracketed zones)
 
+```
 QML_LINTER_COMMAND = "" # Set to your linter command (see QML_LINTER_SETUP.md for options)
 
 # Example: "qml-linter ./qml/ --output-format compact"
@@ -73,7 +78,5 @@ I need to remove the feature "[FEATURE_NAME]" that was contributed by [MOD_NAME]
 
 After removal is complete, I want to add [REPLACEMENT_FEATURE] from [OTHER_MOD] instead.
 [Describe the replacement feature and which mod it comes from — then treat it as a new combine-mods.md run]
-
-```
 
 ```

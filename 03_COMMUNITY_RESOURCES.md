@@ -25,7 +25,7 @@ The prompt template and workflow help you:
 - Identify conflicts between mods
 - Track version information for mods without explicit versioning
 - Create a record of your working setup
-- Tests in your local Traktor installation
+- Test in your local Traktor installation
 - Deploy to Traktor Pro
 - Works with Claude, Copilot, or any AI tool
 

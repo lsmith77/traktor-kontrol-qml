@@ -66,6 +66,8 @@ Most community mods are shared as overlay mods. See [08_SHARING_CHANGES.md](08_S
 
 ### Can I use community mods from the forums, or only what's in this repo?
 
+Yes — any QML mod you find in forum discussions, GitHub repos, or ZIP downloads can be installed the same way.
+
 However:
 
 - Community customizations may stop working after Traktor updates.

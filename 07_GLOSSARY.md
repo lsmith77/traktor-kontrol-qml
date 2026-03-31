@@ -12,12 +12,12 @@ Short definitions for common terms you’ll see when working with Traktor QML mo
 
 - **QML**: A UI and logic language from Qt. Traktor uses it to define controller behavior and screen layouts.
 - **QML Mod**: A folder containing a `qml/` subdirectory with changes to Traktor's controller setup. Can be partial (only changed files) or a full copy. Structure: `MyMod/qml/{CSI,Screens,Defines}...`. When installed, the mod's `qml/` contents are merged into Traktor's `qml/` folder.
-- **Customization Package Install**: Installing a mod by copying its files "on top of" a complete base controller setup, overwriting only the files it changes. Safer because your other customizations stay intact.
+- **Overlay Install**: Installing a mod by copying its files "on top of" a complete base controller setup, overwriting only the files it changes. Safer because your other customizations stay intact.
 - **Base version**: The Traktor version a mod was built for. Overlay mods often require a specific base to work.
 
 ## Folder structure
 
-- **`qml``**: The folder inside a Traktor installation containing all the QML files that control your hardware. Changes here customize button behavior, screen layout, and visual feedback.
+- **`qml`**: The folder inside a Traktor installation containing all the QML files that control your hardware. Changes here customize button behavior, screen layout, and visual feedback.
 - **`CSI`**: Where hardware button and encoder behavior is defined. "What the hardware does." Buttons, encoders, control pathways, signal transformation.
 - **`Screens`**: “What you see.” Layouts, colors, fonts, waveform UI, browser columns.
 - **`Defines`**: Shared definitions. Constants, enums, preferences/singletons, shared helper components.

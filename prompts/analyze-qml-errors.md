@@ -7,7 +7,7 @@
 
 ## How to Use This Prompt
 
-1. Run Traktor from Terminal and capture the output (see [04_TROUBLESHOOTING.md](../04_TROUBLESHOOTING.md#1-run-traktor-from-terminal-and-check-startup-errors-does-it-compile))
+1. Run Traktor from Terminal and capture the output (see [04_TROUBLESHOOTING.md](../04_TROUBLESHOOTING.md#1-run-traktor-from-terminal-and-check-startup-errors))
 2. Copy the entire Terminal output or save it to a file
 3. Paste the output into this prompt along with your request
 4. Ask the AI to analyze the errors

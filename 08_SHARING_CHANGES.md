@@ -339,9 +339,10 @@ as long as they don't modify any of the same files.
 IMPORTANT: Do NOT use --fresh when combining mods. Using --fresh will reset qml to stock before applying, which removes any previously installed mods.
 
 Run the install script from each mod's directory in sequence (stack mode only):
-   traktor-mod           # Apply this mod
+   traktor-mod              # Apply this mod
    # Restart and test
-   traktor-mod -s ../other-mod  # Apply another mod on top
+   cd ../other-mod
+   traktor-mod              # Apply another mod on top
 If two mods modify the same file, the later install will overwrite the earlier one.
 
 RESTORE:

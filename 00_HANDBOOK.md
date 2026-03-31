@@ -141,78 +141,16 @@ These are **data paths** in Traktor (not file paths). Format: dots separate leve
 
 ## Debugging & Metadata Collection Tools
 
-**Quick Start**:
-
-1. **Pull and install the logger package** into Traktor's qml:
-
-   ```bash
-   traktor-mod logger pull
-   traktor-mod --source ~/.traktor-mod/traktor-logger
-   ```
-
-2. **Enable metadata collection on one connected controller**:
-
-   Required for the **Live Metadata** tab. Pick whichever controller is always connected:
-
-   ```bash
-   traktor-mod logger api D2
-   ```
-
-   Only inject into one controller — `ApiModule` monitors all decks globally, so multiple injections cause duplicate events.
-
-3. **Start the server**:
-
-   ```bash
-   traktor-mod server start
-   ```
-
-   Open dashboard: http://localhost:8080
-
-**Supported Controllers**: D2, S8, S5, S4MK3, S3, S2MK3, X1MK3, Z1MK2, MX2, CDJ3000, XDJ700, XDJ1000MK2
-
-**What's included**:
-
-- **Automatic metadata**: Track loaded, play/pause, tempo, key, sync, BPM, mixer channels (requires API integration on a connected controller)
-- **Manual logging**: `Logger` QML component for structured debug messages with severity levels
-- **Real-time dashboard**: Browser UI with live metadata view and console log viewer
-- **Color-coded CLI**: Terminal output with visual severity indicators
-
-**Installation options**:
+Install **[traktor-logger](https://github.com/lsmith77/traktor-logger)** for structured QML logging and a real-time browser dashboard:
 
 ```bash
-# Pull latest traktor-logger from GitHub into local cache
 traktor-mod logger pull
-
-# Install traktor-logger as an overlay mod (Logger.qml + Api modules)
 traktor-mod --source ~/.traktor-mod/traktor-logger
-
-# Wire ApiModule into a controller (run after install above)
-traktor-mod logger api S8
-
-# Install and start server in one go
-traktor-mod --source ~/.traktor-mod/traktor-logger && traktor-mod server start
+traktor-mod logger api D2   # wire metadata collection (one controller only)
+traktor-mod server start    # open dashboard at http://localhost:8080
 ```
 
-**Logger usage in QML**:
-
-```qml
-import Traktor.Defines 1.0
-
-Module {
-    Logger { id: logger }
-
-    onSomeEvent: {
-        logger.info("Event triggered", { deck: 1, state: "playing" })
-        logger.debug("Detailed diagnostics", { value: propValue.value })
-        logger.error("Something failed", { reason: "timeout" })
-    }
-}
-```
-
-**For complete documentation**:
-
-- **Logger usage & examples**: See [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md) → "Technique 4: Advanced Debugging with HTTP Logger"
-- **Server/API documentation**: https://github.com/lsmith77/traktor-logger
+**Full setup, usage, and examples**: [04_TROUBLESHOOTING.md → Technique 4: Advanced Debugging with HTTP Logger](04_TROUBLESHOOTING.md#technique-4-advanced-debugging-with-http-logger-structured-logging)
 
 ---
 

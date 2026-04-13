@@ -14,8 +14,8 @@ This repo is a **documentation set** for customizing Native Instruments **Trakto
 Clone these two repositories alongside this handbook:
 
 ```bash
-git clone https://github.com/lsmith77/traktor-kontrol-qml-files traktor-kontrol-qml-files
-git clone https://github.com/lsmith77/traktor-logger traktor-logger
+git clone https://github.com/lsmith77/traktor-kontrol-qml-files
+git clone https://github.com/lsmith77/traktor-logger
 ```
 
 - **`traktor-kontrol-qml-files/`** — stock Traktor QML baseline, used by AI tools for comparison

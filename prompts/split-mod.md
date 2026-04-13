@@ -5,9 +5,9 @@
 **Prerequisites**:
 
 - A reviewed, human-edited feature list — either from the mod author or produced by [list-features.md](list-features.md)
-- **QML Linter**: Have a QML linter installed and configured (see [QML Linter setup in 01_BASICS.md](../01_BASICS.md#qml-linter))
+- **QML Linter**: Have a QML linter installed and configured (see [QML Linter setup in 01_BASICS.md](../handbook/01_BASICS.md#qml-linter))
 
-**Workflow context**: [Chapter 11 — Feature extraction and splitting](../11_COMBINING_MODS_WORKFLOW.md#ai-prompt-templates-feature-extraction-and-feature-splitting)
+**Workflow context**: [Chapter 11 — Feature extraction and splitting](../handbook/11_COMBINING_MODS_WORKFLOW.md#ai-prompt-templates-feature-extraction-and-feature-splitting)
 
 ---
 

@@ -6,13 +6,13 @@ The target audience of this handbook are **musicians, not programmers**. Use mus
 
 ## Subdirectories Are Intentionally Excluded from Git
 
-The `.gitignore` excludes all subdirectories (`*/`) except `.github/`, `prompts/`, and `scripts/`. This applies to every cloned repo — community mods (e.g. `X1MK3_PerformanceMod/`, `traktor-kontrol-d2/`) and the companion repos (`traktor-kontrol-qml-files/`, `traktor-logger/`) alike. All community mod repos are regular directory clones, not symlinks. The separate `blint` entry in `.gitignore` covers a symlink to a linting tool; symlinks are not matched by `*/`, so it needs its own rule.
+The `.gitignore` excludes all subdirectories (`*/`) except `.github/`, `prompts/`, `scripts/`, and `handbook/`. This applies to every cloned repo — community mods (e.g. `X1MK3_PerformanceMod/`, `traktor-kontrol-d2/`) and the companion repos (`traktor-kontrol-qml-files/`, `traktor-logger/`) alike. All community mod repos are regular directory clones, not symlinks. The separate `blint` entry in `.gitignore` covers a symlink to a linting tool; symlinks are not matched by `*/`, so it needs its own rule.
 
-Consult `02_API_REFERENCE.md` first. Use QML code from subdirectories only when the API reference is insufficient. If you discover something useful, propose an improvement to `02_API_REFERENCE.md`.
+Consult `handbook/02_API_REFERENCE.md` first. Use QML code from subdirectories only when the API reference is insufficient. If you discover something useful, propose an improvement to `handbook/02_API_REFERENCE.md`.
 
 ## Companion Repositories
 
-Clone these into the handbook root (see `00_HANDBOOK.md` for setup commands):
+Clone these into the handbook root (see `handbook/00_HANDBOOK.md` for setup commands):
 
 - **`traktor-kontrol-qml-files/`** — Stock Traktor QML baseline for comparison and examples.
 - **`traktor-logger/`** — Debug dashboard server.
@@ -21,11 +21,11 @@ Several handbook pages link to these using absolute GitHub URLs — if the repos
 
 ## Always Run Prompts from This Root
 
-Run AI prompts (from `prompts/`) with this handbook directory as the working directory — even when the target mod lives in a subdirectory. Pass mod paths as relative paths from here (e.g. `traktor-kontrol-d2/qml/`). See `10_PROMPT_TEMPLATES.md` for the full prompt index and workflow order.
+Run AI prompts (from `prompts/`) with this handbook directory as the working directory — even when the target mod lives in a subdirectory. Pass mod paths as relative paths from here (e.g. `traktor-kontrol-d2/qml/`). See `handbook/10_PROMPT_TEMPLATES.md` for the full prompt index and workflow order.
 
 ## Linting Generated QML
 
-Prompt templates include a linter configuration slot and usage behavior; setup instructions are in `01_BASICS.md#qml-linter`. If the user's prompt does not provide a lint command, remind them to supply one when dealing with syntax issues.
+Prompt templates include a linter configuration slot and usage behavior; setup instructions are in `handbook/01_BASICS.md#qml-linter`. If the user's prompt does not provide a lint command, remind them to supply one when dealing with syntax issues.
 
 ## Script Caution
 

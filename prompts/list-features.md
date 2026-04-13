@@ -4,7 +4,7 @@
 
 **Output**: A bulleted feature list for human review. Edit it before feeding it into the next step — the AI's extraction is a starting point, not ground truth.
 
-**Workflow context**: [Chapter 11 — Feature extraction and splitting](../11_COMBINING_MODS_WORKFLOW.md#ai-prompt-templates-feature-extraction-and-feature-splitting)
+**Workflow context**: [Chapter 11 — Feature extraction and splitting](../handbook/11_COMBINING_MODS_WORKFLOW.md#ai-prompt-templates-feature-extraction-and-feature-splitting)
 
 ---
 
@@ -12,7 +12,7 @@
 
 - The mod folder exists and is accessible (you can browse its `/qml/` structure)
 
-**QML Linter** (optional but recommended): Have a QML linter installed (see [QML Linter setup in 01_BASICS.md](../01_BASICS.md#qml-linter))
+**QML Linter** (optional but recommended): Have a QML linter installed (see [QML Linter setup in 01_BASICS.md](../handbook/01_BASICS.md#qml-linter))
 
 ---
 

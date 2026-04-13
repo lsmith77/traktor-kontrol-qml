@@ -284,7 +284,7 @@ The script auto-elevates to admin via UAC, creates a stock backup on first insta
 
 Full step-by-step instructions — backup, overlay/fresh/full install, restore from GitHub, logger, metadata API, and how to report issues or fix the script yourself with AI:
 
-**→ [scripts/manual-install.md](scripts/manual-install.md)**
+**→ [scripts/manual-install.md](../scripts/manual-install.md)**
 
 ---
 

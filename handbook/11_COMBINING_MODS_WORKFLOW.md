@@ -79,7 +79,7 @@ When prerequisites are missing
 - Web browser, desktop app, or IDE plugin — your choice
 - **No need to download or check out anything** — you're just using an AI chat interface
 
-**4. Get the prompt** from [prompts/combine-mods.md](prompts/combine-mods.md):
+**4. Get the prompt** from [prompts/combine-mods.md](../prompts/combine-mods.md):
 
 - The prompt is self-contained — it doesn't reference files
 - Just copy the text block
@@ -89,7 +89,7 @@ When prerequisites are missing
 - Open a new chat
 - Paste the prompt template
 
-Integration options (includes/excludes/conflict policies): see the `Integration Options` section in [prompts/combine-mods.md](prompts/combine-mods.md#integration-options) for the simple plain-text directives to add under **My Setup**.
+Integration options (includes/excludes/conflict policies): see the `Integration Options` section in [prompts/combine-mods.md](../prompts/combine-mods.md#integration-options) for the simple plain-text directives to add under **My Setup**.
 
 How to phrase integration instructions in the prompt
 
@@ -121,9 +121,9 @@ Note: If the mod author provides a detailed feature list, use that instead of ru
 
 Prompts (open the file, copy the prompt block):
 
-- [list-features.md](prompts/list-features.md) — generate a feature list from raw file changes
-- [inspect-feature.md](prompts/inspect-feature.md) — details on one specific feature
-- [split-mod.md](prompts/split-mod.md) — split a mod into feature-level modules
+- [list-features.md](../prompts/list-features.md) — generate a feature list from raw file changes
+- [inspect-feature.md](../prompts/inspect-feature.md) — details on one specific feature
+- [split-mod.md](../prompts/split-mod.md) — split a mod into feature-level modules
 
 ---
 
@@ -268,7 +268,7 @@ git -C mods/D2-v1.2.3 diff v1.2.3..v1.2.4
 
 # 2. Decide: Do I need this update?
 
-# 3. If yes: Update your qml/ using the Mod Update Prompt for Git (prompts/update-mod-git.md)
+# 3. If yes: Update your qml/ using the Mod Update Prompt for Git (../prompts/update-mod-git.md)
 
 # 4. Commit the change
 git commit -m "Update: D2 v1.2.3 -> v1.2.4 (FX routing fix)"
@@ -294,7 +294,7 @@ unzip ModName-v1.2.4.zip -d ~/my-traktor-setup/mods/ModName-v1.2.4/
 #   mods/ModName-v1.2.3/   ← old (keep during transition for comparison)
 #   mods/ModName-v1.2.4/   ← new
 
-# 2. Use the Mod Update Prompt for Non-Git (prompts/update-mod.md) — reference both directories
+# 2. Use the Mod Update Prompt for Non-Git (../prompts/update-mod.md) — reference both directories
 #    so the AI can compute what changed and update /qml/ accordingly
 
 # 3. Commit the change
@@ -312,7 +312,7 @@ rm -rf ~/my-traktor-setup/mods/ModName-v1.2.3/
 
 ### Simple feature removal
 
-To remove a single feature from your combined mod, use [prompts/remove-feature.md](prompts/remove-feature.md). Tell the AI which feature to remove and which mod it came from. The AI will:
+To remove a single feature from your combined mod, use [prompts/remove-feature.md](../prompts/remove-feature.md). Tell the AI which feature to remove and which mod it came from. The AI will:
 
 1. Locate the relevant files and handlers introduced by that feature
 2. Revert them to the baseline state
@@ -338,15 +338,15 @@ Example METADATA.md entry to look for:
   → If vinyl-break is removed, restore X1MK3 pad 4 long-press to baseline behavior
 ```
 
-Use [prompts/remove-feature.md](prompts/remove-feature.md) and include the relevant `Conflict resolutions applied` entries. The AI will revert both the feature itself and the accommodations made for it.
+Use [prompts/remove-feature.md](../prompts/remove-feature.md) and include the relevant `Conflict resolutions applied` entries. The AI will revert both the feature itself and the accommodations made for it.
 
 ### Switching: replace feature A with feature B from a different mod
 
 If you want to swap one mod's implementation of a feature for another's (e.g., replace D2's loop-roll with X1MK3's implementation):
 
 1. Check METADATA.md for any conflict resolutions tied to the feature being removed
-2. Use [prompts/remove-feature.md](prompts/remove-feature.md) to remove the old implementation (including cascades)
-3. Then use [prompts/combine-mods.md](prompts/combine-mods.md) to add the new implementation
+2. Use [prompts/remove-feature.md](../prompts/remove-feature.md) to remove the old implementation (including cascades)
+3. Then use [prompts/combine-mods.md](../prompts/combine-mods.md) to add the new implementation
 4. Commit both steps separately so you can rollback cleanly if needed
 
 ---
@@ -380,7 +380,7 @@ When combining multiple mods, conflicts occur when:
 
 ### Pre-Merge Detection (Before AI Combines)
 
-Before using the [combine-mods.md](prompts/combine-mods.md) prompt, check for conflicts manually:
+Before using the [combine-mods.md](../prompts/combine-mods.md) prompt, check for conflicts manually:
 
 **Step 1: List all files each mod changes**
 

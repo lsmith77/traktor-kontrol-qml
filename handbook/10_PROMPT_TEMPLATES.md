@@ -23,14 +23,14 @@
 
 | Prompt               | When to use                                                      | File                                                     |
 | -------------------- | ---------------------------------------------------------------- | -------------------------------------------------------- |
-| **Create (New)**     | Design and implement a brand-new feature from scratch            | [prompts/create-feature.md](prompts/create-feature.md)   |
-| **Combine**          | First-time combination of two or more mods                       | [prompts/combine-mods.md](prompts/combine-mods.md)       |
-| **Update (Non-Git)** | A mod from forum/ZIP releases a new version                      | [prompts/update-mod.md](prompts/update-mod.md)           |
-| **Update (Git)**     | A git-tracked mod with tags releases a new version               | [prompts/update-mod-git.md](prompts/update-mod-git.md)   |
-| **Remove / Switch**  | Remove a feature or swap one mod's implementation for another's  | [prompts/remove-feature.md](prompts/remove-feature.md)   |
-| **List Features**    | No author feature list exists — generate one for review          | [prompts/list-features.md](prompts/list-features.md)     |
-| **Inspect Feature**  | Need details on one specific feature only                        | [prompts/inspect-feature.md](prompts/inspect-feature.md) |
-| **Split**            | Split a monolithic mod into feature-level modules before merging | [prompts/split-mod.md](prompts/split-mod.md)             |
+| **Create (New)**     | Design and implement a brand-new feature from scratch            | [prompts/create-feature.md](../prompts/create-feature.md)   |
+| **Combine**          | First-time combination of two or more mods                       | [prompts/combine-mods.md](../prompts/combine-mods.md)       |
+| **Update (Non-Git)** | A mod from forum/ZIP releases a new version                      | [prompts/update-mod.md](../prompts/update-mod.md)           |
+| **Update (Git)**     | A git-tracked mod with tags releases a new version               | [prompts/update-mod-git.md](../prompts/update-mod-git.md)   |
+| **Remove / Switch**  | Remove a feature or swap one mod's implementation for another's  | [prompts/remove-feature.md](../prompts/remove-feature.md)   |
+| **List Features**    | No author feature list exists — generate one for review          | [prompts/list-features.md](../prompts/list-features.md)     |
+| **Inspect Feature**  | Need details on one specific feature only                        | [prompts/inspect-feature.md](../prompts/inspect-feature.md) |
+| **Split**            | Split a monolithic mod into feature-level modules before merging | [prompts/split-mod.md](../prompts/split-mod.md)             |
 
 ---
 
@@ -38,23 +38,23 @@
 
 **Creating a brand-new custom feature**:
 
-1. [create-feature.md](prompts/create-feature.md) — describe your idea, get implementation code + docs
+1. [create-feature.md](../prompts/create-feature.md) — describe your idea, get implementation code + docs
 
 **First-time combination (mods with author feature lists)**:
 
-1. [combine-mods.md](prompts/combine-mods.md) → done
+1. [combine-mods.md](../prompts/combine-mods.md) → done
 
 **First-time combination (mods without feature lists)**:
 
-1. [list-features.md](prompts/list-features.md) — generate + review feature list
-2. (optional) [split-mod.md](prompts/split-mod.md) — split into modules if mod is large
-3. [combine-mods.md](prompts/combine-mods.md) — combine with reviewed feature list
+1. [list-features.md](../prompts/list-features.md) — generate + review feature list
+2. (optional) [split-mod.md](../prompts/split-mod.md) — split into modules if mod is large
+3. [combine-mods.md](../prompts/combine-mods.md) — combine with reviewed feature list
 
 **After initial combination**:
 
-- Mod updates (non-git) → [update-mod.md](prompts/update-mod.md)
-- Mod updates (git) → [update-mod-git.md](prompts/update-mod-git.md)
-- Remove or swap a feature → [remove-feature.md](prompts/remove-feature.md)
+- Mod updates (non-git) → [update-mod.md](../prompts/update-mod.md)
+- Mod updates (git) → [update-mod-git.md](../prompts/update-mod-git.md)
+- Remove or swap a feature → [remove-feature.md](../prompts/remove-feature.md)
 
 ---
 
@@ -118,15 +118,15 @@ Yes. Each prompt is designed to work with Claude, ChatGPT, Copilot, or any text-
 
 **Yes**, but follow the workflow order in [Typical Workflow Order](#typical-workflow-order):
 
-- If mods have **feature documentation** → use [combine-mods.md](prompts/combine-mods.md) directly
-- If mods **lack documentation** → use [list-features.md](prompts/list-features.md) first, then combine
-- For **large monolithic mods** → use [split-mod.md](prompts/split-mod.md) before combining
+- If mods have **feature documentation** → use [combine-mods.md](../prompts/combine-mods.md) directly
+- If mods **lack documentation** → use [list-features.md](../prompts/list-features.md) first, then combine
+- For **large monolithic mods** → use [split-mod.md](../prompts/split-mod.md) before combining
 
 ### Can these prompts generate documentation for my mod?
 
 Yes. Use the combination of:
 
-1. [list-features.md](prompts/list-features.md) — to generate a feature list from your code
+1. [list-features.md](../prompts/list-features.md) — to generate a feature list from your code
 2. [Chapter 09: Mod Documentation Guide](09_MOD_DOCUMENTATION_GUIDE.md) — to structure that feature list into proper documentation
 
 Then publish your mod with clear feature documentation so others can combine it safely.

@@ -113,7 +113,7 @@ These are **data paths** in Traktor (not file paths). Format: dots separate leve
 
 **For creating a brand-new custom feature**:
 
-- Use the AI prompt template in [10_PROMPT_TEMPLATES.md](10_PROMPT_TEMPLATES.md) → [prompts/create-feature.md](prompts/create-feature.md)
+- Use the AI prompt template in [10_PROMPT_TEMPLATES.md](10_PROMPT_TEMPLATES.md) → [prompts/create-feature.md](../prompts/create-feature.md)
 - Describe what you want (trigger, behavior, configuration)
 - Get production-ready code + test checklist
 - Reference [02_API_REFERENCE.md](02_API_REFERENCE.md) for control paths and patterns
@@ -124,9 +124,9 @@ These are **data paths** in Traktor (not file paths). Format: dots separate leve
 - Read [09_MOD_DOCUMENTATION_GUIDE.md](09_MOD_DOCUMENTATION_GUIDE.md) to understand the **metadata lock file** pattern
 - Follow the complete workflow in [11_COMBINING_MODS_WORKFLOW.md](11_COMBINING_MODS_WORKFLOW.md) (4 phases: preparation, AI generation, save, deploy)
 - Use the prompt templates in [10_PROMPT_TEMPLATES.md](10_PROMPT_TEMPLATES.md) with Claude or Copilot to:
-  - Gather version information and combine mods ([prompts/combine-mods.md](prompts/combine-mods.md))
-  - Update a mod to a new version ([prompts/update-mod.md](prompts/update-mod.md))
-  - Remove or swap a feature ([prompts/remove-feature.md](prompts/remove-feature.md))
+  - Gather version information and combine mods ([prompts/combine-mods.md](../prompts/combine-mods.md))
+  - Update a mod to a new version ([prompts/update-mod.md](../prompts/update-mod.md))
+  - Remove or swap a feature ([prompts/remove-feature.md](../prompts/remove-feature.md))
 - Learn from professional implementations in [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md)
 
 **For mod authors creating features for community**:

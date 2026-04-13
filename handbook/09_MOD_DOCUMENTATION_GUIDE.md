@@ -838,7 +838,7 @@ Write your feature .md file (Steps 1-5 above: title, features, files, settings, 
 
 **When combining features from different mods**, use the standardized prompt:
 
-**→ [prompts/combine-mods.md](prompts/combine-mods.md)** (see [Chapter 10](10_PROMPT_TEMPLATES.md) for the full prompt index)
+**→ [prompts/combine-mods.md](../prompts/combine-mods.md)** (see [Chapter 10](10_PROMPT_TEMPLATES.md) for the full prompt index)
 
 This prompt helps you document which versions you're combining and identify conflicts.
 

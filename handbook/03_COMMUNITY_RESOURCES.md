@@ -132,7 +132,7 @@ Community-contributed QML modifications with code snippets and implementation gu
 **For trying this yourself**:
 
 - Read [Chapter 11: Combining Mods — Complete Workflow](11_COMBINING_MODS_WORKFLOW.md) for the full process
-- Use the [combine-mods.md](prompts/combine-mods.md) prompt template when you're ready to combine your own
+- Use the [combine-mods.md](../prompts/combine-mods.md) prompt template when you're ready to combine your own
 - Document your versions like this repo does—makes future updates much safer
 
 ---

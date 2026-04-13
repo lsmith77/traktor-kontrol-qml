@@ -558,7 +558,7 @@ app.traktor.[context].[id/index].[category].[property]
 
 | Path                                               | Type             | Purpose                |
 | -------------------------------------------------- | ---------------- | ---------------------- |
-| `app.traktor.browser.full_screen`                  | bool             | Browser in fullscreen  |
+| `app.traktor.browser.full_screen`                  | bool             | Browser panel open on laptop screen (read/write) |
 | `app.traktor.browser.sort_id`                      | int              | Current sort column    |
 | `app.traktor.browser.tree.select_up_down`          | trigger          | Navigate folder tree   |
 | `app.traktor.browser.list.select_up_down`          | trigger          | Scroll track list      |
@@ -570,6 +570,8 @@ app.traktor.[context].[id/index].[category].[property]
 | `app.traktor.browser.preview_player.is_loaded`     | bool [read-only] | Preview loaded         |
 | `app.traktor.browser.preview_player.elapsed_time`  | real [read-only] | Preview playhead       |
 | `app.traktor.browser.preview_content.track_length` | real [read-only] | Preview track duration |
+
+**Note on `browse.touch`**: This is a one-shot pulse signal — it fires once when the knob is touched but has no corresponding release event. `ButtonScriptAdapter.onRelease` does not fire for it. Use a `SwitchTimer` to detect lift (it resets after a short timeout when pulses stop arriving).
 
 **Note**: Browser item selection (selected track, list contents, current index) is not accessible via AppProperties. It is accessible via `Traktor.Browser` from `Traktor.Gui 1.0` in the Screens layer. See [04_TROUBLESHOOTING.md — Accessing Browser/Playlist Data](04_TROUBLESHOOTING.md#issue-accessing-browserplaylist-data) for details.
 

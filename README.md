@@ -23,6 +23,12 @@ git clone https://github.com/lsmith77/traktor-logger
 
 ---
 
+## Using this handbook as an Agent Skill
+
+This repo ships a [`SKILL.md`](SKILL.md) at the root, so any AI agent that supports the [Skills](https://skills.sh/) format can load the handbook on demand. Install it as a skill (or drop the repo into a directory the agent can read) and ask Traktor QML questions — the agent will pull the relevant chapters and prompt templates itself instead of you having to paste them in.
+
+---
+
 **Navigation**: [00_HANDBOOK.md](handbook/00_HANDBOOK.md) · [01_BASICS.md](handbook/01_BASICS.md) · [Full chapter list](#all-chapters)
 
 ---

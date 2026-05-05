@@ -275,7 +275,7 @@ Not sure? `qml-linter` is a 2-minute pip install.
 - **Claude for VS Code** — Code review, explanations, and debugging in-editor
 - **ChatGPT** — Plugin available in VS Code marketplace
 
-For designing entire new features from a plain-English description, see [prompts/create-feature.md](prompts/create-feature.md) and [Chapter 10: Prompt Templates](10_PROMPT_TEMPLATES.md).
+For designing entire new features from a plain-English description, see [prompts/create-feature.md](../prompts/create-feature.md) and [Chapter 10: Prompt Templates](10_PROMPT_TEMPLATES.md).
 
 ---
 

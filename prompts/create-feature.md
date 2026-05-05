@@ -4,7 +4,7 @@
 
 **Output**: Complete QML code + documentation + test checklist for your new feature.
 
-**Workflow context**: [Chapter 09 — Mod Documentation Guide](../09_MOD_DOCUMENTATION_GUIDE.md)
+**Workflow context**: [Chapter 09 — Mod Documentation Guide](../handbook/09_MOD_DOCUMENTATION_GUIDE.md)
 
 ---
 
@@ -183,4 +183,4 @@ Provide clear test instructions:
 4. **Save the markdown documentation** alongside your feature code
 5. **Version it**: Use semantic versioning (e.g., v1.0.0 for first release)
 
-See [Chapter 09: Mod Documentation Guide](../09_MOD_DOCUMENTATION_GUIDE.md) for how to document and version your feature properly.
+See [Chapter 09: Mod Documentation Guide](../handbook/09_MOD_DOCUMENTATION_GUIDE.md) for how to document and version your feature properly.

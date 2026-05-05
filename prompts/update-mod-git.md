@@ -7,11 +7,11 @@
 - The mod repo is cloned in `/mods/[ModName]/`
 - Both the old and new version tags exist in the repo (e.g., `v1.0.0`, `v2.0.0`)
 - You know which features from this mod are currently integrated into your combined `/qml/`
-- **QML Linter**: Have a QML linter installed and configured (see [QML Linter setup in 01_BASICS.md](../01_BASICS.md#qml-linter))
+- **QML Linter**: Have a QML linter installed and configured (see [QML Linter setup in 01_BASICS.md](../handbook/01_BASICS.md#qml-linter))
 
 **For non-git mods (ZIP/Forum)**: See [update-mod.md](update-mod.md)
 
-**Workflow context**: [Chapter 11 — Updating Later](../11_COMBINING_MODS_WORKFLOW.md#updating-later-when-mods-release-new-versions)
+**Workflow context**: [Chapter 11 — Updating Later](../handbook/11_COMBINING_MODS_WORKFLOW.md#updating-later-when-mods-release-new-versions)
 
 ---
 

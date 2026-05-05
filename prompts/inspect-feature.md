@@ -6,7 +6,7 @@
 
 - **QML Linter**: Have a QML linter installed (optional but recommended, see [QML Linter Setup](#qml-linter-setup) below)
 
-**Workflow context**: [Chapter 11 — Feature extraction and splitting](../11_COMBINING_MODS_WORKFLOW.md#ai-prompt-templates-feature-extraction-and-feature-splitting)
+**Workflow context**: [Chapter 11 — Feature extraction and splitting](../handbook/11_COMBINING_MODS_WORKFLOW.md#ai-prompt-templates-feature-extraction-and-feature-splitting)
 
 ---
 

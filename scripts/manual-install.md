@@ -45,7 +45,7 @@ Alternatively you can fetch a backup for recent Traktor Pro version from https:/
 
 ## Step 2 — Install the mod
 
-Check [Chapter 03: Community Resources](../03_COMMUNITY_RESOURCES.md) to see whether your mod is an overlay or a full replacement. If it's not listed there, check the mod's README.
+Check [Chapter 03: Community Resources](../handbook/03_COMMUNITY_RESOURCES.md) to see whether your mod is an overlay or a full replacement. If it's not listed there, check the mod's README.
 
 For full replacements, just replace the the full `qml` directory. Remember when switching overlay mods, you might want to reset to your backup first unless you explicitly want to layer your overlay mods. But be aware that if overlay mods modify the same file, you might need to merge then manually to not break one of the overlay mods.
 

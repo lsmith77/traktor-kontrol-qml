@@ -23,26 +23,32 @@ git clone https://github.com/lsmith77/traktor-logger
 
 ---
 
-**Navigation**: [00_HANDBOOK.md](00_HANDBOOK.md) · [01_BASICS.md](01_BASICS.md) · [Full chapter list](#all-chapters)
+## Using this handbook as an Agent Skill
+
+This repo ships a [`SKILL.md`](SKILL.md) at the root, so any AI agent that supports the [Skills](https://skills.sh/) format can load the handbook on demand. Install it as a skill (or drop the repo into a directory the agent can read) and ask Traktor QML questions — the agent will pull the relevant chapters and prompt templates itself instead of you having to paste them in.
+
+---
+
+**Navigation**: [00_HANDBOOK.md](handbook/00_HANDBOOK.md) · [01_BASICS.md](handbook/01_BASICS.md) · [Full chapter list](#all-chapters)
 
 ---
 
 ## I want to install a community mod
 
-1. **[Chapter 03: Community Resources](03_COMMUNITY_RESOURCES.md)** — curated list of GitHub repos and forum mods for S4 MK3, X1 MK3, and other controllers
-2. **[Chapter 01: Basics](01_BASICS.md)** — `qml` folder structure, Traktor architecture
-3. **[Chapter 08: Sharing Changes](08_SHARING_CHANGES.md)** — `traktor-mod` script setup (automates backup, overlay install, restore); if the script fails, **[scripts/manual-install.md](scripts/manual-install.md)** covers every step manually
-4. **[Chapter 05: FAQ](05_FAQ.md)** — safety, Traktor updates overwriting mods, common questions
-5. **[Chapter 04: Troubleshooting](04_TROUBLESHOOTING.md)** — when something breaks
+1. **[Chapter 03: Community Resources](handbook/03_COMMUNITY_RESOURCES.md)** — curated list of GitHub repos and forum mods for S4 MK3, X1 MK3, and other controllers
+2. **[Chapter 01: Basics](handbook/01_BASICS.md)** — `qml` folder structure, Traktor architecture
+3. **[Chapter 08: Sharing Changes](handbook/08_SHARING_CHANGES.md)** — `traktor-mod` script setup (automates backup, overlay install, restore); if the script fails, **[scripts/manual-install.md](scripts/manual-install.md)** covers every step manually
+4. **[Chapter 05: FAQ](handbook/05_FAQ.md)** — safety, Traktor updates overwriting mods, common questions
+5. **[Chapter 04: Troubleshooting](handbook/04_TROUBLESHOOTING.md)** — when something breaks
 
 ---
 
 ## I want to combine features from multiple mods
 
-1. **[Chapter 10: Prompt Templates](10_PROMPT_TEMPLATES.md)** — full index with workflow order
-2. **[Chapter 11: Combining Mods — Complete Workflow](11_COMBINING_MODS_WORKFLOW.md)** — step-by-step guide (preparation → AI generation → save → deploy)
-3. **[Chapter 08: Sharing Changes](08_SHARING_CHANGES.md)** — understand mod structure before combining
-4. **[Chapter 09: Mod Documentation Guide](09_MOD_DOCUMENTATION_GUIDE.md)** — how to read feature documentation in well-documented mods
+1. **[Chapter 10: Prompt Templates](handbook/10_PROMPT_TEMPLATES.md)** — full index with workflow order
+2. **[Chapter 11: Combining Mods — Complete Workflow](handbook/11_COMBINING_MODS_WORKFLOW.md)** — step-by-step guide (preparation → AI generation → save → deploy)
+3. **[Chapter 08: Sharing Changes](handbook/08_SHARING_CHANGES.md)** — understand mod structure before combining
+4. **[Chapter 09: Mod Documentation Guide](handbook/09_MOD_DOCUMENTATION_GUIDE.md)** — how to read feature documentation in well-documented mods
 5. **[traktor-logger](https://github.com/lsmith77/traktor-logger)** — verify combined mods load and interact correctly
 
 Paste the prompt into Claude, ChatGPT, Copilot, or any AI chat — no tooling beyond a text editor and git.
@@ -58,16 +64,16 @@ Example: _"Pressing PLAY while the deck is playing should trigger a 700ms vinyl 
 3. Get complete QML code + documentation + test checklist
 4. Deploy and test in Traktor — use **[traktor-logger](https://github.com/lsmith77/traktor-logger)** for real-time monitoring
 
-See [Chapter 10: Prompt Templates](10_PROMPT_TEMPLATES.md) for details, or jump straight to [prompts/create-feature.md](prompts/create-feature.md).
+See [Chapter 10: Prompt Templates](handbook/10_PROMPT_TEMPLATES.md) for details, or jump straight to [prompts/create-feature.md](prompts/create-feature.md).
 
 ---
 
 ## I'm a new mod author
 
-1. **[Chapter 01: Basics](01_BASICS.md)** — QML fundamentals, folder structure, how Traktor loads files
-2. **[Chapter 02: API Reference](02_API_REFERENCE.md)** — control value paths, copy-paste code patterns
-3. **[Chapter 08: Sharing Changes](08_SHARING_CHANGES.md)** — how to package and publish your work
-4. **[Chapter 09: Mod Documentation Guide](09_MOD_DOCUMENTATION_GUIDE.md)** — how to structure your mod so users can apply individual features, and so AI tools can combine your mod with others automatically
+1. **[Chapter 01: Basics](handbook/01_BASICS.md)** — QML fundamentals, folder structure, how Traktor loads files
+2. **[Chapter 02: API Reference](handbook/02_API_REFERENCE.md)** — control value paths, copy-paste code patterns
+3. **[Chapter 08: Sharing Changes](handbook/08_SHARING_CHANGES.md)** — how to package and publish your work
+4. **[Chapter 09: Mod Documentation Guide](handbook/09_MOD_DOCUMENTATION_GUIDE.md)** — how to structure your mod so users can apply individual features, and so AI tools can combine your mod with others automatically
 5. **[traktor-logger](https://github.com/lsmith77/traktor-logger)** — test and debug your code with real-time monitoring
 
 The format in Chapter 09 — one markdown file per feature, semantic version tags in git — means your users can pick just the features they want, and understand exactly what changed in each release.
@@ -94,24 +100,24 @@ your-mod/
 
 Each file lists: what the feature does, which QML files it touches, settings/toggles, and a 3-step test checklist.
 
-**→ [Chapter 09: Mod Documentation Guide](09_MOD_DOCUMENTATION_GUIDE.md)** — full format spec, real examples, pitfalls to avoid, and the reasoning behind each convention
+**→ [Chapter 09: Mod Documentation Guide](handbook/09_MOD_DOCUMENTATION_GUIDE.md)** — full format spec, real examples, pitfalls to avoid, and the reasoning behind each convention
 
 ---
 
 ## All chapters
 
-- [00_HANDBOOK.md](00_HANDBOOK.md) — index and suggested reading order
-- [01_BASICS.md](01_BASICS.md) — beginner QML + Traktor `qml` folder structure + install/restore
-- [02_API_REFERENCE.md](02_API_REFERENCE.md) — reference guide + copy-paste code patterns (includes the full control value path catalog)
-- [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) — real working mods from the community (GitHub repos + forum discussions)
-- [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md) — debugging + testing when something breaks
-- [05_FAQ.md](05_FAQ.md) — frequently asked questions (safety, installation, mods, updates)
-- [06_COMPATIBILITY_FIXES.md](06_COMPATIBILITY_FIXES.md) — version compatibility + known fixes
-- [07_GLOSSARY.md](07_GLOSSARY.md) — quick definitions
-- [08_SHARING_CHANGES.md](08_SHARING_CHANGES.md) — how to share your changes (basics)
-- [09_MOD_DOCUMENTATION_GUIDE.md](09_MOD_DOCUMENTATION_GUIDE.md) — how to document mods + metadata lock files
-- [10_PROMPT_TEMPLATES.md](10_PROMPT_TEMPLATES.md) — AI prompt templates for combining, updating, and removing mods
-- [11_COMBINING_MODS_WORKFLOW.md](11_COMBINING_MODS_WORKFLOW.md) — complete step-by-step workflow for combining mods
+- [00_HANDBOOK.md](handbook/00_HANDBOOK.md) — index and suggested reading order
+- [01_BASICS.md](handbook/01_BASICS.md) — beginner QML + Traktor `qml` folder structure + install/restore
+- [02_API_REFERENCE.md](handbook/02_API_REFERENCE.md) — reference guide + copy-paste code patterns (includes the full control value path catalog)
+- [03_COMMUNITY_RESOURCES.md](handbook/03_COMMUNITY_RESOURCES.md) — real working mods from the community (GitHub repos + forum discussions)
+- [04_TROUBLESHOOTING.md](handbook/04_TROUBLESHOOTING.md) — debugging + testing when something breaks
+- [05_FAQ.md](handbook/05_FAQ.md) — frequently asked questions (safety, installation, mods, updates)
+- [06_COMPATIBILITY_FIXES.md](handbook/06_COMPATIBILITY_FIXES.md) — version compatibility + known fixes
+- [07_GLOSSARY.md](handbook/07_GLOSSARY.md) — quick definitions
+- [08_SHARING_CHANGES.md](handbook/08_SHARING_CHANGES.md) — how to share your changes (basics)
+- [09_MOD_DOCUMENTATION_GUIDE.md](handbook/09_MOD_DOCUMENTATION_GUIDE.md) — how to document mods + metadata lock files
+- [10_PROMPT_TEMPLATES.md](handbook/10_PROMPT_TEMPLATES.md) — AI prompt templates for combining, updating, and removing mods
+- [11_COMBINING_MODS_WORKFLOW.md](handbook/11_COMBINING_MODS_WORKFLOW.md) — complete step-by-step workflow for combining mods
 
 ---
 

@@ -7,9 +7,9 @@
 - One baseline: a `traktor-kontrol-qml-files` tag/file tree, or a legacy mod directory with a full `qml/` tree
 - For each mod: either a reviewed feature list (bulleted), or the mod file tree + author feature list
 - If you only have raw file changes with no feature list, run [list-features.md](list-features.md) first, review the output, then return here
-- **QML Linter**: Have a QML linter installed and configured before running this prompt (see [QML Linter setup in 01_BASICS.md](../01_BASICS.md#qml-linter))
+- **QML Linter**: Have a QML linter installed and configured before running this prompt (see [QML Linter setup in 01_BASICS.md](../handbook/01_BASICS.md#qml-linter))
 
-**Workflow context**: [Chapter 11 — Combining Mods Workflow](../11_COMBINING_MODS_WORKFLOW.md)
+**Workflow context**: [Chapter 11 — Combining Mods Workflow](../handbook/11_COMBINING_MODS_WORKFLOW.md)
 
 ---
 

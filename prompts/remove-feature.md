@@ -2,7 +2,7 @@
 
 **When to use**: Remove a feature from your combined `/qml/`, or swap it for a different mod's implementation.
 
-**Workflow context**: [Chapter 11 — Removing or Switching Features](../11_COMBINING_MODS_WORKFLOW.md#removing-or-switching-features)
+**Workflow context**: [Chapter 11 — Removing or Switching Features](../handbook/11_COMBINING_MODS_WORKFLOW.md#removing-or-switching-features)
 
 ---
 
@@ -10,7 +10,7 @@
 
 Before running this prompt, have a QML linter ready to validate the modified output.
 
-\u2192 **[See 01_BASICS.md \u2014 QML Linter for setup instructions](../01_BASICS.md#qml-linter)**
+\u2192 **[See 01_BASICS.md \u2014 QML Linter for setup instructions](../handbook/01_BASICS.md#qml-linter)**
 
 Three options: qml-linter (CLI), VS Code, or Qt Creator. Works on macOS and Windows.
 

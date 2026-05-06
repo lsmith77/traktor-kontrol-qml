@@ -121,6 +121,77 @@ QtObject {
 - Display text formatting
 - UI component styling
 
+### Screen File Structure
+
+Screen files follow a standard import and layout pattern:
+
+```qml
+import CSI 1.0
+import QtQuick 2.0
+import "../Widgets" as Widgets      // Namespaced widgets (new since Traktor Pro 4.5.0)
+import "../Defines" as Defines
+import "../../CSI/[Controller]/Defines"
+
+Item {
+  id: screen
+  property string propertiesPath: ""
+  width: 128
+  height: 64
+  clip: true
+
+  // Your screen content here
+}
+```
+
+**Note**: Widget imports via `import "../Widgets" as Widgets` are required since Traktor Pro 4.5.0. Text components like `ThinText` and `ThickText` must be prefixed with the `Widgets` namespace (e.g., `Widgets.ThinText`).
+
+### Supporting Multiple Traktor Versions (Single Codebase)
+
+To support both pre-4.5.0 and 4.5.0+ with identical screen code, maintain the text component files in **both locations**:
+
+**Directory structure for cross-version support:**
+
+```
+qml/
+├── Screens/
+│   ├── Defines/
+│   │   ├── ThinText.qml       ← Pre-4.5.0 location (keep a copy here)
+│   │   └── ThickText.qml      ← Pre-4.5.0 location (keep a copy here)
+│   ├── Widgets/
+│   │   ├── ThinText.qml       ← 4.5.0+ location
+│   │   └── ThickText.qml      ← 4.5.0+ location
+│   └── [Controller]/
+│       └── DeckScreen.qml
+```
+
+In your screen files, use the 4.5.0+ import style everywhere:
+
+```qml
+import "../Widgets" as Widgets
+
+Widgets.ThinText { text: "Display" }
+```
+
+**How it works:**
+
+- Traktor Pro 4.5.0+ finds components in `Screens/Widgets/` (new location)
+- Pre-4.5.0 finds components in `Screens/Defines/` (previous location)
+- Same import statement, same code, works on all versions
+- No runtime detection or Loader components needed
+
+Keep both sets of files in sync with identical definitions. This is the simplest approach for multi-version compatibility.
+
+### Screen Properties Reference
+
+| Property           | Type   | Purpose                     | Deprecated |
+| ------------------ | ------ | --------------------------- | ---------- |
+| `screenside:left`  | enum   | Screen positioning (legacy) | ⚠️ 4.5.0   |
+| `screenside:right` | enum   | Screen positioning (legacy) | ⚠️ 4.5.0   |
+| `propertiesPath`   | string | Binding path for data       | —          |
+| `width`            | int    | Screen width (pixels)       | —          |
+| `height`           | int    | Screen height (pixels)      | —          |
+| `clip`             | bool   | Clip to bounds              | —          |
+
 ---
 
 ## Traktor QML Building Blocks
@@ -200,6 +271,44 @@ The `enabled:` field is frequently used for “Shift layers”:
 Wire { from: "%surface%.deck.button"; to: actionA; enabled:  shift.value }
 Wire { from: "%surface%.deck.button"; to: actionB; enabled: !shift.value }
 ```
+
+### Screen Components (Text Widgets)
+
+**What they are** (Traktor Pro 4.5.0+): Reusable text/display components in the Screens layer that follow the Qt/QML pattern of module-based imports.
+
+**Traktor Pro 4.5.0 Change**: Screen files now use a widget import pattern. Text display components are namespaced under `Widgets`:
+
+```qml
+// Top of Screens/*.qml file:
+import "../Widgets" as Widgets
+
+// Use in layout:
+Widgets.ThinText {
+    text: "Display Text"
+    color: "white"
+}
+
+Widgets.ThickText {
+    text: "Bold Header"
+}
+```
+
+**Available widgets**:
+
+- `Widgets.ThinText` — Small/detail text (font: TRAKTORFREON, 36px)
+- `Widgets.ThickText` — Bold uppercase text (font: UpheavalX1, 16px)
+
+**Pre-4.5.0 syntax** (no longer valid):
+
+```qml
+// ❌ OLD - Do not use:
+ThinText { ... }
+ThickText { ... }
+```
+
+**Migration tip**: If you have existing mods using `ThinText` or `ThickText`, add the import at the top of your screen file and prefix with `Widgets.`.
+
+---
 
 ### Adapters (example: `ButtonScriptAdapter`)
 
@@ -556,20 +665,20 @@ app.traktor.[context].[id/index].[category].[property]
 
 ### Browser & Preview
 
-| Path                                               | Type             | Purpose                |
-| -------------------------------------------------- | ---------------- | ---------------------- |
+| Path                                               | Type             | Purpose                                          |
+| -------------------------------------------------- | ---------------- | ------------------------------------------------ |
 | `app.traktor.browser.full_screen`                  | bool             | Browser panel open on laptop screen (read/write) |
-| `app.traktor.browser.sort_id`                      | int              | Current sort column    |
-| `app.traktor.browser.tree.select_up_down`          | trigger          | Navigate folder tree   |
-| `app.traktor.browser.list.select_up_down`          | trigger          | Scroll track list      |
-| `app.traktor.browser.flip_sort_up_down`            | trigger          | Toggle sort direction  |
-| `app.traktor.browser.preparation.append`           | trigger          | Add to prep list       |
-| `app.traktor.browser.preparation.toggle`           | trigger          | Toggle prep status     |
-| `app.traktor.browser.preview_player.load`          | trigger          | Load in preview player |
-| `app.traktor.browser.preview_player.play`          | trigger          | Play preview           |
-| `app.traktor.browser.preview_player.is_loaded`     | bool [read-only] | Preview loaded         |
-| `app.traktor.browser.preview_player.elapsed_time`  | real [read-only] | Preview playhead       |
-| `app.traktor.browser.preview_content.track_length` | real [read-only] | Preview track duration |
+| `app.traktor.browser.sort_id`                      | int              | Current sort column                              |
+| `app.traktor.browser.tree.select_up_down`          | trigger          | Navigate folder tree                             |
+| `app.traktor.browser.list.select_up_down`          | trigger          | Scroll track list                                |
+| `app.traktor.browser.flip_sort_up_down`            | trigger          | Toggle sort direction                            |
+| `app.traktor.browser.preparation.append`           | trigger          | Add to prep list                                 |
+| `app.traktor.browser.preparation.toggle`           | trigger          | Toggle prep status                               |
+| `app.traktor.browser.preview_player.load`          | trigger          | Load in preview player                           |
+| `app.traktor.browser.preview_player.play`          | trigger          | Play preview                                     |
+| `app.traktor.browser.preview_player.is_loaded`     | bool [read-only] | Preview loaded                                   |
+| `app.traktor.browser.preview_player.elapsed_time`  | real [read-only] | Preview playhead                                 |
+| `app.traktor.browser.preview_content.track_length` | real [read-only] | Preview track duration                           |
 
 **Note on `browse.touch`**: This is a one-shot pulse signal — it fires once when the knob is touched but has no corresponding release event. `ButtonScriptAdapter.onRelease` does not fire for it. Use a `SwitchTimer` to detect lift (it resets after a short timeout when pulses stop arriving).
 
@@ -655,17 +764,17 @@ app.traktor.[context].[id/index].[category].[property]
 
 ### Cue Points & Hotcues
 
-| Path                                                 | Type               | Purpose               | Index             |
-| ---------------------------------------------------- | ------------------ | --------------------- | ----------------- |
-| `app.traktor.decks.X.cue`                            | bool               | Main cue point        | Hardwired         |
+| Path                                                 | Type               | Purpose               | Index                          |
+| ---------------------------------------------------- | ------------------ | --------------------- | ------------------------------ |
+| `app.traktor.decks.X.cue`                            | bool               | Main cue point        | Hardwired                      |
 | `app.traktor.decks.X.cup`                            | trigger            | Cue + play (CUP)      | Jump to cue and start playback |
-| `app.traktor.decks.X.track.cue.hotcues.Y.exists`     | bool [read-only]   | Hotcue Y placed       | Y = 1–8           |
-| `app.traktor.decks.X.track.cue.hotcues.Y.start_pos`  | real               | Position in track     | Seconds           |
-| `app.traktor.decks.X.track.cue.hotcues.Y.length`     | real               | Hotcue entry duration | Sample length     |
-| `app.traktor.decks.X.track.cue.select_or_set_hotcue` | trigger            | Set/jump to hotcue    | Context-dependent |
-| `app.traktor.decks.X.track.cue.delete_hotcue`        | trigger            | Delete hotcue         | Permanent         |
-| `app.traktor.decks.X.track.cue.active.type`          | int [read-only]    | Current cue type      | 0=main, 1=hotcue  |
-| `app.traktor.decks.X.track.cue.active.name`          | string [read-only] | Active cue label      | Display name      |
+| `app.traktor.decks.X.track.cue.hotcues.Y.exists`     | bool [read-only]   | Hotcue Y placed       | Y = 1–8                        |
+| `app.traktor.decks.X.track.cue.hotcues.Y.start_pos`  | real               | Position in track     | Seconds                        |
+| `app.traktor.decks.X.track.cue.hotcues.Y.length`     | real               | Hotcue entry duration | Sample length                  |
+| `app.traktor.decks.X.track.cue.select_or_set_hotcue` | trigger            | Set/jump to hotcue    | Context-dependent              |
+| `app.traktor.decks.X.track.cue.delete_hotcue`        | trigger            | Delete hotcue         | Permanent                      |
+| `app.traktor.decks.X.track.cue.active.type`          | int [read-only]    | Current cue type      | 0=main, 1=hotcue               |
+| `app.traktor.decks.X.track.cue.active.name`          | string [read-only] | Active cue label      | Display name                   |
 
 ---
 

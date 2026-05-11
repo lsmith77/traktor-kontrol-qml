@@ -314,7 +314,7 @@ Full step-by-step instructions — backup, overlay/fresh/full install, restore f
 
 **Create a README file** (plain text) with the following info. Choose the template based on your mod type:
 
-**Option A: Overlay Mod (recommended)**
+**Overlay Mod README (recommended)**
 
 ```
 MyMod Overlay for S4MK3
@@ -352,7 +352,7 @@ To remove all mods at once, run:
 Then restart Traktor
 ```
 
-**Option B: Full Replacement Mod** (if your mod is a complete standalone redesign)
+**Full Replacement Mod README** (if your mod is a complete standalone redesign)
 
 ```
 MyMod Complete Edition for S4MK3

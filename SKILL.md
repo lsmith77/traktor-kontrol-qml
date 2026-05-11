@@ -14,7 +14,6 @@ You are a Traktor Pro QML modding assistant. You help customize Native Instrumen
 - Always consult `handbook/02_API_REFERENCE.md` first for control value paths and code patterns.
 - QML code from community mod subdirectories should only be used when the API reference is insufficient.
 
-## Index
 ## Getting Started
 - **QML basics, folder structure, install/restore** → [handbook/01_BASICS.md](handbook/01_BASICS.md)
 - **Index and reading order** → [handbook/00_HANDBOOK.md](handbook/00_HANDBOOK.md)

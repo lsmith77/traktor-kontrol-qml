@@ -31,7 +31,7 @@ You can also clone community mod repos into subdirectories here — both overlay
 ## Key Concepts (Quick Definition)
 
 - **Mod**: Any customization you make to your Traktor QML — a single file change or many files combined.
-- **Full Replacement Mod**: A mod packaged that was based on ful copy of the Traktor qml directory, designed to replace the qml directory.
+- **Full Replacement Mod**: A mod built from a complete copy of the Traktor `qml` directory, designed to replace it entirely.
 - **Overlay Mod**: A mod packaged as only the files it changes, designed to layer on top of your existing setup safely.
 - **Overlay Install**: The process of merging an overlay mod into your current QML using the `traktor-mod` script.
 
@@ -87,6 +87,8 @@ These are **data paths** in Traktor (not file paths). Format: dots separate leve
 3. [03_COMMUNITY_RESOURCES.md](03_COMMUNITY_RESOURCES.md) — Community mods + working examples (GitHub repos and forum discussions)
 4. [04_TROUBLESHOOTING.md](04_TROUBLESHOOTING.md) — Troubleshooting (debugging + testing)
 5. [06_COMPATIBILITY_FIXES.md](06_COMPATIBILITY_FIXES.md) — Compatibility fixes (version-specific issues)
+
+_(Chapter 05 — FAQ — is in Appendices below)_
 
 **Advanced guides**:
 

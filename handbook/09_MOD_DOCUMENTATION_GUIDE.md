@@ -842,7 +842,7 @@ Write your feature .md file (Steps 1-5 above: title, features, files, settings, 
 
 This prompt helps you document which versions you're combining and identify conflicts.
 
-#### After AI Generates: Add Metadata Loc Filter File
+#### After AI Generates: Add Metadata Lock File
 
 When your combined QML is ready, add this metadata comment block at the **very top** of the file:
 
@@ -1201,22 +1201,21 @@ One-click → user finds all D2 features and knows where they live.
 
 ---
 
-## Real Example: X1MK3 Stem Mute Feature
+## Real Example: X1MK3 Stem/Remix Controls
 
 Here's a real feature taken from the X1MK3 Performance Mod to show what good documentation looks like.
 
-See: [X1MK3_stem-mute-pads.md](../X1MK3_TP4.4.1_PerformanceMod_12/stem-mute-pads.md)
+See: [X1_stem-remix-controls.md](../X1MK3_PerformanceMod/X1_stem-remix-controls.md)
 
 Key points from this real example:
 
-1. **Clear title**: "Stem Mute Pads for X1MK3" (not "stem feature mod thing")
-2. **What it does**: One paragraph explaining user experience
-3. **Features list**: Exactly what capabilities
-4. **Modified files**: Just `CSI/Common/Deck_S8Style.qml` (single file!)
-5. **Settings block**: Marked with exact `// --- MOD SETTINGS ---` delimiters
-6. **Before/After blocks**: Each change shown explicitly
-7. **Testing checklist**: Clear pass/fail tests
-8. **Compatibility**: What it conflicts with, what it requires
+1. **Clear title**: "X1MK3 Stem/Remix Controls (Superknobs, Quantization, Beat Counter)" — names the controller, the feature, and the sub-capabilities up front
+2. **Brief description**: One paragraph after the "See Also" links explaining what the feature does at a glance
+3. **Features list**: Specific capabilities bulleted (Superknob Controls, Capture Source Selection, Quantization Toggle, Remix Beat Counter, etc.)
+4. **Modified files**: Three files listed with a one-line description each — `CSI/X1MK3/X1MK3FXSection.qml`, `CSI/X1MK3/X1MK3Deck.qml`, `Screens/X1MK3/DeckView.qml`
+5. **Implementation Patterns**: Each change section uses a Description + code block ("Implementation Pattern") rather than Before/After blocks — acceptable when there is no git history to diff against
+6. **Testing checklist**: Detailed nested tests covering each sub-feature (Superknob volume, filter, mute, FX send, capture source, quantization, beat counter)
+7. **Dependencies**: "Requires" and "Optional" sections listing prerequisite features and hardware — note this file uses "Dependencies" rather than the template's "Compatibility" heading, and omits an explicit "Conflicts With" section
 
 This is the standard every feature should follow.
 

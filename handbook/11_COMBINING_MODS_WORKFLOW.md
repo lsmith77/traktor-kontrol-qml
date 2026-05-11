@@ -38,7 +38,7 @@ This proves the workflow works. You can do the same thing.
 
 **1. Read the handbook** (this can be done online, no checkout/download required):
 
-- [Chapter 09: Mod Documentation Guide](https://github.com/lsmith77/traktor-kontrol-qml/blob/main/09_MOD_DOCUMENTATION_GUIDE.md) — Understand versioning, metadata lock files, how to find version info
+- [Chapter 09: Mod Documentation Guide](09_MOD_DOCUMENTATION_GUIDE.md) — Understand versioning, metadata lock files, how to find version info
 - This chapter explains the _why_ behind the workflow
 
 **2. Gather mod information** about each mod you want to combine:

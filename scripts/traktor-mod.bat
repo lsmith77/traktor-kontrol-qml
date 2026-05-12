@@ -44,7 +44,7 @@ setlocal enabledelayedexpansion
 
 :: Check for admin rights and re-launch elevated if needed, forwarding all args
 net session >nul 2>&1
-if %errorLevel% == 0 (
+if !ERRORLEVEL! EQU 0 (
     goto :admin_ok
 ) else (
     echo Requesting administrative privileges...
@@ -52,13 +52,12 @@ if %errorLevel% == 0 (
 )
 
 :uac_prompt
-    echo Set UAC = CreateObject("Shell.Application") > "%temp%\getadmin.vbs"
-    echo UAC.ShellExecute "%~f0", "%*", "%CD%", "runas", 1 >> "%temp%\getadmin.vbs"
-    "%temp%\getadmin.vbs"
+    :: Note: arguments containing spaces in --source paths may not survive re-launch.
+    :: In that case, right-click the script and choose "Run as administrator" directly.
+    powershell -NoProfile -Command "Start-Process -FilePath '%~f0' -ArgumentList '%*' -Verb RunAs -WorkingDirectory '%CD%'"
     exit /B
 
 :admin_ok
-    if exist "%temp%\getadmin.vbs" ( del "%temp%\getadmin.vbs" )
 
 :: Check for help flag first
 for %%A in (%*) do (
@@ -82,7 +81,6 @@ set "TRAKTOR_APP=C:\Program Files\Native Instruments\Traktor Pro 4\Traktor Pro 4
 
 :: Logger cache paths
 set "LOGGER_CACHE_DIR=%USERPROFILE%\.traktor-mod\traktor-logger"
-set "LOGGER_GITHUB_URL=https://raw.githubusercontent.com/lsmith77/traktor-logger/main"
 
 :: --- initialize variables ---
 
@@ -260,6 +258,12 @@ goto :parse_args
 
 :end_parse_args
 
+:: Catch -s/--source with no following argument (NEXT_IS_SOURCE still true means value was never set)
+if "!NEXT_IS_SOURCE!"=="true" (
+    echo Error: -s/--source requires a directory path
+    goto :end_error
+)
+
 :: --- RESTORE MODE ---
 
 if /I "!MODE!"=="restore" (
@@ -289,13 +293,13 @@ if /I "!MODE!"=="restore" (
         echo   traktor-mod.bat restore /pull
         goto :end_error
     )
-    echo Restoring stock qml from backup...
-    echo.
-    set /p CONFIRM="Are you sure you want to restore stock qml? (y/n): "
+    echo This will restore stock qml, removing ALL mods and symlinks.
+    set /p CONFIRM="Are you sure? (y/n): "
     if /I not "!CONFIRM!"=="y" (
         echo Restore cancelled.
         goto :end
     )
+    echo Restoring stock qml from backup...
     rmdir /s /q "!TRAKTOR_QML!" 2>nul
     if !ERRORLEVEL! NEQ 0 (
         echo Error: Could not delete current qml folder. Is Traktor running?
@@ -339,13 +343,6 @@ if "!START_TRAKTOR!"=="true" (
 )
 
 :: --- STANDARD INSTALL MODE ---
-
-echo.
-echo ╔════════════════════════════════════════════════════════════════╗
-echo ║ Traktor Mod Installer (Windows) - Full Featured Edition        ║
-echo ║ Supports: overlay/full modes, symlinks, logger, metadata       ║
-echo ╚════════════════════════════════════════════════════════════════╝
-echo.
 
 if not exist "!TRAKTOR_QML!" (
     echo Error: Traktor Pro 4 not found at expected path.
@@ -414,6 +411,7 @@ if "!FULL!"=="true" (
         mklink /d "!TRAKTOR_QML!" "!MOD_QML_ABS!" >nul 2>&1
         if !ERRORLEVEL! NEQ 0 (
             echo Error: Could not create symlink. Make sure you have sufficient permissions.
+            echo   The live qml was already removed. Run: traktor-mod restore
             goto :end_error
         )
         echo Done.
@@ -427,11 +425,12 @@ if "!FULL!"=="true" (
             echo Error: Could not delete current qml folder. Is Traktor running?
             goto :end_error
         )
-        robocopy "!MOD_QML!" "!TRAKTOR_QML!" /E /COPYALL /NFL /NDL /NJH /NJS >nul
+        robocopy "!MOD_QML!" "!TRAKTOR_QML!" /E /NFL /NDL /NJH /NJS >nul
         if !ERRORLEVEL! LEQ 7 (
             echo Done.
         ) else (
             echo Error: Could not copy mod files. Aborting.
+            echo   The live qml was already removed. Run: traktor-mod restore
             goto :end_error
         )
     )
@@ -464,7 +463,8 @@ if "!FULL!"=="true" (
         echo Symlinks point to: !MOD_QML_ABS!
         echo Edit files there and restart Traktor - no reinstall needed.
     ) else (
-        echo Warning: Some symlinks could not be created. Check file permissions.
+        echo Error: Some symlinks could not be created. Check file permissions.
+        goto :end_error
     )
 ) else (
     echo Installing mod (merging overlay into Traktor qml)...
@@ -580,32 +580,6 @@ if "!PULL_REF!"=="" (
 call :download_traktor_logger_from_github "!PULL_REF!" "!PULL_REF_TYPE!"
 endlocal
 exit /b %ERRORLEVEL%
-
-:get_logger_qml_path
-:: Get path to Logger.qml (download if needed)
-:: Returns path via named variable %1
-setlocal enabledelayedexpansion
-set "CACHE_FILE=!LOGGER_CACHE_DIR!\qml\Defines\Logger.qml"
-
-if exist "!CACHE_FILE!" (
-    endlocal & set "%~1=!CACHE_FILE!"
-    exit /b 0
-)
-
-:: Not in cache - try downloading the full package
-call :download_traktor_logger_from_github "!BRANCH!"
-if !ERRORLEVEL! NEQ 0 (
-    endlocal
-    exit /b 1
-)
-
-if exist "!CACHE_FILE!" (
-    endlocal & set "%~1=!CACHE_FILE!"
-    exit /b 0
-) else (
-    endlocal
-    exit /b 1
-)
 
 :enable_metadata_traktor
 :: Enable metadata for Traktor's installed QML
@@ -737,7 +711,7 @@ powershell -NoProfile -Command ^
     "  $relPath = $file.FullName.Substring($traktorQml.Length + 1);" ^
     "  if ($content -match 'ApiBrowser') { Write-Host \"  [OK] ${relPath}: browser monitoring already enabled\"; continue };" ^
     "  $fileRelToScreens = $file.DirectoryName.Substring($screensDir.Length).TrimStart('\');" ^
-    "  if ($fileRelToScreens -eq '') { $depth = 0 } else { $depth = ($fileRelToScreens -split '\\').Count };" ^
+    "  $depth = [regex]::Matches($fileRelToScreens, '\\').Count;" ^
     "  $importPath = ('../' * ($depth + 1)).TrimEnd('/') + 'Common';" ^
     "  if ($content -match 'isLeftScreen') { $browserLine = '  LoggerScreens.ApiBrowser { active: isLeftScreen }' }" ^
     "  else { $browserLine = '  LoggerScreens.ApiBrowser {}' };" ^
@@ -806,7 +780,7 @@ if defined PYTHON_CMD (
     :: Find server.py - check cache
     if not exist "!LOGGER_CACHE_DIR!\server.py" (
         echo Downloading server from GitHub...
-        call :download_traktor_logger_from_github "!BRANCH!"
+        call :download_traktor_logger_from_github "!BRANCH!" "!BRANCH_REF_TYPE!"
     )
     if exist "!LOGGER_CACHE_DIR!\server.py" (
         echo Server running on http://localhost:8080
@@ -875,9 +849,10 @@ exit /b 1
     echo   traktor-mod.bat -s C:\path\to\mod - use specific directory
     echo.
     echo Logger Cache Options (used with 'logger pull'):
-    echo   /branch ^<name^>        - pull from a specific GitHub branch (default: main)
-    echo   --source ^<path^>           - copy from a local traktor-logger directory
-    echo   --symlink (with --source) - symlink local directory into cache instead of copying
+    echo   /tag ^<name^>           - pull a specific release tag (e.g. v1.2.0)
+    echo   /branch ^<name^>        - pull from a specific GitHub branch (default: latest release)
+    echo   --source ^<path^>       - copy from a local traktor-logger directory
+    echo   /symlink (with --source) - symlink local directory into cache instead of copying
     echo.
     echo Help:
     echo   traktor-mod.bat -h              - show this help
@@ -973,21 +948,27 @@ powershell -NoProfile -Command ^
     "  $qmlSrc = Join-Path $inner.FullName 'qml';" ^
     "  if (-not (Test-Path $qmlSrc)) { Write-Error 'No qml folder found in downloaded archive'; exit 1 };" ^
     "  if (Test-Path '!TRAKTOR_QML!') { Remove-Item -Path '!TRAKTOR_QML!' -Recurse -Force };" ^
-    "  if (Test-Path '!TRAKTOR_QML_BACKUP!') { Remove-Item -Path '!TRAKTOR_QML_BACKUP!' -Recurse -Force };" ^
     "  Copy-Item -Path $qmlSrc -Destination '!TRAKTOR_QML!' -Recurse;" ^
+    "  if (Test-Path '!TRAKTOR_QML_BACKUP!') { Remove-Item -Path '!TRAKTOR_QML_BACKUP!' -Recurse -Force };" ^
     "  Remove-Item '!TMP_ZIP!', '!TMP_DIR!' -Recurse -Force -ErrorAction SilentlyContinue;" ^
     "  Write-Host 'Done.'" ^
     "} catch { Write-Error $_; exit 1 } }"
 
-if !ERRORLEVEL! NEQ 0 (
-    echo Error: Failed to download or extract QML files for tag: !SELECTED_TAG!
-    endlocal
-    exit /b 1
-)
+if !ERRORLEVEL! NEQ 0 goto :restore_github_fail
 
 echo Restart Traktor to apply.
 endlocal
 exit /b 0
+
+:restore_github_fail
+echo Error: Failed to download or extract QML files for tag: !SELECTED_TAG!
+if exist "!TRAKTOR_QML_BACKUP!" (
+    echo   Backup still intact. Run: traktor-mod.bat restore
+) else (
+    echo   No backup found. Run: traktor-mod.bat restore /pull to try again.
+)
+endlocal
+exit /b 1
 
 :end_error
     echo.
@@ -997,6 +978,5 @@ exit /b 0
 
 :end
     echo.
-    pause
     endlocal
     exit /b 0

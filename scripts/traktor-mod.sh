@@ -144,33 +144,6 @@ check_traktor_installed() {
     fi
 }
 
-# --- logger utility (hybrid: local → cached → github) ---
-
-
-
-get_logger_qml() {
-    # Returns path to Logger.qml using hybrid fallback chain: cache → GitHub
-    local logger_path="$SERVER_CACHE_DIR/qml/Defines/Logger.qml"
-    local logger_url="$SERVER_GITHUB_REPO/qml/Defines/Logger.qml"
-    # 1. Check cache (for offline use, one-time download)
-    if [ -f "$logger_path" ]; then
-        echo "$logger_path"
-        return 0
-    fi
-    # 2. Download from GitHub (first-time setup, requires internet)
-    echo "Downloading Logger.qml from GitHub..." >&2
-    mkdir -p "$(dirname "$logger_path")"
-    if ! curl -sS -o "$logger_path" "$logger_url"; then
-        echo "Error: Failed to download Logger.qml from GitHub" >&2
-        echo "URL: $logger_url" >&2
-        return 1
-    fi
-    echo "Downloaded to: $logger_path" >&2
-    echo "$logger_path"
-    return 0
-}
-
-
 # --- traktor-logger server caching (metadata + manual logging system) ---
 
 SERVER_CACHE_DIR="$HOME/.traktor-mod/traktor-logger"
@@ -640,7 +613,6 @@ SOURCE_DIR="."
 # --- argument parsing ---
 BRANCH=""
 BRANCH_REF_TYPE="heads"
-SERVER_GITHUB_REPO="https://raw.githubusercontent.com/lsmith77/traktor-logger/main"
 LOGGER_LOCAL_PATH=""
 while [ $# -gt 0 ]; do
     arg="$1"

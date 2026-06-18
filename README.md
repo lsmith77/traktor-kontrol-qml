@@ -137,3 +137,14 @@ This documentation was inspired by community customizations from:
 - **[Traktor Kontrol Screens (tipesoft edition)](https://github.com/kokernutz/traktor-kontrol-screens)** by @tipesoft / @TraktorSimpleScreen - 7 spectrum waveform color themes, Camelot key display, hotcue bar, phase meter, flux reverse, Prefs.qml system, with contributions from kokernutz, jlertle, derzw3rg, and MrPatben8 (TP 3.10-3.11)
 - **[Flux Marker Fix](https://community.native-instruments.com/discussion/1202/dysfunctional-flux-marker-repaired)** - Community fix for broken flux marker on hardware screens (Traktor 3.5+)
 - Various contributions from the Native Instruments community forums
+
+---
+
+## License
+
+This repository is dual-licensed:
+
+- **QML mods, handbook, and documentation** are released under
+  [CC0 1.0 Universal](LICENSE) (a public-domain dedication) — see [LICENSE](LICENSE).
+- **The install scripts** in [scripts/](scripts/) (`traktor-mod.sh`, `traktor-mod.bat`)
+  are licensed under the [MIT License](scripts/LICENSE) — see [scripts/LICENSE](scripts/LICENSE).

@@ -1,4 +1,5 @@
 #!/bin/bash
+# SPDX-License-Identifier: MIT
 # NOTE: This script is vibe coded via AI with minimal code review. Use with caution and review before production use.
 # traktor-mod.sh — Install a QML overlay mod into Traktor Pro 4 (macOS)
 #

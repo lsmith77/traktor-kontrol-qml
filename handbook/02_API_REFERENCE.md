@@ -638,6 +638,7 @@ app.traktor.[context].[id/index].[category].[property]
 | Cues & Hotcues        | [Cue Points & Hotcues](#cue-points--hotcues)             |
 | Beatgrid              | [Beatgrid & Analysis](#beatgrid--analysis)               |
 | Freeze Mode           | [Freeze & Advanced Features](#freeze--advanced-features) |
+| Deck View Controls    | [Deck View Controls](#deck-view-controls)                |
 | Stem Deck             | [Stem Deck](#stem-deck)                                  |
 | Remix Deck            | [Remix Deck](#remix-deck)                                |
 | Mixer                 | [Mixer](#mixer)                                          |
@@ -805,6 +806,15 @@ app.traktor.[context].[id/index].[category].[property]
 | `app.traktor.decks.X.freeze.is_slicer_mode` | bool            | Slicer vs looper            | Mode indicator       |
 | `app.traktor.decks.X.platter.touch`         | bool            | Jog wheel touched           | Contact detection    |
 | `app.traktor.decks.X.platter.move`          | trigger         | Jog wheel moved             | Scratch/seek         |
+
+---
+
+### Deck View Controls
+
+| Path                                          | Type             | Purpose                        | Values           |
+| --------------------------------------------- | ---------------- | ------------------------------ | ---------------- |
+| `app.traktor.decks.X.view.show_advanced_panel` | int              | Show/hide advanced panel       | 0 = hidden, 1 = visible |
+| `app.traktor.decks.X.view.select_advanced_panel` | int            | Select advanced panel tab      | 0–4 (tab index)  |
 
 ---
 
